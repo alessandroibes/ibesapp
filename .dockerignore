@@ -1,0 +1,10 @@
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.expo
+.git
+.local
+.env
+artifacts
+TestResults

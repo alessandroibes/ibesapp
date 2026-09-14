@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Embaixadores do Rei",
+    "slug": "ibes",
+    "scheme": "ibes",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "org.ibes.app"
+    },
+    "android": {
+      "package": "org.ibes.app"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

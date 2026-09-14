@@ -1,0 +1,51 @@
+name: ibes
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ibes
+      POSTGRES_USER: ibes
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD em .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ibes -d ibes"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  migrate:
+    build: .
+    command: ["--migrate"]
+    environment: &api-environment
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Postgres: Host=postgres;Database=ibes;Username=ibes;Password=${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD}
+      Auth__Issuer: https://localhost:7443/
+      Bootstrap__Enabled: "true"
+      Bootstrap__Password: ${BOOTSTRAP_PASSWORD:?Configure BOOTSTRAP_PASSWORD}
+      ASPNETCORE_URLS: https://+:8443;http://+:8080
+      ASPNETCORE_HTTPS_PORT: "7443"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /certs/localhost.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${CERT_PASSWORD:?Configure CERT_PASSWORD}
+      DataProtection__Certificate: /certs/localhost.pfx
+      DataProtection__CertificatePassword: ${CERT_PASSWORD:?Configure CERT_PASSWORD}
+    volumes:
+      - ./.local:/certs:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    build: .
+    environment: *api-environment
+    ports:
+      - "127.0.0.1:7443:8443"
+    volumes:
+      - ./.local:/certs:ro
+      - data-protection:/home/app/.aspnet/DataProtection-Keys
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+volumes:
+  postgres-data:
+  data-protection:

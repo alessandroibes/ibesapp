@@ -2,7 +2,8 @@
 
 ## Produto e plataforma
 - Multi-organização/multi-tenant.
-- Primeiro tenant: Embaixada James Jackson Taylor, nome usual Embaixada J. J. Taylor.
+- Cada Igreja é um tenant e possui exatamente uma Embaixada.
+- Primeiro tenant real: a Igreja da Embaixada James Jackson Taylor (Embaixada J. J. Taylor); identificação da Igreja ainda não informada. Não criar dados reais presumidos.
 - O produto deverá poder evoluir para sistema completo da igreja.
 - Pais/responsáveis não terão acesso no MVP.
 - Mobile inicialmente para Conselheiros/liderança adulta.
@@ -16,6 +17,14 @@
 - React Native + Expo + Expo Router.
 - ASP.NET Core Identity + OpenIddict.
 - Containers + PostgreSQL gerenciado.
+- Conta adulta única, com vínculos e permissões independentes por Igreja.
+- Web com BFF e cookie de sessão HttpOnly; credenciais OAuth não são entregues ao JavaScript web.
+- Mobile com Authorization Code + PKCE no navegador do sistema.
+- CI no GitHub Actions.
+
+## Fundação — confirmação de 14/09/2026
+- Igreja define o limite de isolamento; o escopo da Embaixada é o mesmo tenant, dada a relação 1:1.
+- O bootstrap usa somente dados fictícios de desenvolvimento, ativados explicitamente. Provisionamento real, convites e recuperação de contas não estão definidos nesta fase.
 
 ## Embaixadores
 - Faixa geral: 9 a 17 anos.

@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ibes.Api/Ibes.Api.csproj" />
+    <Project Path="src/Ibes.Foundation/Ibes.Foundation.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/">
+    <Project Path="src/Modules/Ibes.AcervoHistorico/Ibes.AcervoHistorico.csproj" />
+    <Project Path="src/Modules/Ibes.AgendaAtividades/Ibes.AgendaAtividades.csproj" />
+    <Project Path="src/Modules/Ibes.Competicoes/Ibes.Competicoes.csproj" />
+    <Project Path="src/Modules/Ibes.ConsuladosDiretoria/Ibes.ConsuladosDiretoria.csproj" />
+    <Project Path="src/Modules/Ibes.Embaixadas/Ibes.Embaixadas.csproj" />
+    <Project Path="src/Modules/Ibes.Financeiro/Ibes.Financeiro.csproj" />
+    <Project Path="src/Modules/Ibes.Frequencia/Ibes.Frequencia.csproj" />
+    <Project Path="src/Modules/Ibes.Pessoas/Ibes.Pessoas.csproj" />
+    <Project Path="src/Modules/Ibes.Progressao/Ibes.Progressao.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ibes.IntegrationTests/Ibes.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

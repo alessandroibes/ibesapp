@@ -1,0 +1,228 @@
+@import "tailwindcss";
+:root {
+  --background: #f6f4ed;
+  --foreground: #183a38;
+  --primary: #183a38;
+  --primary-foreground: #fff;
+  --ring: #9b6b12;
+}
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ring: var(--ring);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, sans-serif;
+}
+a {
+  color: inherit;
+}
+button,
+a,
+select {
+  touch-action: manipulation;
+}
+a:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
+}
+.app {
+  max-width: 1440px;
+  margin: auto;
+}
+header {
+  padding: 28px 6%;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  border-bottom: 1px solid #d8dbd0;
+}
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.5;
+}
+.simbolo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 50px;
+  background: #183a38;
+  color: #f4d98e;
+  border-radius: 4px 4px 20px 20px;
+  font-size: 17px;
+  letter-spacing: 0;
+}
+.assinatura {
+  margin-left: auto;
+  font-size: 13px;
+  color: #4f625c;
+}
+main {
+  padding: 60px 9% 24px;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #526258;
+  margin: 0 0 16px;
+}
+h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(38px, 5vw, 66px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+h1 em {
+  color: #526b4b;
+  font-weight: 400;
+}
+.introducao {
+  color: #526258;
+  font-size: 17px;
+  max-width: 470px;
+  line-height: 1.7;
+  margin: 25px 0 38px;
+}
+.painel {
+  border: 1px solid #cbd1c3;
+  border-top: 4px solid #b68a35;
+  background: #fffdf8;
+  border-radius: 4px;
+  padding: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  min-height: 200px;
+}
+h2 {
+  font-family: Georgia, serif;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 400;
+  margin: 0;
+}
+h3 {
+  font-weight: 700;
+  margin: 8px 0;
+}
+.acesso {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.acesso p {
+  margin: 0;
+  line-height: 1.65;
+  color: #526258;
+}
+.acesso a {
+  gap: 25px;
+  justify-self: start;
+  text-decoration: none;
+}
+.acesso label {
+  font-size: 13px;
+  font-weight: 700;
+}
+select {
+  width: 100%;
+  min-height: 44px;
+  font: inherit;
+  background: white;
+  color: #183a38;
+  border: 1px solid #71817c;
+  border-radius: 6px;
+  padding: 10px;
+}
+.nota {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 30px 0;
+  color: #596653;
+}
+.nota > span {
+  font-size: 30px;
+  color: #886622;
+}
+.nota p {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  margin: 0;
+}
+.nota small {
+  display: block;
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  margin-top: 5px;
+}
+footer {
+  padding: 22px 6%;
+  border-top: 1px solid #d8dbd0;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  font-size: 10px;
+  color: #596653;
+  letter-spacing: 0.05em;
+}
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: 10px;
+  top: 10px;
+  background: white;
+  padding: 10px;
+  z-index: 2;
+}
+[role="alert"] {
+  color: #972b25;
+}
+@media (max-width: 650px) {
+  header {
+    padding: 22px 6%;
+  }
+  .assinatura {
+    display: none;
+  }
+  header > button {
+    margin-left: auto;
+  }
+  main {
+    padding: 40px 6% 12px;
+  }
+  .painel {
+    grid-template-columns: 1fr;
+    padding: 24px;
+    gap: 24px;
+  }
+  .introducao {
+    font-size: 16px;
+  }
+  footer {
+    flex-direction: column;
+  }
+  h1 {
+    font-size: 40px;
+  }
+}
