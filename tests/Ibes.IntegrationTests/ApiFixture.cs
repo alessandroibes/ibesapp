@@ -3,6 +3,8 @@ using System.Text.RegularExpressions;
 using Ibes.Foundation.Identidade;
 using Ibes.Foundation.Organizacoes;
 using Ibes.Foundation.Persistence;
+using Ibes.Pessoas;
+using Ibes.Embaixadas;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -48,7 +50,10 @@ public sealed class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
         {
             db.Igrejas.Add(new Igreja { IgrejaId = IgrejaA, Nome = "Igreja A" });
             db.Embaixadas.Add(new Embaixada { IgrejaId = IgrejaA, Nome = "Embaixada A" });
-            db.VinculosIgreja.Add(new VinculoIgreja { IgrejaId = IgrejaA, UsuarioId = UsuarioId, Permissoes = [Permissoes.ConsultarFundacao, Permissoes.ConsultarAuditoria] });
+            db.VinculosIgreja.Add(new VinculoIgreja { IgrejaId = IgrejaA, UsuarioId = UsuarioId, Permissoes = Permissoes.Todas });
+            var pessoa = new Pessoa { IgrejaId = IgrejaA, Nome = "Conselheiro de teste", DataNascimento = new DateOnly(1980, 1, 1) };
+            db.Add(pessoa);
+            db.Add(new Conselheiro { IgrejaId = IgrejaA, PessoaId = pessoa.Id, UsuarioId = UsuarioId, DataInicio = new DateOnly(2020, 1, 1), Funcao = "Conselheiro" });
             await db.SaveChangesAsync();
         });
         await NaIgreja(IgrejaB, async db =>

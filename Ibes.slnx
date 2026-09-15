@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Ibes.Api/Ibes.Api.csproj" />
     <Project Path="src/Ibes.Foundation/Ibes.Foundation.csproj" />
+    <Project Path="src/Ibes.Infrastructure/Ibes.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Modules/">
     <Project Path="src/Modules/Ibes.AcervoHistorico/Ibes.AcervoHistorico.csproj" />

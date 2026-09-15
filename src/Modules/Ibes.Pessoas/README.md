@@ -1,5 +1,5 @@
 # Pessoas
 
-Limite de módulo reservado pela Fase 0. Nenhuma regra, entidade de produto ou endpoint implementado.
-As próximas fases organizam casos de uso em vertical slices dentro deste projeto, com contratos explícitos entre módulos.
-Não acessar tabelas de outros módulos nem inferir permissões a partir de cargos ou postos.
+Fase 1: Pessoa, Responsável, vínculo eclesiástico e foto privada. O cadastro é compartilhado pelos papéis de uma pessoa dentro da Igreja, sem criar login para meninos ou responsáveis.
+
+Entidades neste módulo; persistência em `Ibes.Infrastructure`; casos de uso HTTP em `Ibes.Api/Features/Dominio/PessoasEndpoints.cs`. Integrações com Conselheiros e jornada são compostas na API. Permissões e isolamento são verificados independentemente dos papéis de negócio.

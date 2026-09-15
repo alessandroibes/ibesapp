@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "./components/ui/button";
 import type { components } from "../../../packages/contracts/api";
+import { Dominio } from "./dominio/Dominio";
 
 type Igreja = components["schemas"]["IgrejaResponse"];
 type Contexto = components["schemas"]["ContextoResponse"];
@@ -167,8 +168,8 @@ export function App() {
                     <div role="status">
                       <h3>{contexto.embaixada}</h3>
                       <p>
-                        Seu espaço está pronto para receber as próximas
-                        funcionalidades.
+                        Consulte pessoas, acompanhe a jornada ER e mantenha os
+                        registros da sua Embaixada.
                       </p>
                     </div>
                   ) : (
@@ -185,6 +186,15 @@ export function App() {
             “Somos embaixadores por Cristo.”<small>2 Coríntios 5:20</small>
           </p>
         </aside>
+        {estado === "pronto" &&
+        contexto?.permissoes?.length &&
+        !erroContexto ? (
+          <Dominio
+            key={igrejaId}
+            igrejaId={igrejaId}
+            permissoes={contexto.permissoes}
+          />
+        ) : null}
       </main>
       <footer>
         <span>EMBAIXADORES DO REI</span>

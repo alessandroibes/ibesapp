@@ -89,7 +89,7 @@ npx openapi-typescript ../../artifacts/openapi.json -o ../../packages/contracts/
 
 ```powershell
 dotnet tool restore
-dotnet ef migrations script --idempotent --project src/Ibes.Foundation --startup-project src/Ibes.Api --output artifacts/migrations.sql
+dotnet ef migrations script --idempotent --project src/Ibes.Infrastructure --startup-project src/Ibes.Api --output artifacts/migrations.sql
 ```
 
 Configurar a connection string no ambiente antes do comando. Em implantação, revisar/aplicar migração separadamente e verificar readiness; não executar rollback destrutivo automaticamente.

@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.RateLimiting;
 using Ibes.Api.Features;
+using Ibes.Api.Features.Dominio;
+using Microsoft.AspNetCore.Antiforgery;
 using Ibes.Api.Infrastructure;
 using Ibes.Foundation.Identidade;
 using Ibes.Foundation.Organizacoes;
@@ -25,6 +27,8 @@ builder.Services.AddProblemDetails(o => o.CustomizeProblemDetails = c =>
     c.ProblemDetails.Extensions["traceId"] = Activity.Current?.TraceId.ToString() ?? c.HttpContext.TraceIdentifier);
 builder.Services.AddExceptionHandler<SafeExceptionHandler>();
 builder.Services.AddScoped<TenantContext>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<Relogio>();
 builder.Services.AddDbContext<AppDbContext>(o =>
 {
     o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")
@@ -67,7 +71,7 @@ builder.Services.AddAuthentication(o =>
 builder.Services.AddAuthorization(o =>
 {
     o.FallbackPolicy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    foreach (var permission in new[] { Permissoes.ConsultarFundacao, Permissoes.ConsultarAuditoria })
+    foreach (var permission in Permissoes.Todas)
         o.AddPolicy(permission, p => p.RequireAuthenticatedUser().RequireAssertion(c =>
             c.Resource is HttpContext http && http.Items["permissoes"] is string[] permissions && permissions.Contains(permission)));
 });
@@ -83,7 +87,23 @@ var protection = builder.Services.AddDataProtection().SetApplicationName("ibes")
 if (builder.Configuration["DataProtection:Certificate"] is { Length: > 0 } protectionCertificate)
     protection.ProtectKeysWithCertificate(X509CertificateLoader.LoadPkcs12FromFile(
         protectionCertificate, builder.Configuration["DataProtection:CertificatePassword"]));
-builder.Services.AddOpenApi("v1");
+builder.Services.AddOpenApi("v1", options => options.AddOperationTransformer((operation, context, ct) =>
+{
+    if (context.Description.RelativePath?.StartsWith("api/v1/", StringComparison.Ordinal) == true)
+    {
+        operation.Parameters ??= [];
+        if (!operation.Parameters.Any(p => p.Name == "X-Igreja-Id"))
+            operation.Parameters.Add(new Microsoft.OpenApi.OpenApiParameter
+            {
+                Name = "X-Igreja-Id",
+                In = Microsoft.OpenApi.ParameterLocation.Header,
+                Required = true,
+                Description = "Igreja selecionada. Exige vínculo e permissão da conta autenticada.",
+                Schema = new Microsoft.OpenApi.OpenApiSchema { Type = Microsoft.OpenApi.JsonSchemaType.String, Format = "uuid" }
+            });
+    }
+    return Task.CompletedTask;
+}));
 builder.Services.AddHealthChecks().AddCheck<PostgresHealthCheck>("postgres", tags: ["ready"]);
 builder.Services.AddRateLimiter(o =>
 {
@@ -163,10 +183,23 @@ app.Use(async (context, next) =>
 });
 app.UseMiddleware<TenantMiddleware>();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/api/v1") && !HttpMethods.IsGet(context.Request.Method) && !HttpMethods.IsHead(context.Request.Method)
+        && !context.Request.Headers.Authorization.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+    {
+        try { await context.RequestServices.GetRequiredService<IAntiforgery>().ValidateRequestAsync(context); }
+        catch (AntiforgeryValidationException) { await Results.Problem(statusCode: 400, title: "Requisição inválida. Atualize a página e tente novamente.").ExecuteAsync(context); return; }
+    }
+    await next(context);
+});
 app.UseAntiforgery();
 app.MapRazorPages().RequireRateLimiting("autenticacao");
 app.MapIdentidade();
 app.MapFundacao();
+app.MapPessoas();
+app.MapEmbaixada();
+app.MapProgressao();
 app.MapHealthChecks("/health/live", new() { Predicate = _ => false }).AllowAnonymous();
 app.MapHealthChecks("/health/ready", new() { Predicate = c => c.Tags.Contains("ready") }).AllowAnonymous();
 app.MapOpenApi().AllowAnonymous();

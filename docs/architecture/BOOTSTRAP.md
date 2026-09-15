@@ -1,5 +1,7 @@
 # Fundação executável — Fase 0
 
+Registro da entrega original do bootstrap. O estado atual das Fases 1 e 2, incluindo a extração da persistência para `Ibes.Infrastructure`, está em [Domínio](DOMAIN-FOUNDATION.md).
+
 Decisões confirmadas pelo usuário em 14/09/2026: Igreja é tenant; uma Embaixada por Igreja; conta adulta global com vínculos/permissões por Igreja; BFF web; Authorization Code + PKCE mobile; GitHub Actions.
 
 ## Organização do código

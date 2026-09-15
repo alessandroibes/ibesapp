@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Ibes.Foundation/Ibes.Foundation.csproj" />
+    <ProjectReference Include="../Modules/Ibes.Pessoas/Ibes.Pessoas.csproj" />
+    <ProjectReference Include="../Modules/Ibes.Embaixadas/Ibes.Embaixadas.csproj" />
+    <ProjectReference Include="../Modules/Ibes.Progressao/Ibes.Progressao.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11" PrivateAssets="all" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="7.7.0" />
+  </ItemGroup>
+</Project>

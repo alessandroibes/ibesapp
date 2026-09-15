@@ -9,11 +9,11 @@ public static class Fundacao
 {
     public static void MapFundacao(this WebApplication app)
     {
-        app.MapGet("/api/v1/contexto", async ([FromHeader(Name = "X-Igreja-Id")] Guid igrejaId, AppDbContext db, TenantContext tenant, CancellationToken ct) =>
+        app.MapGet("/api/v1/contexto", async ([FromHeader(Name = "X-Igreja-Id")] Guid igrejaId, AppDbContext db, TenantContext tenant, HttpContext http, CancellationToken ct) =>
         {
             var igreja = await db.Igrejas.AsNoTracking().SingleAsync(ct);
             var embaixada = await db.Embaixadas.AsNoTracking().SingleAsync(ct);
-            return TypedResults.Ok(new ContextoResponse(tenant.IgrejaId, igreja.Nome, embaixada.Nome));
+            return TypedResults.Ok(new ContextoResponse(tenant.IgrejaId, igreja.Nome, embaixada.Nome, (string[])http.Items["permissoes"]!));
         }).RequireAuthorization(Permissoes.ConsultarFundacao).WithName("ConsultarContexto")
             .WithDescription("Sessão BFF ou bearer OAuth com vínculo e permissão fundacao.consultar na Igreja selecionada.")
             .ProducesProblem(400).ProducesProblem(401).ProducesProblem(403);
@@ -29,5 +29,5 @@ public static class Fundacao
     }
 }
 
-public sealed record ContextoResponse(Guid IgrejaId, string Igreja, string Embaixada);
+public sealed record ContextoResponse(Guid IgrejaId, string Igreja, string Embaixada, string[] Permissoes);
 public sealed record AuditoriaResponse(Guid Id, DateTimeOffset CreatedAt, string Acao, string Entidade, string TraceId);

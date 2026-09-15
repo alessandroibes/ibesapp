@@ -19,6 +19,13 @@ Registrar conclusão oficial do posto anterior cria o ingresso no próximo posto
 
 ## Emérito
 Não inventar tarefas enquanto o manual não estiver finalizado.
+A conclusão do Sênior registra ingresso no Emérito na mesma data, sem manual; tarefas e conclusão do Emérito ficam indisponíveis até definição.
+
+## Idade e histórico
+O menino permanece Embaixador até a véspera de completar 18 anos. Depois disso, sua trajetória permanece acessível como histórico. É permitido cadastrar hoje pessoas adultas e lançar fatos ocorridos na idade ER; a validação usa a data de cada fato.
+
+## Versão durante o Posto
+A versão é escolhida no ingresso no Posto e permanece fixa até sua conclusão. Migração de edição não pertence a esta fase.
 
 ## Frequência
 Uma reunião pode registrar presença de membros e visitantes. A primeira reunião do menino é a menor data de presença válida.

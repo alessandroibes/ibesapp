@@ -1,6 +1,6 @@
 # ER — Starter completo para Codex
 
-Fundação executável da **Fase 0** disponível. As demais fases não foram implementadas.
+Fundação executável e **Fases 1 e 2** disponíveis: Pessoas, Igreja/Embaixada, Conselheiros, responsáveis, vínculos e jornada ER com manuais versionados e progressão histórica. O escopo implementado termina no prompt `01-domain-foundation.md`.
 
 ```powershell
 ./scripts/dev-setup.ps1
@@ -11,6 +11,8 @@ docker compose up --build -d
 Acesse `https://localhost:7443`. Conta fictícia: `adulto@example.test`; senha em `BOOTSTRAP_PASSWORD` no `.env` gerado.
 
 Consulte [execução local e validações](docs/operations/LOCAL-DEVELOPMENT.md), [arquitetura do bootstrap](docs/architecture/BOOTSTRAP.md) e [resultado das validações](docs/quality/BOOTSTRAP-VALIDATION.md).
+
+Para as Fases 1 e 2, consulte [funcionalidades e decisões técnicas](docs/architecture/DOMAIN-FOUNDATION.md) e [validações do domínio](docs/quality/DOMAIN-FOUNDATION-VALIDATION.md). O ambiente de demonstração não cria edições de manuais: informe a identificação real da edição na seção **Manuais** antes de registrar uma admissão.
 
 Fonte de verdade consolidada para o sistema de gestão da Organização Embaixadores do Rei.
 

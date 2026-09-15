@@ -28,6 +28,10 @@
 
 ## Embaixadores
 - Faixa geral: 9 a 17 anos.
+- O menino permanece Embaixador até a véspera de completar 18 anos. A condição atual é calculada, sem apagar sua trajetória ao completar 18.
+- É permitido cadastrar hoje pessoas maiores de 17 anos para registrar trajetórias históricas; a idade é validada na data de cada fato da jornada.
+- A conclusão do Sênior registra o ingresso como Emérito na mesma data, mesmo sem manual disponível. Tarefas e conclusão do Emérito permanecem indisponíveis até definição do manual.
+- A versão do manual fica vinculada ao ingresso em cada posto e não muda durante aquele posto. Migrações de edição não fazem parte desta fase.
 - Antes de completar Requisitos Mínimos, o menino é Candidato.
 - Requisitos Mínimos: Significado do nome Embaixador do Rei; Compromisso dos ER; Tema dos ER; Divisa dos ER; Hino Oficial dos ER.
 - Cada requisito registra sua data de conclusão.

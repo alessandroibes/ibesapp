@@ -1,6 +1,8 @@
 using Ibes.Foundation.Identidade;
 using Ibes.Foundation.Organizacoes;
 using Ibes.Foundation.Persistence;
+using Ibes.Pessoas;
+using Ibes.Embaixadas;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
@@ -44,7 +46,7 @@ public static class Bootstrap
         var db = services.GetRequiredService<AppDbContext>();
         var tenant = services.GetRequiredService<TenantContext>();
         tenant.Definir(IgrejaDevelopment, null, "bootstrap-development");
-        if (await db.Igrejas.AnyAsync()) return;
+        if (await db.Igrejas.AnyAsync()) { await CompletarDominioDevelopmentAsync(services); return; }
         await using var transaction = await db.Database.BeginTransactionAsync();
         var users = services.GetRequiredService<UserManager<Usuario>>();
         var email = "adulto@example.test";
@@ -61,9 +63,27 @@ public static class Bootstrap
         {
             IgrejaId = IgrejaDevelopment,
             UsuarioId = user.Id,
-            Permissoes = [OrganizacoesPermissoes.ConsultarFundacao, OrganizacoesPermissoes.ConsultarAuditoria]
+            Permissoes = OrganizacoesPermissoes.Todas
         });
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
+        await CompletarDominioDevelopmentAsync(services);
+    }
+
+    private static async Task CompletarDominioDevelopmentAsync(IServiceProvider services)
+    {
+        var db = services.GetRequiredService<AppDbContext>();
+        var usuario = await db.Users.SingleOrDefaultAsync(u => u.Email == "adulto@example.test");
+        if (usuario is null) return;
+        var vinculo = await db.VinculosIgreja.SingleOrDefaultAsync(v => v.UsuarioId == usuario.Id);
+        if (vinculo is null) return;
+        if (!vinculo.Permissoes.Order().SequenceEqual(OrganizacoesPermissoes.Todas.Order())) vinculo.Permissoes = OrganizacoesPermissoes.Todas;
+        if (!await db.Set<Conselheiro>().AnyAsync(c => c.UsuarioId == usuario.Id))
+        {
+            var pessoa = new Pessoa { IgrejaId = IgrejaDevelopment, Nome = "Conselheiro de demonstração", DataNascimento = new DateOnly(1980, 1, 1) };
+            db.Add(pessoa);
+            db.Add(new Conselheiro { IgrejaId = IgrejaDevelopment, PessoaId = pessoa.Id, UsuarioId = usuario.Id, DataInicio = new DateOnly(2020, 1, 1), Funcao = "Conselheiro" });
+        }
+        await db.SaveChangesAsync();
     }
 }

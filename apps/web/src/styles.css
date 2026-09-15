@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "./";
 :root {
   --background: #f6f4ed;
   --foreground: #183a38;
@@ -225,4 +226,142 @@ footer {
   h1 {
     font-size: 40px;
   }
+}
+.dominio {
+  margin: 28px 0 48px;
+  display: grid;
+  gap: 24px;
+}
+.dominio nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.dominio section,
+.dominio article {
+  min-width: 0;
+}
+.dominio h2 {
+  margin: 18px 0;
+}
+.dominio p {
+  line-height: 1.6;
+}
+.dominio input,
+.dominio textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #71817c;
+  border-radius: 6px;
+  background: white;
+  padding: 10px;
+  font: inherit;
+  color: #183a38;
+}
+.dominio :focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+.dominio label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.dominio details {
+  border: 1px solid #cbd1c3;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  background: #fffdf8;
+}
+.dominio summary {
+  cursor: pointer;
+  min-height: 32px;
+  font-weight: 700;
+}
+.formulario-dominio {
+  margin: 18px 0;
+}
+.formulario-dominio fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.formulario-dominio legend {
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.campos-dominio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.lista-dominio {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+.lista-dominio > li > strong,
+.lista-dominio > li > span {
+  display: block;
+}
+.lista-dominio > li > span {
+  margin-top: 6px;
+  color: #526258;
+}
+.pessoas-lista {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+  margin: 18px 0;
+}
+.pessoas-lista li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pessoas-lista li > span {
+  font-size: 13px;
+  color: #526258;
+}
+.acoes-dominio {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.lista-dominio > li,
+.dominio article {
+  padding: 18px;
+  border: 1px solid #cbd1c3;
+  border-radius: 8px;
+  background: #fffdf8;
+  margin: 12px 0;
+}
+.dominio dl {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 2fr;
+  gap: 12px;
+  overflow-wrap: anywhere;
+}
+.dominio dt {
+  font-weight: 600;
+}
+.dominio dd {
+  margin: 0;
+}
+.dominio img {
+  max-width: 160px;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.dominio button {
+  max-width: 100%;
+  white-space: normal;
 }

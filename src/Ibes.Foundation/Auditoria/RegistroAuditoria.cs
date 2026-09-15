@@ -11,4 +11,5 @@ public sealed class RegistroAuditoria : ITenantEntity
     public string Acao { get; set; } = "";
     public string Entidade { get; set; } = "";
     public string TraceId { get; set; } = "";
+    public string? Chave { get; set; }
 }

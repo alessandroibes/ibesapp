@@ -12,3 +12,5 @@ Correções aplicadas durante a fundação:
 Pendência: npm mobile reporta oito entradas moderadas, propagadas pela cadeia Expo Router / React Navigation / query-string / decode-uri-component. O advisory de origem é [GHSA-vcc3-ghjq-m6fr](https://github.com/advisories/GHSA-vcc3-ghjq-m6fr), sobre consumo excessivo de CPU ao decodificar entrada malformada. A correção de decode-uri-component está em uma versão ESM incompatível com o consumidor CommonJS atual. `npm audit fix --force` sugere downgrades incompatíveis do Expo/Router; não foi aplicado.
 
 Essa pendência não está resolvida e deve ser revisitada antes de distribuição do aplicativo. Não é uma autorização de release nem deve ser ocultada por desabilitar a auditoria. Builds nativos em dispositivos e hardening de release pertencem às validações seguintes, não foram declarados como concluídos pelo bootstrap.
+
+Revalidação em 15/09/2026 durante o prompt 01: a consulta atual reportou quatro entradas moderadas no mobile, sem altas/críticas; web e NuGet não reportaram vulnerabilidades. A pendência de origem permanece; a contagem retornada pelo serviço de auditoria mudou sem alteração dos lockfiles npm.

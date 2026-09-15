@@ -4,10 +4,14 @@ using Ibes.Foundation.Organizacoes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Ibes.Foundation.Domain;
+using Ibes.Pessoas;
+using Ibes.Embaixadas;
+using Ibes.Progressao;
 
 namespace Ibes.Foundation.Persistence;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TenantContext tenant)
+public sealed partial class AppDbContext(DbContextOptions<AppDbContext> options, TenantContext tenant)
     : IdentityDbContext<Usuario, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<Igreja> Igrejas => Set<Igreja>();
@@ -19,6 +23,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TenantC
     {
         base.OnModelCreating(b);
         b.UseOpenIddict();
+        ConfigurarDominio(b);
         b.Entity<Usuario>().ToTable("usuarios", "identidade");
         b.Entity<IdentityRole<Guid>>().ToTable("papeis", "identidade");
         b.Entity<IdentityUserRole<Guid>>().ToTable("usuarios_papeis", "identidade");
@@ -31,6 +36,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TenantC
             e.ToTable("igrejas", "organizacoes");
             e.HasKey(x => x.IgrejaId);
             e.Property(x => x.Nome).HasMaxLength(200);
+            e.Property(x => x.Versao).IsConcurrencyToken();
+            e.Property(x => x.Endereco).HasMaxLength(500);
+            e.Property(x => x.Pastor).HasMaxLength(200);
             e.HasQueryFilter(x => tenant.IgrejaId != Guid.Empty && x.IgrejaId == tenant.IgrejaId);
         });
         b.Entity<Embaixada>(e =>
@@ -38,6 +46,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TenantC
             e.ToTable("embaixadas", "organizacoes");
             e.HasKey(x => x.IgrejaId);
             e.Property(x => x.Nome).HasMaxLength(200);
+            e.Property(x => x.Versao).IsConcurrencyToken();
+            e.Property(x => x.NomeUsual).HasMaxLength(200);
+            e.Property(x => x.Endereco).HasMaxLength(500);
+            e.Property(x => x.Historia).HasMaxLength(10000);
             e.HasOne<Igreja>().WithOne().HasForeignKey<Embaixada>(x => x.IgrejaId).OnDelete(DeleteBehavior.Restrict);
             e.HasQueryFilter(x => tenant.IgrejaId != Guid.Empty && x.IgrejaId == tenant.IgrejaId);
         });
@@ -57,6 +69,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TenantC
             e.Property(x => x.Acao).HasMaxLength(100);
             e.Property(x => x.Entidade).HasMaxLength(100);
             e.Property(x => x.TraceId).HasMaxLength(100);
+            e.Property(x => x.Chave).HasMaxLength(200);
             e.HasOne<Igreja>().WithMany().HasForeignKey(x => x.IgrejaId).OnDelete(DeleteBehavior.Restrict);
             e.HasQueryFilter(x => tenant.IgrejaId != Guid.Empty && x.IgrejaId == tenant.IgrejaId);
         });
@@ -68,6 +81,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TenantC
             .Where(x => x.State is EntityState.Added or EntityState.Modified or EntityState.Deleted).ToList();
         foreach (var entry in alteracoes)
         {
+            if (entry.State != EntityState.Added && entry.Entity is VersaoManual or TarefaManual or Manual or ConclusaoRequisito or ConclusaoTarefa or CerimoniaReconhecimento)
+                throw new InvalidOperationException("Registro histórico ou versão de manual imutável.");
+            if (entry.Entity is JornadaPosto && entry.State == EntityState.Modified && entry.Property(nameof(JornadaPosto.VersaoManualId)).IsModified)
+                throw new InvalidOperationException("A versão do manual é fixa durante o posto.");
             if (tenant.IgrejaId == Guid.Empty || entry.Entity.IgrejaId != tenant.IgrejaId ||
                 (entry.State != EntityState.Added && entry.Property(nameof(ITenantEntity.IgrejaId)).OriginalValue is Guid original && original != tenant.IgrejaId))
                 throw new InvalidOperationException("Escrita fora da Igreja selecionada.");
@@ -82,9 +99,17 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, TenantC
                 IgrejaId = tenant.IgrejaId,
                 UsuarioId = tenant.UsuarioId,
                 TraceId = tenant.TraceId,
-                Acao = entry.State.ToString(),
-                Entidade = entry.Metadata.ClrType.Name
+                Acao = entry.State switch { EntityState.Added => "Criacao", EntityState.Modified => "Alteracao", _ => "Exclusao" },
+                Entidade = entry.Metadata.ClrType.Name,
+                Chave = string.Join("/", entry.Metadata.FindPrimaryKey()!.Properties.Select(p => entry.Property(p.Name).CurrentValue))
             });
+            if (entry.Entity is Entidade entidade)
+            {
+                entidade.Versao = Guid.NewGuid();
+                entidade.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+            if (entry.Entity is Igreja igreja) igreja.Versao = Guid.NewGuid();
+            if (entry.Entity is Embaixada embaixada) embaixada.Versao = Guid.NewGuid();
         }
     }
 

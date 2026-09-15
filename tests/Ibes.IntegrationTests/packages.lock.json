@@ -1131,7 +1131,7 @@
       "ibes.api": {
         "type": "Project",
         "dependencies": {
-          "Ibes.Foundation": "[1.0.0, )",
+          "Ibes.Infrastructure": "[1.0.0, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.10, )",
           "Microsoft.OpenApi": "[2.7.5, )",
           "OpenIddict.AspNetCore": "[7.7.0, )",
@@ -1141,12 +1141,37 @@
           "OpenTelemetry.Instrumentation.Http": "[1.18.0, )"
         }
       },
-      "ibes.foundation": {
+      "ibes.embaixadas": {
         "type": "Project",
         "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
+      "ibes.foundation": {
+        "type": "Project"
+      },
+      "ibes.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Embaixadas": "[1.0.0, )",
+          "Ibes.Foundation": "[1.0.0, )",
+          "Ibes.Pessoas": "[1.0.0, )",
+          "Ibes.Progressao": "[1.0.0, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[10.0.10, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
           "OpenIddict.EntityFrameworkCore": "[7.7.0, )"
+        }
+      },
+      "ibes.pessoas": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
+      "ibes.progressao": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
         }
       }
     }

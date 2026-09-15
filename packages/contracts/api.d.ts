@@ -121,10 +121,623 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pessoas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListarPessoas"];
+        put?: never;
+        post: operations["CadastrarPessoa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ConsultarPessoa"];
+        put: operations["AlterarPessoa"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/responsaveis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ResponsavelRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/vinculos-eclesiasticos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VinculoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/responsaveis/{vinculoId}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    vinculoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarVinculoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/vinculos-eclesiasticos/{vinculoId}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    vinculoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarVinculoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/foto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/embaixada": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ConsultarEmbaixada"];
+        put: operations["AlterarEmbaixada"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/embaixada/conselheiros": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListarConselheiros"];
+        put?: never;
+        post: operations["CadastrarConselheiro"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/embaixada/contas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListarContasDaIgreja"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/embaixada/conselheiros/{id}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarVinculoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/embaixada/liderancas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListarLiderancas"];
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LiderancaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/embaixada/liderancas/{id}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarVinculoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manuais": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListarVersoesManuais"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manuais/tarefas-conhecidas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ConsultarTarefasConhecidas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/manuais/versoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CadastrarVersaoManual"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/candidatura": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RegistrarCandidatura"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/jornada": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ConsultarJornada"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/jornada/requisitos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ConcluirRequisito"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/jornada/admissao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RegistrarAdmissao"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/jornada/tarefas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ConcluirTarefa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/jornada/conclusao-posto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ConcluirPosto"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/jornada/cerimonias": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RegistrarCerimonia"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AdmissaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            versaoManualId: string;
+            /** Format: date */
+            dataAdmissao: string;
+        };
+        AlterarPessoaRequest: {
+            /** Format: uuid */
+            versao: string;
+            dados: components["schemas"]["DadosPessoa"];
+        };
         AuditoriaResponse: {
             /** Format: uuid */
             id: string;
@@ -134,19 +747,246 @@ export interface components {
             entidade: string;
             traceId: string;
         };
+        CerimoniaRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            jornadaPostoId: string;
+            /** Format: date */
+            data: string;
+            descricao: string;
+        };
+        CerimoniaResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            jornadaPostoId: string;
+            /** Format: date */
+            data: string;
+            descricao: string;
+        };
+        ConcluirPostoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            proximaVersaoManualId: null | string;
+            /** Format: date */
+            dataConclusao: string;
+        };
+        ConcluirRequisitoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: int32 */
+            requisito: number | string;
+            /** Format: date */
+            dataConclusao: string;
+        };
+        ConcluirTarefaRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            tarefaManualId: string;
+            /** Format: date */
+            dataConclusao: string;
+        };
+        ConselheiroRequest: {
+            /** Format: uuid */
+            pessoaId: string;
+            /** Format: uuid */
+            versaoPessoa: string;
+            /** Format: uuid */
+            usuarioId: null | string;
+            funcao: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        ConselheiroResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            /** Format: uuid */
+            usuarioId: null | string;
+            funcao: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+        };
+        ContaResponse: {
+            /** Format: uuid */
+            id: string;
+            email: string;
+        };
         ContextoResponse: {
             /** Format: uuid */
             igrejaId: string;
             igreja: string;
             embaixada: string;
+            permissoes: string[];
         };
         CsrfResponse: {
             token: string;
+        };
+        DadosPessoa: {
+            nome: string;
+            /** Format: date */
+            dataNascimento: null | string;
+            naturalidade: null | string;
+            whatsApp: null | string;
+            endereco: null | string;
+            /** Format: date */
+            dataBatismo: null | string;
+            localBatismo: null | string;
+            numeroCarteira: null | string;
+            situacaoCarteira: null | string;
+            possuiBiblia: null | boolean;
+            observacoes: null | string;
+        };
+        EmbaixadaRequest: {
+            nomeIgreja: string;
+            enderecoIgreja: null | string;
+            pastor: null | string;
+            /** Format: uuid */
+            versaoIgreja: string;
+            nomeOficial: string;
+            nomeUsual: null | string;
+            /** Format: date */
+            dataFundacao: null | string;
+            enderecoEmbaixada: null | string;
+            historia: null | string;
+            /** Format: uuid */
+            versaoEmbaixada: string;
+        };
+        EmbaixadaResponse: {
+            nomeIgreja: string;
+            enderecoIgreja: null | string;
+            pastor: null | string;
+            /** Format: uuid */
+            versaoIgreja: string;
+            nomeOficial: string;
+            nomeUsual: null | string;
+            /** Format: date */
+            dataFundacao: null | string;
+            enderecoEmbaixada: null | string;
+            historia: null | string;
+            /** Format: uuid */
+            versaoEmbaixada: string;
+        };
+        EncerrarVinculoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataFim: string;
+        };
+        IdResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
         };
         IgrejaResponse: {
             /** Format: uuid */
             igrejaId: string;
             nome: string;
+        };
+        JornadaResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            situacao: string;
+            faixaEtaria: null | string;
+            /** Format: date */
+            dataBase: string;
+            /** Format: int32 */
+            mesesPermanencia: null | number | string;
+            elegivelAdmissao: boolean;
+            requisitos: components["schemas"]["RequisitoResponse"][];
+            postos: components["schemas"]["PostoResponse"][];
+            cerimonias: components["schemas"]["CerimoniaResponse"][];
+        };
+        LiderancaRequest: {
+            /** Format: uuid */
+            conselheiroId: string;
+            /** Format: uuid */
+            versaoConselheiro: string;
+            funcao: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        LiderancaResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            conselheiroId: string;
+            nome: string;
+            funcao: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+        };
+        ManualRequest: {
+            /** Format: int32 */
+            posto: number | string;
+            identificacao: string;
+            tarefas: string[];
+        };
+        ManualResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            posto: number | string;
+            nomePosto: string;
+            identificacao: string;
+            tarefas: components["schemas"]["TarefaResponse"][];
+        };
+        PessoaResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            dados: components["schemas"]["DadosPessoa"];
+            faixaEtaria: null | string;
+            possuiFoto: boolean;
+            responsaveis: components["schemas"]["ResponsavelResponse"][];
+            vinculos: components["schemas"]["VinculoResponse"][];
+        };
+        PessoaResumo: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+            /** Format: date */
+            dataNascimento: null | string;
+            situacao: null | string;
+        };
+        PessoasResponse: {
+            /** Format: int32 */
+            total: number | string;
+            pessoas: components["schemas"]["PessoaResumo"][];
+        };
+        PostoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            posto: number | string;
+            nome: string;
+            /** Format: date */
+            dataIngresso: string;
+            /** Format: date */
+            dataConclusao: null | string;
+            /** Format: uuid */
+            versaoManualId: null | string;
+            identificacaoManual: null | string;
+            /** Format: date */
+            permanenciaAte: string;
+            tarefas: components["schemas"]["TarefaJornadaResponse"][];
         };
         ProblemDetails: {
             type?: null | string;
@@ -156,8 +996,75 @@ export interface components {
             detail?: null | string;
             instance?: null | string;
         };
+        RequisitoResponse: {
+            /** Format: int32 */
+            requisito: number | string;
+            nome: string;
+            /** Format: date */
+            dataConclusao: null | string;
+        };
+        ResponsavelRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            responsavelId: string;
+            parentesco: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        ResponsavelResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            whatsApp: null | string;
+            parentesco: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+        };
         SessaoResponse: {
             igrejas: components["schemas"]["IgrejaResponse"][];
+        };
+        TarefaJornadaResponse: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+            /** Format: date */
+            dataConclusao: null | string;
+        };
+        TarefaResponse: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+        };
+        VersaoRequest: {
+            /** Format: uuid */
+            versao: string;
+        };
+        VinculoRequest: {
+            /** Format: uuid */
+            versao: string;
+            nomeIgreja: string;
+            tipo: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        VinculoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nomeIgreja: string;
+            tipo: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
         };
     };
     responses: never;
@@ -284,6 +1191,533 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListarPessoas: {
+        parameters: {
+            query?: {
+                busca?: string;
+                pagina?: number | string;
+            };
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PessoasResponse"];
+                };
+            };
+        };
+    };
+    CadastrarPessoa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DadosPessoa"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    ConsultarPessoa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PessoaResponse"];
+                };
+            };
+        };
+    };
+    AlterarPessoa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlterarPessoaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    ConsultarEmbaixada: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmbaixadaResponse"];
+                };
+            };
+        };
+    };
+    AlterarEmbaixada: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmbaixadaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListarConselheiros: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConselheiroResponse"][];
+                };
+            };
+        };
+    };
+    CadastrarConselheiro: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConselheiroRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    ListarContasDaIgreja: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContaResponse"][];
+                };
+            };
+        };
+    };
+    ListarLiderancas: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LiderancaResponse"][];
+                };
+            };
+        };
+    };
+    ListarVersoesManuais: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManualResponse"][];
+                };
+            };
+        };
+    };
+    ConsultarTarefasConhecidas: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string[];
+                    };
+                };
+            };
+        };
+    };
+    CadastrarVersaoManual: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    RegistrarCandidatura: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersaoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    ConsultarJornada: {
+        parameters: {
+            query?: {
+                dataBase?: string;
+            };
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JornadaResponse"];
+                };
+            };
+        };
+    };
+    ConcluirRequisito: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConcluirRequisitoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    RegistrarAdmissao: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdmissaoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    ConcluirTarefa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConcluirTarefaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    ConcluirPosto: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConcluirPostoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    RegistrarCerimonia: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CerimoniaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
                 };
             };
         };

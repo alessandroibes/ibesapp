@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Pessoas } from "../components/Pessoas";
 import {
   ActivityIndicator,
   Pressable,
@@ -31,6 +32,7 @@ export default function Inicio() {
   const [igrejas, setIgrejas] = useState<Igreja[]>([]);
   const [selecionada, setSelecionada] = useState("");
   const [embaixada, setEmbaixada] = useState("");
+  const [permissoes, setPermissoes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [carregandoIgrejas, setCarregandoIgrejas] = useState(false);
   const [erro, setErro] = useState("");
@@ -107,6 +109,7 @@ export default function Inicio() {
     setLoading(true);
     setErro("");
     setEmbaixada("");
+    setPermissoes([]);
     setSelecionada(igrejaId);
     try {
       const r = await fetch(`${api}/api/v1/contexto`, {
@@ -116,8 +119,12 @@ export default function Inicio() {
         },
       });
       if (!r.ok) throw new Error();
-      const data = (await r.json()) as { embaixada: string };
+      const data = (await r.json()) as {
+        embaixada: string;
+        permissoes?: string[];
+      };
       setEmbaixada(data.embaixada);
+      setPermissoes(data.permissoes ?? []);
     } catch {
       setErro(
         "Não foi possível acessar a Igreja. Entre novamente se sua sessão expirou.",
@@ -227,10 +234,15 @@ export default function Inicio() {
                   <Text accessibilityRole="header" style={styles.heading}>
                     {embaixada}
                   </Text>
-                  <Text style={styles.body}>
-                    Seu espaço está pronto para receber as próximas
-                    funcionalidades.
-                  </Text>
+                  {permissoes.includes("pessoas.consultar") && (
+                    <Pessoas
+                      key={selecionada}
+                      api={api}
+                      token={sessao.accessToken}
+                      igrejaId={selecionada}
+                      permissoes={permissoes}
+                    />
+                  )}
                 </>
               )}
               <Pressable
