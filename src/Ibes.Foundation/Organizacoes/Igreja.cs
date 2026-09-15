@@ -41,6 +41,11 @@ public static class Permissoes
     public const string ConsultarProgressao = "progressao.consultar";
     public const string RegistrarProgressao = "progressao.registrar";
     public const string GerenciarManuais = "manuais.gerenciar";
+    public const string ConsultarAgenda = "agenda.consultar";
+    public const string EditarAgenda = "agenda.editar";
+    public const string ConsultarFrequencia = "frequencia.consultar";
+    public const string RegistrarFrequencia = "frequencia.registrar";
     public static readonly string[] Todas = [ConsultarFundacao, ConsultarAuditoria, ConsultarPessoas, EditarPessoas,
-        ConsultarEmbaixada, EditarEmbaixada, ConsultarProgressao, RegistrarProgressao, GerenciarManuais];
+        ConsultarEmbaixada, EditarEmbaixada, ConsultarProgressao, RegistrarProgressao, GerenciarManuais,
+        ConsultarAgenda, EditarAgenda, ConsultarFrequencia, RegistrarFrequencia];
 }

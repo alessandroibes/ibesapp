@@ -39,7 +39,7 @@ public static class PessoasEndpoints
                 .Select(v => new VinculoResponse(v.Id, v.Versao, v.NomeIgreja, v.Tipo, v.DataInicio, v.DataFim)).ToListAsync(ct);
             return Results.Ok(new PessoaResponse(pessoa.Id, pessoa.Versao, DadosPessoa.De(pessoa),
                 pessoa.DataNascimento is { } nascimento ? FaixaEtaria(nascimento, relogio.Hoje) : null,
-                await db.Set<FotoPessoa>().AnyAsync(f => f.PessoaId == id, ct), responsaveis, vinculos));
+                await db.Set<FotoPessoa>().AnyAsync(f => f.PessoaId == id, ct), responsaveis, vinculos, await FrequenciaEndpoints.PrimeiraReuniao(db, id, ct)));
         }).RequireAuthorization(Permissoes.ConsultarPessoas).Produces<PessoaResponse>().WithName("ConsultarPessoa");
         grupo.MapPost("/", async (DadosPessoa dados, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
         {
@@ -149,6 +149,6 @@ public sealed record ResponsavelRequest(Guid Versao, Guid ResponsavelId, [proper
 public sealed record VinculoRequest(Guid Versao, [property: Required, StringLength(200)] string NomeIgreja, [property: Required] string Tipo, DateOnly DataInicio);
 public sealed record PessoasResponse(int Total, List<PessoaResumo> Pessoas);
 public sealed record PessoaResumo(Guid Id, string Nome, DateOnly? DataNascimento, string? Situacao);
-public sealed record PessoaResponse(Guid Id, Guid Versao, DadosPessoa Dados, string? FaixaEtaria, bool PossuiFoto, List<ResponsavelResponse> Responsaveis, List<VinculoResponse> Vinculos);
+public sealed record PessoaResponse(Guid Id, Guid Versao, DadosPessoa Dados, string? FaixaEtaria, bool PossuiFoto, List<ResponsavelResponse> Responsaveis, List<VinculoResponse> Vinculos, DateOnly? PrimeiraReuniao);
 public sealed record ResponsavelResponse(Guid Id, Guid Versao, Guid PessoaId, string Nome, string? WhatsApp, string Parentesco, DateOnly DataInicio, DateOnly? DataFim);
 public sealed record VinculoResponse(Guid Id, Guid Versao, string NomeIgreja, string Tipo, DateOnly DataInicio, DateOnly? DataFim);

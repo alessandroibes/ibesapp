@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type Api = <T>(
   caminho: string,
@@ -61,12 +61,15 @@ export function criarApi(igrejaId: string): Api {
   };
 }
 export function useConsulta<T>(api: Api, caminho: string | null, revisao = 0) {
+  const anterior = useRef<{ api: Api; caminho: string | null } | null>(null);
   const [dados, setDados] = useState<T>();
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const controller = new AbortController();
-    setDados(undefined);
+    if (anterior.current?.api !== api || anterior.current?.caminho !== caminho)
+      setDados(undefined);
+    anterior.current = { api, caminho };
     setErro("");
     setLoading(!!caminho);
     if (caminho)
@@ -75,7 +78,10 @@ export function useConsulta<T>(api: Api, caminho: string | null, revisao = 0) {
           if (!controller.signal.aborted) setDados(d);
         })
         .catch((e: Error) => {
-          if (!controller.signal.aborted) setErro(e.message);
+          if (!controller.signal.aborted) {
+            setErro(e.message);
+            setDados(undefined);
+          }
         })
         .finally(() => {
           if (!controller.signal.aborted) setLoading(false);

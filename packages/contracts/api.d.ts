@@ -121,6 +121,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pessoas/{id}/frequencia": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["FrequenciaPessoaResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pessoas": {
         parameters: {
             query?: never;
@@ -721,6 +761,772 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agenda/cadastros": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CadastrosAgendaResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/promotoras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NomeAgendaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/tipos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NomeAgendaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/modelos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ModeloRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/modelos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ModeloRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/atividades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AtividadeRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/atividades/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AtividadeDetalheResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    inicio: string;
+                    fim: string;
+                    promotoraId?: string;
+                    tipoId?: string;
+                    situacao?: number | string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OcorrenciaResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/atividades/{id}/ocorrencias/{data}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    data: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ExcecaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/atividades/{id}/alteracoes-futuras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlteracaoSerieRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agenda/atividades/{id}/ocorrencias/{data}/reuniao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    data: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PrepararReuniaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reunioes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    inicio: string;
+                    fim: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReuniaoResumo"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reunioes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReuniaoResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reunioes/{id}/roteiro": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RoteiroRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reunioes/{id}/chamada": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    busca?: string;
+                    pagina?: number | string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ChamadaResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reunioes/{id}/frequencia/{pessoaId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    pessoaId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["FrequenciaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reunioes/{id}/visitantes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VisitanteRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reunioes/{id}/frequencia/{pessoaId}/historico": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    pessoaId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AlteracaoFrequenciaResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -733,10 +1539,75 @@ export interface components {
             /** Format: date */
             dataAdmissao: string;
         };
+        AlteracaoFrequenciaResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            situacaoAnterior: null | number | string;
+            /** Format: int32 */
+            situacao: number | string;
+            observacoes: null | string;
+            /** Format: uuid */
+            registradoPor: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AlteracaoSerieRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            aPartirDe: string;
+            dados: components["schemas"]["AtividadeRequest"];
+        };
         AlterarPessoaRequest: {
             /** Format: uuid */
             versao: string;
             dados: components["schemas"]["DadosPessoa"];
+        };
+        AtividadeDetalheResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            dados: components["schemas"]["AtividadeRequest"];
+        };
+        AtividadeRequest: {
+            titulo: string;
+            /** Format: uuid */
+            tipoAtividadeId: string;
+            /** Format: uuid */
+            entidadePromotoraId: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            /** Format: time */
+            horaInicio: null | string;
+            /** Format: time */
+            horaFim: null | string;
+            diaInteiro: boolean;
+            /** Format: int32 */
+            situacao: number | string;
+            /** Format: int32 */
+            periodicidade: null | number | string;
+            /** Format: int32 */
+            intervalo: number | string;
+            diasSemana: null | (number | string)[];
+            /** Format: date */
+            recorrenciaAte: null | string;
+            local: null | string;
+            observacoes: null | string;
+            prazo: boolean;
+            destaque: boolean;
+            /** Format: double */
+            valor: null | number | string;
+            moeda: null | string;
+            link: null | string;
+            /** Format: uuid */
+            responsavelId: null | string;
+            /** Format: uuid */
+            atividadeRelacionadaId: null | string;
+            fusoHorario: string;
         };
         AuditoriaResponse: {
             /** Format: uuid */
@@ -746,6 +1617,11 @@ export interface components {
             acao: string;
             entidade: string;
             traceId: string;
+        };
+        CadastrosAgendaResponse: {
+            promotoras: components["schemas"]["NomeAgendaResponse"][];
+            tipos: components["schemas"]["NomeAgendaResponse"][];
+            modelos: components["schemas"]["ModeloResponse"][];
         };
         CerimoniaRequest: {
             /** Format: uuid */
@@ -764,6 +1640,16 @@ export interface components {
             /** Format: date */
             data: string;
             descricao: string;
+        };
+        ChamadaResponse: {
+            /** Format: uuid */
+            reuniaoId: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: int32 */
+            total: number | string;
+            pessoas: components["schemas"]["PessoaChamada"][];
+            contagens: components["schemas"]["ContagemFrequencia"][];
         };
         ConcluirPostoRequest: {
             /** Format: uuid */
@@ -815,6 +1701,12 @@ export interface components {
             dataInicio: string;
             /** Format: date */
             dataFim: null | string;
+        };
+        ContagemFrequencia: {
+            /** Format: int32 */
+            situacao: number | string;
+            /** Format: int32 */
+            quantidade: number | string;
         };
         ContaResponse: {
             /** Format: uuid */
@@ -882,6 +1774,37 @@ export interface components {
             /** Format: date */
             dataFim: string;
         };
+        ExcecaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            /** Format: time */
+            horaInicio: null | string;
+            /** Format: time */
+            horaFim: null | string;
+            /** Format: int32 */
+            situacao: number | string;
+            observacoes: null | string;
+        };
+        FrequenciaPessoaResponse: {
+            /** Format: uuid */
+            reuniaoId: string;
+            titulo: string;
+            /** Format: date */
+            data: string;
+            /** Format: int32 */
+            situacao: number | string;
+        };
+        FrequenciaRequest: {
+            /** Format: uuid */
+            versao: null | string;
+            /** Format: int32 */
+            situacao: number | string;
+            observacoes: null | string;
+        };
         IdResponse: {
             /** Format: uuid */
             id: string;
@@ -892,6 +1815,12 @@ export interface components {
             /** Format: uuid */
             igrejaId: string;
             nome: string;
+        };
+        ItemRoteiro: {
+            titulo: string;
+            /** Format: int32 */
+            duracaoMinutos: null | number | string;
+            observacoes: null | string;
         };
         JornadaResponse: {
             /** Format: uuid */
@@ -947,6 +1876,79 @@ export interface components {
             identificacao: string;
             tarefas: components["schemas"]["TarefaResponse"][];
         };
+        ModeloRequest: {
+            nome: string;
+            itens: components["schemas"]["ItemRoteiro"][];
+            /** Format: uuid */
+            versao: null | string;
+        };
+        ModeloResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            itens: components["schemas"]["ItemRoteiro"][];
+        };
+        NomeAgendaRequest: {
+            nome: string;
+        };
+        NomeAgendaResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+        };
+        OcorrenciaResponse: {
+            /** Format: uuid */
+            atividadeId: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataOriginal: string;
+            titulo: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            /** Format: time */
+            horaInicio: null | string;
+            /** Format: time */
+            horaFim: null | string;
+            diaInteiro: boolean;
+            fusoHorario: string;
+            /** Format: int32 */
+            situacao: number | string;
+            local: null | string;
+            observacoes: null | string;
+            promotora: string;
+            tipo: string;
+            prazo: boolean;
+            destaque: boolean;
+            /** Format: double */
+            valor: null | number | string;
+            moeda: null | string;
+            link: null | string;
+            /** Format: uuid */
+            atividadeRelacionadaId: null | string;
+            /** Format: uuid */
+            reuniaoId: null | string;
+            recorrente: boolean;
+        };
+        PessoaChamada: {
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            condicao: string;
+            /** Format: uuid */
+            frequenciaId: null | string;
+            /** Format: uuid */
+            versao: null | string;
+            /** Format: int32 */
+            situacao: null | number | string;
+            observacoes: null | string;
+        };
         PessoaResponse: {
             /** Format: uuid */
             id: string;
@@ -957,6 +1959,8 @@ export interface components {
             possuiFoto: boolean;
             responsaveis: components["schemas"]["ResponsavelResponse"][];
             vinculos: components["schemas"]["VinculoResponse"][];
+            /** Format: date */
+            primeiraReuniao: null | string;
         };
         PessoaResumo: {
             /** Format: uuid */
@@ -987,6 +1991,12 @@ export interface components {
             /** Format: date */
             permanenciaAte: string;
             tarefas: components["schemas"]["TarefaJornadaResponse"][];
+        };
+        PrepararReuniaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            modeloId: null | string;
         };
         ProblemDetails: {
             type?: null | string;
@@ -1027,6 +2037,34 @@ export interface components {
             /** Format: date */
             dataFim: null | string;
         };
+        ReuniaoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            titulo: string;
+            /** Format: date */
+            data: string;
+            /** Format: int32 */
+            situacao: number | string;
+            /** Format: uuid */
+            modeloId: null | string;
+            /** Format: uuid */
+            versaoModelo: null | string;
+            roteiro: components["schemas"]["ItemRoteiro"][];
+        };
+        ReuniaoResumo: {
+            /** Format: uuid */
+            id: string;
+            titulo: string;
+            /** Format: date */
+            data: string;
+        };
+        RoteiroRequest: {
+            /** Format: uuid */
+            versao: string;
+            itens: components["schemas"]["ItemRoteiro"][];
+        };
         SessaoResponse: {
             igrejas: components["schemas"]["IgrejaResponse"][];
         };
@@ -1065,6 +2103,9 @@ export interface components {
             dataInicio: string;
             /** Format: date */
             dataFim: null | string;
+        };
+        VisitanteRequest: {
+            nome: string;
         };
     };
     responses: never;

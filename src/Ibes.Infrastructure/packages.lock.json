@@ -455,6 +455,12 @@
           "System.Composition.Runtime": "9.0.0"
         }
       },
+      "ibes.agendaatividades": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
       "ibes.embaixadas": {
         "type": "Project",
         "dependencies": {
@@ -463,6 +469,12 @@
       },
       "ibes.foundation": {
         "type": "Project"
+      },
+      "ibes.frequencia": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
       },
       "ibes.pessoas": {
         "type": "Project",

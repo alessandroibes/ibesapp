@@ -625,6 +625,12 @@
           "System.Composition.Runtime": "9.0.0"
         }
       },
+      "ibes.agendaatividades": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
       "ibes.embaixadas": {
         "type": "Project",
         "dependencies": {
@@ -634,11 +640,19 @@
       "ibes.foundation": {
         "type": "Project"
       },
+      "ibes.frequencia": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
       "ibes.infrastructure": {
         "type": "Project",
         "dependencies": {
+          "Ibes.AgendaAtividades": "[1.0.0, )",
           "Ibes.Embaixadas": "[1.0.0, )",
           "Ibes.Foundation": "[1.0.0, )",
+          "Ibes.Frequencia": "[1.0.0, )",
           "Ibes.Pessoas": "[1.0.0, )",
           "Ibes.Progressao": "[1.0.0, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[10.0.10, )",

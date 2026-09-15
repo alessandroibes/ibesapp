@@ -365,3 +365,69 @@ footer {
   max-width: 100%;
   white-space: normal;
 }
+.calendario-agenda {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 24px 0;
+}
+.dia-agenda {
+  border: 1px solid #cbd1c3;
+  padding: 8px;
+  min-height: 100px;
+  border-radius: 6px;
+  background: #fffdf8;
+}
+.dia-agenda h3 {
+  font-size: 13px;
+}
+.evento-agenda {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  border: 1px solid #71817c;
+  border-left: 4px solid #526b4b;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 8px 0;
+  text-align: left;
+  background: #fff;
+  color: #183a38;
+  font: inherit;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.evento-agenda span {
+  font-size: 12px;
+}
+.evento-destaque {
+  border-left-color: #9b6b12;
+  background: #fff7e5;
+}
+.botoes-chamada {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.botoes-chamada button {
+  min-height: 48px;
+  height: auto;
+  padding: 12px;
+}
+@media (max-width: 1050px) {
+  .calendario-agenda {
+    grid-template-columns: 1fr;
+  }
+  .dia-vazio {
+    display: none;
+  }
+  .dia-agenda:has(> h3:only-child) {
+    min-height: auto;
+  }
+}
+@media (max-width: 500px) {
+  .botoes-chamada {
+    grid-template-columns: 1fr;
+  }
+}

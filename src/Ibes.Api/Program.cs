@@ -200,6 +200,8 @@ app.MapFundacao();
 app.MapPessoas();
 app.MapEmbaixada();
 app.MapProgressao();
+app.MapAgenda();
+app.MapFrequencia();
 app.MapHealthChecks("/health/live", new() { Predicate = _ => false }).AllowAnonymous();
 app.MapHealthChecks("/health/ready", new() { Predicate = c => c.Tags.Contains("ready") }).AllowAnonymous();
 app.MapOpenApi().AllowAnonymous();

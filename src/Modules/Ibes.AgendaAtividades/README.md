@@ -1,5 +1,5 @@
 # AgendaAtividades
 
-Limite de módulo reservado pela Fase 0. Nenhuma regra, entidade de produto ou endpoint implementado.
-As próximas fases organizam casos de uso em vertical slices dentro deste projeto, com contratos explícitos entre módulos.
-Não acessar tabelas de outros módulos nem inferir permissões a partir de cargos ou postos.
+Fase 3: atividades/prazos de agenda, tipos e entidades promotoras configuráveis, modelos de roteiro, recorrências e exceções. Recorrência é expandida por intervalo consultado; alterações futuras dividem a série sem reescrever o passado.
+
+Persistência em `Ibes.Infrastructure`; casos HTTP em `Ibes.Api/Features/Dominio/AgendaEndpoints.cs`. Participantes de atividades e competições pertencem a fases posteriores e não foram implementados aqui.

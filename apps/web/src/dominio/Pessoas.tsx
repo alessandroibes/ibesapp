@@ -3,6 +3,7 @@ import type { components } from "../../../../packages/contracts/api";
 import { type Api, useConsulta, dataBr, hoje } from "./api";
 import { Estado, Formulario, SeletorPessoa, type Campo } from "./componentes";
 import { Jornada } from "./Jornada";
+import { estadosFrequencia } from "./Chamada";
 import { Button } from "../components/ui/button";
 type Pessoa = components["schemas"]["PessoaResponse"];
 const camposPessoa: Campo[] = [
@@ -100,6 +101,15 @@ export function Pessoas({
   const editar = permissoes.includes("pessoas.editar");
   const atualizar = () => setRevisao((r) => r + 1);
   const p = ficha.dados;
+  const frequencia = useConsulta<
+    components["schemas"]["FrequenciaPessoaResponse"][]
+  >(
+    api,
+    selecionada && permissoes.includes("frequencia.consultar")
+      ? `/pessoas/${selecionada}/frequencia`
+      : null,
+    revisao,
+  );
   return (
     <section>
       <h2>Pessoas e jornada ER</h2>
@@ -182,6 +192,12 @@ export function Pessoas({
           <dl>
             <dt>Nascimento</dt>
             <dd>{dataBr(p.dados.dataNascimento)}</dd>
+            <dt>Primeira reunião</dt>
+            <dd>
+              {p.primeiraReuniao
+                ? dataBr(p.primeiraReuniao)
+                : "Nenhuma presença registrada"}
+            </dd>
             <dt>Faixa etária atual</dt>
             <dd>
               {p.faixaEtaria ?? "Fora da faixa etária ER ou data não informada"}
@@ -213,6 +229,23 @@ export function Pessoas({
             <dt>Observações</dt>
             <dd>{p.dados.observacoes ?? "Nenhuma"}</dd>
           </dl>
+          {permissoes.includes("frequencia.consultar") && (
+            <details>
+              <summary>Histórico de frequência</summary>
+              <Estado {...frequencia} atualizar={atualizar} />
+              {frequencia.dados?.length === 0 && (
+                <p>Nenhuma frequência registrada.</p>
+              )}
+              <ul>
+                {frequencia.dados?.map((f) => (
+                  <li key={f.reuniaoId}>
+                    {dataBr(f.data)} · {f.titulo} ·{" "}
+                    {estadosFrequencia[Number(f.situacao) - 1]}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
           {editar && (
             <>
               <details>

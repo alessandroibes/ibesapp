@@ -206,6 +206,10 @@ export function Pessoas({
             Nascimento: {pessoa.dados.dataNascimento ?? "Não informado"}
           </Text>
           <Text>
+            Primeira reunião:{" "}
+            {pessoa.primeiraReuniao ?? "Nenhuma presença registrada"}
+          </Text>
+          <Text>
             Faixa etária: {pessoa.faixaEtaria ?? "Fora da faixa etária ER"}
           </Text>
           <Text>WhatsApp: {pessoa.dados.whatsApp ?? "Não informado"}</Text>

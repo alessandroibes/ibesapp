@@ -1,6 +1,6 @@
 # ER — Starter completo para Codex
 
-Fundação executável e **Fases 1 e 2** disponíveis: Pessoas, Igreja/Embaixada, Conselheiros, responsáveis, vínculos e jornada ER com manuais versionados e progressão histórica. O escopo implementado termina no prompt `01-domain-foundation.md`.
+Fundação executável e **Fases 1, 2 e 3** disponíveis: cadastros, jornada ER, reuniões, frequência com visitantes e agenda recorrente. O escopo implementado termina no prompt `02-operacao-agenda.md`.
 
 ```powershell
 ./scripts/dev-setup.ps1
@@ -15,6 +15,8 @@ Consulte [execução local e validações](docs/operations/LOCAL-DEVELOPMENT.md)
 Para as Fases 1 e 2, consulte [funcionalidades e decisões técnicas](docs/architecture/DOMAIN-FOUNDATION.md) e [validações do domínio](docs/quality/DOMAIN-FOUNDATION-VALIDATION.md). O ambiente de demonstração não cria edições de manuais: informe a identificação real da edição na seção **Manuais** antes de registrar uma admissão.
 
 Fonte de verdade consolidada para o sistema de gestão da Organização Embaixadores do Rei.
+
+Na Fase 3, use **Agenda e reuniões** no web para cadastrar tipos/promotoras, atividades e modelos; prepare uma ocorrência como reunião para abrir a chamada no web ou mobile. Consulte [operação e agenda](docs/architecture/OPERACAO-AGENDA.md) e [validações](docs/quality/OPERACAO-AGENDA-VALIDATION.md).
 
 ## Produto inicial
 Sistema multi-organização para gestão de Embaixadas de Embaixadores do Rei, começando pela Embaixada James Jackson Taylor (Embaixada J. J. Taylor).

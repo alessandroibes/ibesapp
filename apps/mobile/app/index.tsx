@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Pessoas } from "../components/Pessoas";
+import { Operacao } from "../components/Operacao";
 import {
   ActivityIndicator,
   Pressable,
@@ -234,6 +235,16 @@ export default function Inicio() {
                   <Text accessibilityRole="header" style={styles.heading}>
                     {embaixada}
                   </Text>
+                  {(permissoes.includes("agenda.consultar") ||
+                    permissoes.includes("frequencia.consultar")) && (
+                    <Operacao
+                      key={`operacao-${selecionada}`}
+                      api={api}
+                      token={sessao.accessToken}
+                      igrejaId={selecionada}
+                      permissoes={permissoes}
+                    />
+                  )}
                   {permissoes.includes("pessoas.consultar") && (
                     <Pessoas
                       key={selecionada}

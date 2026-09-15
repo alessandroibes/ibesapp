@@ -81,6 +81,10 @@
 - Conhecimentos Gerais da Bíblia possui livro de referência variável por competição.
 
 ## Agenda
+- Confirmação da Fase 3: frequência usa Presença com Pontualidade, Presença com Atraso, Falta e Falta Justificada. Ausência de lançamento não equivale a falta.
+- Visitante utiliza cadastro mínimo de Pessoa, sem candidatura automática.
+- Cancelamento preserva frequência e auditoria. Presenças de reunião cancelada continuam contando para a primeira reunião.
+- Recorrências diárias, semanais, mensais e anuais, com intervalo e término opcional; exceções individuais e alterações futuras preservam reuniões realizadas.
 - Deve existir cronograma anual/mensal e agenda.
 - Atividades podem ser internas ou promovidas por entidades externas.
 - Deve suportar recorrência, prazos, eventos de um ou vários dias, horário, local, valor, entidade promotora, status e observações.

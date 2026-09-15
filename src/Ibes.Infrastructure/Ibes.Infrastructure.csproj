@@ -5,6 +5,8 @@
     <ProjectReference Include="../Modules/Ibes.Pessoas/Ibes.Pessoas.csproj" />
     <ProjectReference Include="../Modules/Ibes.Embaixadas/Ibes.Embaixadas.csproj" />
     <ProjectReference Include="../Modules/Ibes.Progressao/Ibes.Progressao.csproj" />
+    <ProjectReference Include="../Modules/Ibes.Frequencia/Ibes.Frequencia.csproj" />
+    <ProjectReference Include="../Modules/Ibes.AgendaAtividades/Ibes.AgendaAtividades.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11" PrivateAssets="all" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />

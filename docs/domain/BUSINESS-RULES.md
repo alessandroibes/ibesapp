@@ -29,6 +29,7 @@ A versão é escolhida no ingresso no Posto e permanece fixa até sua conclusão
 
 ## Frequência
 Uma reunião pode registrar presença de membros e visitantes. A primeira reunião do menino é a menor data de presença válida.
+Presença com Pontualidade e Presença com Atraso contam como presença. Falta e Falta Justificada não contam. A ausência de lançamento não presume falta. Conforme confirmação do usuário, cancelamento da reunião **não exclui** suas presenças do cálculo da primeira reunião. Correções preservam histórico auditado.
 
 ## Diretoria
 Configuração flexível por Embaixada. Preservar mandatos e ocupantes. Cônsul é liderança de Consulado.

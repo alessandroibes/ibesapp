@@ -6,7 +6,7 @@ import type { components } from "../../../../packages/contracts/api";
 export type Campo = {
   nome: string;
   rotulo: string;
-  tipo?: "date" | "textarea" | "select" | "text";
+  tipo?: "date" | "time" | "number" | "textarea" | "select" | "text";
   obrigatorio?: boolean;
   limite?: number;
   opcoes?: { valor: string; rotulo: string }[];
@@ -128,10 +128,14 @@ export function SeletorPessoa({
   api,
   nome = "pessoaId",
   rotulo = "Pessoa",
+  obrigatorio = true,
+  valorInicial = "",
 }: {
   api: Api;
   nome?: string;
   rotulo?: string;
+  obrigatorio?: boolean;
+  valorInicial?: string;
 }) {
   const id = useId();
   const [busca, setBusca] = useState("");
@@ -154,9 +158,19 @@ export function SeletorPessoa({
       </label>
       <Estado {...lista} atualizar={() => setRevisao((r) => r + 1)} />
       <label htmlFor={id}>
-        {rotulo} *
-        <select id={id} name={nome} required defaultValue="">
+        {rotulo}
+        {obrigatorio && " *"}
+        <select
+          id={id}
+          name={nome}
+          required={obrigatorio}
+          defaultValue={valorInicial}
+        >
           <option value="">Selecione uma pessoa cadastrada</option>
+          {valorInicial &&
+            !lista.dados?.pessoas.some((p) => p.id === valorInicial) && (
+              <option value={valorInicial}>Pessoa atualmente vinculada</option>
+            )}
           {lista.dados?.pessoas.map((p) => (
             <option key={p.id} value={p.id}>
               {p.nome}

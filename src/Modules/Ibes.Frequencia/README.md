@@ -1,5 +1,5 @@
 # Frequencia
 
-Limite de módulo reservado pela Fase 0. Nenhuma regra, entidade de produto ou endpoint implementado.
-As próximas fases organizam casos de uso em vertical slices dentro deste projeto, com contratos explícitos entre módulos.
-Não acessar tabelas de outros módulos nem inferir permissões a partir de cargos ou postos.
+Fase 3: reunião com cópia do roteiro, frequência por pessoa e histórico de correções. Os quatro estados foram definidos pelo usuário em `DECISIONS.md`.
+
+Persistência em `Ibes.Infrastructure`; integração com agenda e pessoas em `Ibes.Api/Features/Dominio/FrequenciaEndpoints.cs`. Primeira reunião é derivada das presenças, incluindo reuniões canceladas. Visitantes não ganham candidatura automaticamente.

@@ -3,6 +3,7 @@ import { criarApi } from "./api";
 import { Pessoas } from "./Pessoas";
 import { Instituicao } from "./Instituicao";
 import { Manuais } from "./Manuais";
+import { Agenda } from "./Agenda";
 import { Button } from "../components/ui/button";
 export function Dominio({
   igrejaId,
@@ -23,6 +24,7 @@ export function Dominio({
       permissao: "embaixada.consultar",
     },
     { id: "manuais", nome: "Manuais", permissao: "progressao.consultar" },
+    { id: "agenda", nome: "Agenda e reuniões", permissao: "agenda.consultar" },
   ].filter((s) => permissoes.includes(s.permissao));
   const [secao, setSecao] = useState(secoes[0]?.id ?? "");
   const api = useMemo(() => criarApi(igrejaId), [igrejaId]);
@@ -53,6 +55,7 @@ export function Dominio({
       {secao === "manuais" && (
         <Manuais api={api} editar={permissoes.includes("manuais.gerenciar")} />
       )}
+      {secao === "agenda" && <Agenda api={api} permissoes={permissoes} />}
     </div>
   );
 }
