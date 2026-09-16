@@ -1527,6 +1527,646 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrganizacaoResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/consulados": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConsuladoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/consulados/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarConsuladoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/consulados/{id}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarOrganizacaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/consulados/{id}/membros": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MembroRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/membros/{id}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarOrganizacaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/membros/{id}/transferencia": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["TransferenciaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/consulados/{id}/consul": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConsulRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/consules/{id}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarOrganizacaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/cargos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CargoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/cargos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarCargoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/mandatos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MandatoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/mandatos/{id}/ocupacoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["OcupacaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/ocupacoes/{id}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarOrganizacaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizacao/mandatos/{id}/eleicoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EleicaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1558,6 +2198,19 @@ export interface components {
             /** Format: date */
             aPartirDe: string;
             dados: components["schemas"]["AtividadeRequest"];
+        };
+        AlterarCargoRequest: {
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            /** Format: int32 */
+            quantidadeVagas: number | string;
+            ativo: boolean;
+        };
+        AlterarConsuladoRequest: {
+            /** Format: uuid */
+            versao: string;
+            nome: string;
         };
         AlterarPessoaRequest: {
             /** Format: uuid */
@@ -1622,6 +2275,21 @@ export interface components {
             promotoras: components["schemas"]["NomeAgendaResponse"][];
             tipos: components["schemas"]["NomeAgendaResponse"][];
             modelos: components["schemas"]["ModeloResponse"][];
+        };
+        CargoRequest: {
+            nome: string;
+            /** Format: int32 */
+            quantidadeVagas: number | string;
+        };
+        CargoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            /** Format: int32 */
+            quantidadeVagas: number | string;
+            ativo: boolean;
         };
         CerimoniaRequest: {
             /** Format: uuid */
@@ -1702,6 +2370,44 @@ export interface components {
             /** Format: date */
             dataFim: null | string;
         };
+        ConsuladoRequest: {
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        ConsuladoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            membros: components["schemas"]["MembroConsuladoResponse"][];
+            consules: components["schemas"]["ConsulResponse"][];
+        };
+        ConsulRequest: {
+            /** Format: uuid */
+            membroConsuladoId: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        ConsulResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            motivoFim: null | string;
+        };
         ContagemFrequencia: {
             /** Format: int32 */
             situacao: number | string;
@@ -1738,6 +2444,32 @@ export interface components {
             possuiBiblia: null | boolean;
             observacoes: null | string;
         };
+        EleicaoRequest: {
+            /** Format: uuid */
+            versaoMandato: string;
+            /** Format: uuid */
+            cargoEmbaixadaId: string;
+            /** Format: uuid */
+            pessoaEscolhidaId: string;
+            /** Format: date */
+            data: string;
+            motivo: string;
+        };
+        EleicaoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            cargoId: string;
+            cargo: string;
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: date */
+            data: string;
+            motivo: string;
+        };
         EmbaixadaRequest: {
             nomeIgreja: string;
             enderecoIgreja: null | string;
@@ -1767,6 +2499,13 @@ export interface components {
             historia: null | string;
             /** Format: uuid */
             versaoEmbaixada: string;
+        };
+        EncerrarOrganizacaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataFim: string;
+            motivo: string;
         };
         EncerrarVinculoRequest: {
             /** Format: uuid */
@@ -1861,6 +2600,28 @@ export interface components {
             /** Format: date */
             dataFim: null | string;
         };
+        MandatoRequest: {
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            observacoes: null | string;
+        };
+        MandatoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            observacoes: null | string;
+            ocupacoes: components["schemas"]["OcupacaoResponse"][];
+            eleicoes: components["schemas"]["EleicaoResponse"][];
+        };
         ManualRequest: {
             /** Format: int32 */
             posto: number | string;
@@ -1875,6 +2636,26 @@ export interface components {
             nomePosto: string;
             identificacao: string;
             tarefas: components["schemas"]["TarefaResponse"][];
+        };
+        MembroConsuladoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            motivoFim: null | string;
+        };
+        MembroRequest: {
+            /** Format: uuid */
+            pessoaId: string;
+            /** Format: date */
+            dataInicio: string;
         };
         ModeloRequest: {
             nome: string;
@@ -1935,6 +2716,41 @@ export interface components {
             /** Format: uuid */
             reuniaoId: null | string;
             recorrente: boolean;
+        };
+        OcupacaoRequest: {
+            /** Format: uuid */
+            versaoMandato: string;
+            /** Format: uuid */
+            cargoEmbaixadaId: string;
+            /** Format: uuid */
+            pessoaId: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        OcupacaoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            cargoId: string;
+            cargo: string;
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            motivoFim: null | string;
+            membroIgreja: boolean;
+        };
+        OrganizacaoResponse: {
+            consulados: components["schemas"]["ConsuladoResponse"][];
+            cargos: components["schemas"]["CargoResponse"][];
+            mandatos: components["schemas"]["MandatoResponse"][];
+            /** Format: date */
+            hoje: string;
         };
         PessoaChamada: {
             /** Format: uuid */
@@ -2079,6 +2895,14 @@ export interface components {
             /** Format: uuid */
             id: string;
             nome: string;
+        };
+        TransferenciaRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            consuladoDestinoId: string;
+            /** Format: date */
+            data: string;
         };
         VersaoRequest: {
             /** Format: uuid */

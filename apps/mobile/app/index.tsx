@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pessoas } from "../components/Pessoas";
 import { Operacao } from "../components/Operacao";
+import { Organizacao } from "../components/Organizacao";
 import {
   ActivityIndicator,
   Pressable,
@@ -252,6 +253,14 @@ export default function Inicio() {
                       token={sessao.accessToken}
                       igrejaId={selecionada}
                       permissoes={permissoes}
+                    />
+                  )}
+                  {permissoes.includes("organizacao.consultar") && (
+                    <Organizacao
+                      key={`organizacao-${selecionada}`}
+                      api={api}
+                      token={sessao.accessToken}
+                      igrejaId={selecionada}
                     />
                   )}
                 </>

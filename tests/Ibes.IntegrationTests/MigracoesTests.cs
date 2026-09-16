@@ -10,7 +10,7 @@ namespace Ibes.IntegrationTests;
 public sealed class MigracoesTests
 {
     [Fact]
-    public async Task AtualizaFundacaoPreservandoDadosEReaplicaScriptIdempotente()
+    public async Task AtualizaFasesAnterioresPreservandoDadosEReaplicaScriptIdempotente()
     {
         await using var postgres = new PostgreSqlBuilder("postgres:17-alpine").Build();
         await postgres.StartAsync();
@@ -33,7 +33,7 @@ public sealed class MigracoesTests
         var script = migrador.GenerateScript(options: MigrationsSqlGenerationOptions.Idempotent);
         await db.Database.ExecuteSqlRawAsync(script);
         await db.Database.ExecuteSqlRawAsync(script);
-        Assert.Equal(3, (await db.Database.GetAppliedMigrationsAsync()).Count());
+        Assert.Equal(4, (await db.Database.GetAppliedMigrationsAsync()).Count());
         Assert.Single(await db.Igrejas.ToListAsync());
     }
 }

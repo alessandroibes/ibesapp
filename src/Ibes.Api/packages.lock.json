@@ -631,6 +631,12 @@
           "Ibes.Foundation": "[1.0.0, )"
         }
       },
+      "ibes.consuladosdiretoria": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
       "ibes.embaixadas": {
         "type": "Project",
         "dependencies": {
@@ -650,6 +656,7 @@
         "type": "Project",
         "dependencies": {
           "Ibes.AgendaAtividades": "[1.0.0, )",
+          "Ibes.ConsuladosDiretoria": "[1.0.0, )",
           "Ibes.Embaixadas": "[1.0.0, )",
           "Ibes.Foundation": "[1.0.0, )",
           "Ibes.Frequencia": "[1.0.0, )",

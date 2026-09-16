@@ -63,6 +63,11 @@
 - Cônsul decorre da liderança de um Consulado.
 - Cargo, Posto e Permissão são independentes.
 - Preservar histórico de diretorias, cargos, consulados, lideranças e acontecimentos.
+- Confirmação da Fase 4: Candidatos e Embaixadores podem integrar Consulados, definidos pelos Conselheiros; cada menino possui no máximo um vínculo vigente e a transferência encerra o anterior na mesma data em que inicia o novo.
+- Cada Consulado possui no máximo um Cônsul vigente, escolhido entre seus membros vigentes.
+- Somente Embaixadores podem integrar a Diretoria. Vínculo vigente como Membro da Igreja da Embaixada é uma preferência informativa, sem impedir a ocupação.
+- Diretoria possui mandatos datados; cargos são configuráveis e possuem quantidade de vagas. Um Embaixador pode ocupar mais de um cargo e acumular cargo com a função de Cônsul.
+- Eleição registra somente o resultado. Ocupações preservam histórico e podem ser encerradas e iniciadas em datas diferentes, registrando o motivo quando encerradas.
 
 ## Frequência e cadastro
 - Frequência aceita ER, Candidatos e Visitantes.

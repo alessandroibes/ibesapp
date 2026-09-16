@@ -415,6 +415,12 @@ footer {
   height: auto;
   padding: 12px;
 }
+.grade-organizacao {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 18px;
+  align-items: start;
+}
 @media (max-width: 1050px) {
   .calendario-agenda {
     grid-template-columns: 1fr;
