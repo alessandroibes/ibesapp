@@ -64,6 +64,26 @@ public sealed class CompeticoesTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
+    public async Task PessoaInativaNaoEAceitaParaAptidaoNemIndicadaParaEscalacao()
+    {
+        var catalogo = await Catalogo($"Prova de inativação {Guid.NewGuid():N}");
+        var pessoa = await Menino(2015);
+        await Aptidao(pessoa, catalogo.Prova);
+        await api.NaIgreja(api.IgrejaA, async db =>
+        {
+            (await db.Set<Pessoa>().SingleAsync(x => x.Id == pessoa)).Ativa = false;
+            await db.SaveChangesAsync();
+        });
+        var dados = await Configurar(catalogo.Prova, [CategoriaCompeticao.Junior], 1, 1, 0, 1);
+        var candidatos = await Ler<List<CandidatoEscalacaoResponse>>(await api.GetTenant(
+            $"/api/v1/competicoes/{dados.Competicao}/provas/{dados.Configuracao}/candidatos", api.IgrejaA));
+        Assert.Empty(candidatos);
+        var outra = await Catalogo($"Outra prova {Guid.NewGuid():N}");
+        Assert.Equal(HttpStatusCode.BadRequest, (await Enviar("/api/v1/competicoes/aptidoes",
+            new AptidaoRequest(pessoa, outra.Prova, new DateOnly(2025, 1, 1)))).StatusCode);
+    }
+
+    [Fact]
     public async Task LimitesFinalizacaoBloqueioEReaberturaSaoAplicados()
     {
         var catalogo = await Catalogo($"Revezamento {Guid.NewGuid():N}");

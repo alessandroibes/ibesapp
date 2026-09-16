@@ -36,6 +36,12 @@ public sealed partial class AppDbContext
         pessoa.Property(x => x.NumeroCarteira).HasMaxLength(80);
         pessoa.Property(x => x.SituacaoCarteira).HasMaxLength(100);
         pessoa.Property(x => x.Observacoes).HasMaxLength(4000);
+        pessoa.Property(x => x.Ativa).HasDefaultValue(true);
+        var alteracaoPessoa = Base<AlteracaoSituacaoPessoa>(b, "alteracoes_situacao", "pessoas");
+        alteracaoPessoa.Property(x => x.Tipo).HasConversion<string>().HasMaxLength(20);
+        alteracaoPessoa.Property(x => x.Motivo).HasMaxLength(500);
+        alteracaoPessoa.HasOne<Pessoa>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.PessoaId }).OnDelete(DeleteBehavior.Restrict);
+        alteracaoPessoa.HasIndex(x => new { x.IgrejaId, x.PessoaId, x.Data });
         var responsavel = Base<ResponsavelPessoa>(b, "responsaveis_pessoa", "pessoas");
         responsavel.Property(x => x.Parentesco).HasMaxLength(80);
         responsavel.HasOne<Pessoa>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.PessoaId }).OnDelete(DeleteBehavior.Restrict);

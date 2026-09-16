@@ -209,6 +209,7 @@ app.MapAcervoHistorico();
 app.MapHealthChecks("/health/live", new() { Predicate = _ => false }).AllowAnonymous();
 app.MapHealthChecks("/health/ready", new() { Predicate = c => c.Tags.Contains("ready") }).AllowAnonymous();
 app.MapOpenApi().AllowAnonymous();
+app.MapFallbackToFile("index.html").AllowAnonymous();
 app.Run();
 
 public partial class Program;

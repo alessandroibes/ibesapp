@@ -4,6 +4,7 @@ namespace Ibes.Pessoas;
 
 public sealed class Pessoa : Entidade
 {
+    public bool Ativa { get; set; } = true;
     public string Nome { get; set; } = "";
     public DateOnly? DataNascimento { get; set; }
     public string? Naturalidade { get; set; }
@@ -15,6 +16,17 @@ public sealed class Pessoa : Entidade
     public string? SituacaoCarteira { get; set; }
     public bool? PossuiBiblia { get; set; }
     public string? Observacoes { get; set; }
+}
+
+public enum TipoAlteracaoSituacaoPessoa { Inativacao, Reativacao }
+
+public sealed class AlteracaoSituacaoPessoa : Entidade
+{
+    public Guid PessoaId { get; set; }
+    public TipoAlteracaoSituacaoPessoa Tipo { get; set; }
+    public DateOnly Data { get; set; }
+    public string Motivo { get; set; } = "";
+    public Guid RegistradoPor { get; set; }
 }
 
 public sealed class ResponsavelPessoa : Entidade

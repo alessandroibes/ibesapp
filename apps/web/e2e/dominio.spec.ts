@@ -11,7 +11,7 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     .getByLabel("Senha", { exact: true })
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await page.getByRole("tab", { name: "Manuais", exact: true }).click();
+  await page.getByRole("link", { name: "Manuais", exact: true }).click();
   const edicao = `Edição fictícia E2E ${Date.now()}`;
   await page.getByLabel("Identificação exata da edição").fill(edicao);
   await page
@@ -25,16 +25,16 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     page.getByText(`Embaixador Escudeiro · ${edicao}`),
   ).toBeVisible();
   await page
-    .getByRole("tab", { name: "Pessoas e jornada", exact: true })
+    .getByRole("link", { name: "Pessoas e jornada", exact: true })
     .click();
-  await page.getByText("Cadastrar pessoa", { exact: true }).click();
+  await page.getByRole("link", { name: "Adicionar pessoa" }).click();
   const nova = page.getByRole("form", { name: "Nova pessoa" });
   const nome = `Pessoa fictícia E2E ${Date.now()}`;
   await nova.getByLabel("Nome completo").fill(nome);
   await nova.getByLabel("Data de nascimento").fill("2010-01-01");
   await nova.getByRole("button", { name: "Salvar" }).click();
   await expect(
-    page.getByRole("heading", { name: `Ficha de ${nome}` }),
+    page.getByRole("heading", { name: nome, exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Iniciar trajetória" }).click();
   const requisitos = [
@@ -94,7 +94,14 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     fullPage: true,
   });
   await page.reload();
+  await page.getByRole("button", { name: "Áreas de trabalho" }).click();
+  await page
+    .getByRole("link", { name: "Pessoas e jornada", exact: true })
+    .click();
   await page.getByLabel("Buscar pelo nome").fill(nome);
-  await page.getByRole("button", { name: nome, exact: true }).click();
+  await page
+    .getByRole("row", { name: new RegExp(nome) })
+    .getByRole("link", { name: "Visualizar" })
+    .click();
   await expect(page.getByText("Concluída em 03/01/2024")).toBeVisible();
 });

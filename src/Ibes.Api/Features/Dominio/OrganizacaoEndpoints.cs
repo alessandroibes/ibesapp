@@ -136,6 +136,7 @@ public static class OrganizacaoEndpoints
     private static async Task<(Pessoa Pessoa, JornadaEmbaixador Jornada)> ExigirJornada(AppDbContext db, Guid pessoaId, DateOnly data, bool admitido, CancellationToken ct)
     {
         var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(x => x.Id == pessoaId, ct) ?? throw new RegistroNaoEncontradoException();
+        Exigir(pessoa.Ativa, "Somente pessoas ativas podem iniciar um vínculo organizacional.");
         var jornada = await db.Set<JornadaEmbaixador>().Include(x => x.Postos).SingleOrDefaultAsync(x => x.PessoaId == pessoaId, ct) ?? throw new Ibes.Foundation.Domain.RegraNegocioException(admitido ? "Somente Embaixadores podem integrar a Diretoria." : "Somente Candidatos e Embaixadores podem integrar Consulados.");
         Exigir(pessoa.DataNascimento is { } nascimento && Idade(nascimento, data) is >= 9 and < 18 && (!admitido || jornada.Postos.Any(p => p.DataIngresso <= data)), admitido ? "Somente Embaixadores podem integrar a Diretoria na data informada." : "A pessoa deve ser Candidato ou Embaixador na data informada.");
         return (pessoa, jornada);

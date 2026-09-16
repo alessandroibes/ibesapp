@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { Dominio } from "./Dominio";
 
 vi.mock("./Pessoas", () => ({ Pessoas: () => <h2>Pessoas abertas</h2> }));
@@ -23,39 +24,32 @@ vi.mock("./AcervoHistorico", () => ({
 }));
 
 describe("Navegação do domínio", () => {
-  it("expõe áreas permitidas como abas e mantém somente uma área visível", async () => {
+  it("expõe somente áreas permitidas como páginas com URLs próprias", async () => {
     render(
-      <Dominio
-        igrejaId="igreja-a"
-        permissoes={["pessoas.consultar", "agenda.consultar"]}
-      />,
-    );
-
-    expect(screen.getByRole("tablist")).toHaveAccessibleName(
-      "Gestão da Embaixada",
+      <MemoryRouter initialEntries={["/pessoas"]}>
+        <Dominio
+          igrejaId="igreja-a"
+          permissoes={["pessoas.consultar", "agenda.consultar"]}
+        />
+      </MemoryRouter>,
     );
     expect(
-      screen.getByRole("tab", { name: "Pessoas e jornada" }),
-    ).toHaveAttribute("aria-selected", "true");
+      screen.getByRole("navigation", { name: "Gestão da Embaixada" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Pessoas e jornada/ }),
+    ).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Pessoas abertas")).toBeInTheDocument();
-
     await userEvent.click(
-      screen.getByRole("tab", { name: "Agenda e reuniões" }),
+      screen.getByRole("link", { name: /Agenda e reuniões/ }),
     );
-
     expect(
-      screen.getByRole("tab", { name: "Agenda e reuniões" }),
-    ).toHaveAttribute("aria-selected", "true");
+      screen.getByRole("link", { name: /Agenda e reuniões/ }),
+    ).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Agenda aberta")).toBeInTheDocument();
     expect(screen.queryByText("Pessoas abertas")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("tab", { name: "Agenda e reuniões" }),
-    ).toHaveFocus();
-
-    await userEvent.keyboard("{ArrowLeft}");
-    expect(
-      screen.getByRole("tab", { name: "Pessoas e jornada" }),
-    ).toHaveFocus();
-    expect(screen.getByText("Pessoas abertas")).toBeInTheDocument();
+      screen.queryByRole("link", { name: /Competições/ }),
+    ).not.toBeInTheDocument();
   });
 });

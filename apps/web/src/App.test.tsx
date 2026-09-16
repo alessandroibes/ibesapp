@@ -2,13 +2,20 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { App } from "./App";
+import { MemoryRouter } from "react-router-dom";
+const renderizar = () =>
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>,
+  );
 describe("Shell web", () => {
   it("oferece acesso quando não autenticado", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(new Response(null, { status: 401 })),
     );
-    render(<App />);
+    renderizar();
     expect(
       await screen.findByRole("link", { name: /Entrar na minha conta/ }),
     ).toHaveAttribute("href", "/conta/entrar");
@@ -18,7 +25,7 @@ describe("Shell web", () => {
       "fetch",
       vi.fn().mockResolvedValue(Response.json({ igrejas: [] })),
     );
-    render(<App />);
+    renderizar();
     expect(
       await screen.findByText(/ainda não possui vínculo/),
     ).toBeInTheDocument();
@@ -29,7 +36,7 @@ describe("Shell web", () => {
       .mockRejectedValueOnce(new Error())
       .mockResolvedValueOnce(new Response(null, { status: 401 }));
     vi.stubGlobal("fetch", fetcher);
-    render(<App />);
+    renderizar();
     await userEvent.click(
       await screen.findByRole("button", { name: "Tentar novamente" }),
     );
@@ -63,7 +70,7 @@ describe("Shell web", () => {
         }),
       );
     vi.stubGlobal("fetch", fetcher);
-    render(<App />);
+    renderizar();
     await screen.findByText("Embaixada A");
     await userEvent.selectOptions(
       screen.getByRole("combobox", { name: "Igreja" }),

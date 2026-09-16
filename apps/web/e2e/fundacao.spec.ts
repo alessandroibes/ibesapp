@@ -21,17 +21,16 @@ test("acesso web, contexto, logout e acessibilidade", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Embaixada de demonstração" }),
   ).toBeVisible();
-  const primeiraAba = page.getByRole("tab", { name: "Pessoas e jornada" });
+  const primeiraAba = page.getByRole("link", { name: "Pessoas e jornada" });
   await expect(
-    page.getByRole("tablist", { name: "Gestão da Embaixada" }),
+    page.getByRole("navigation", { name: "Gestão da Embaixada" }),
   ).toBeVisible();
-  await primeiraAba.focus();
-  await primeiraAba.press("ArrowRight");
+  await expect(primeiraAba).toHaveAttribute("aria-current", "page");
+  await page.getByRole("link", { name: "Igreja e Embaixada" }).click();
   await expect(
-    page.getByRole("tab", { name: "Igreja e Embaixada" }),
-  ).toHaveAttribute("aria-selected", "true");
-  await page.getByRole("tab", { name: "Igreja e Embaixada" }).press("Home");
-  await expect(primeiraAba).toHaveAttribute("aria-selected", "true");
+    page.getByRole("link", { name: "Igreja e Embaixada" }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(page).toHaveURL(/\/instituicao$/);
   expect(
     (
       await new AxeBuilder({ page })

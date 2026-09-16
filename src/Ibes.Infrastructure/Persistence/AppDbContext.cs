@@ -93,6 +93,8 @@ public sealed partial class AppDbContext(DbContextOptions<AppDbContext> options,
                 throw new InvalidOperationException("Resultado de eleição é imutável.");
             if (entry.Entity is Ibes.Competicoes.AlteracaoEscalacao && entry.State != EntityState.Added)
                 throw new InvalidOperationException("Histórico da escalação é imutável.");
+            if (entry.Entity is AlteracaoSituacaoPessoa && entry.State != EntityState.Added)
+                throw new InvalidOperationException("Histórico da situação da pessoa é imutável.");
             if (entry.State != EntityState.Added && entry.Entity is VersaoManual or TarefaManual or Manual or ConclusaoRequisito or ConclusaoTarefa or CerimoniaReconhecimento)
                 throw new InvalidOperationException("Registro histórico ou versão de manual imutável.");
             if (entry.Entity is JornadaPosto && entry.State == EntityState.Modified && entry.Property(nameof(JornadaPosto.VersaoManualId)).IsModified)

@@ -12,7 +12,7 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
 
   const sufixo = Date.now();
   const iniciativaNome = `Camisas E2E ${sufixo}`;
-  await page.getByRole("tab", { name: "Financeiro", exact: true }).click();
+  await page.getByRole("link", { name: "Financeiro", exact: true }).click();
   const iniciativa = page.getByRole("form", { name: "Nova iniciativa" });
   await iniciativa.getByLabel("Nome").fill(iniciativaNome);
   await iniciativa.getByRole("button", { name: "Salvar" }).click();
@@ -36,7 +36,7 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
   await expect(page.getByText(/R\$\s*75,50/).first()).toBeVisible();
 
   await page
-    .getByRole("tab", { name: "Acervo histórico", exact: true })
+    .getByRole("link", { name: "Acervo histórico", exact: true })
     .click();
   const titulo = `Acampamento E2E ${sufixo}`;
   const marco = page.getByRole("form", { name: "Novo marco histórico" });

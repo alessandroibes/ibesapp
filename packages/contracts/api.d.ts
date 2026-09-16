@@ -193,6 +193,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pessoas/{id}/inativacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarSituacaoPessoaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/reativacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarSituacaoPessoaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pessoas/{id}/responsaveis": {
         parameters: {
             query?: never;
@@ -3597,6 +3685,14 @@ export interface components {
             aPartirDe: string;
             dados: components["schemas"]["AtividadeRequest"];
         };
+        AlteracaoSituacaoPessoaResponse: {
+            tipo: components["schemas"]["TipoAlteracaoSituacaoPessoa"];
+            /** Format: date */
+            data: string;
+            motivo: string;
+            /** Format: date-time */
+            registradoEm: string;
+        };
         AlterarCargoRequest: {
             /** Format: uuid */
             versao: string;
@@ -3679,6 +3775,13 @@ export interface components {
             natureza: components["schemas"]["NaturezaProva"];
             tipoReferencia: components["schemas"]["TipoReferenciaProva"];
             ativa: boolean;
+        };
+        AlterarSituacaoPessoaRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            data: string;
+            motivo: string;
         };
         AnexoMarcoHistoricoResponse: {
             /** Format: uuid */
@@ -4461,14 +4564,19 @@ export interface components {
             vinculos: components["schemas"]["VinculoResponse"][];
             /** Format: date */
             primeiraReuniao: null | string;
+            ativa: boolean;
+            alteracoesSituacao: components["schemas"]["AlteracaoSituacaoPessoaResponse"][];
         };
         PessoaResumo: {
             /** Format: uuid */
             id: string;
+            /** Format: uuid */
+            versao: string;
             nome: string;
             /** Format: date */
             dataNascimento: null | string;
             situacao: null | string;
+            ativa: boolean;
         };
         PessoasResponse: {
             /** Format: int32 */
@@ -4681,6 +4789,7 @@ export interface components {
             nome: string;
         };
         TipoAlteracaoEscalacao: number;
+        TipoAlteracaoSituacaoPessoa: number;
         TipoLancamentoFinanceiro: number;
         TipoReferenciaProva: number;
         TransferenciaRequest: {
@@ -4851,6 +4960,8 @@ export interface operations {
         parameters: {
             query?: {
                 busca?: string;
+                condicao?: string;
+                incluirInativos?: boolean;
                 pagina?: number | string;
             };
             header: {

@@ -39,6 +39,7 @@ public static class FrequenciaEndpoints
             var r = await db.Set<Reuniao>().SingleOrDefaultAsync(r => r.Id == id, ct) ?? throw new RegistroNaoEncontradoException();
             Exigir((pagina ?? 1) is >= 1 and <= 10000 && (busca?.Length ?? 0) <= 100, "Busca inválida.");
             var query = db.Set<Pessoa>().AsNoTracking();
+            query = query.Where(p => p.Ativa || db.Set<RegistroFrequencia>().Any(f => f.PessoaId == p.Id && f.ReuniaoId == id));
             if (!string.IsNullOrWhiteSpace(busca)) query = query.Where(p => p.Nome.Contains(busca));
             else query = query.Where(p => db.Set<JornadaEmbaixador>().Any(j => j.PessoaId == p.Id) || db.Set<RegistroFrequencia>().Any(f => f.PessoaId == p.Id && f.ReuniaoId == id));
             var total = await query.CountAsync(ct);

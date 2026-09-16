@@ -13,4 +13,11 @@ Princípios:
 - composição de painel administrativo próxima ao Tailwind Admin, com sidebar responsiva, cabeçalho operacional, superfícies neutras e páginas em cartões;
 - preservar identidade e linguagem dos Embaixadores do Rei sobre essa composição, sem incorporar fluxos ou dados demonstrativos de templates.
 
+Navegação e cadastros:
+- cada módulo possui rota própria e endereço copiável;
+- cadastros extensos usam uma página de listagem e páginas próprias para inclusão, visualização e edição;
+- ações curtas e contextuais, como inativar ou reativar uma pessoa, usam diálogo modal;
+- listas operacionais oferecem busca, filtros, estado vazio e ações explícitas por registro;
+- a navegação preserva foco, rótulos acessíveis e adaptação para telas pequenas.
+
 Agenda deve oferecer mês, semana/lista e cronograma anual. Status concluído deve ser visível sem depender apenas de cor. Eventos cancelados devem permanecer no histórico.

@@ -143,6 +143,42 @@ public sealed class DominioTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
+    public async Task InativacaoOcultaPessoaDasListasOperacionaisEPreservaHistorico()
+    {
+        var pessoa = await CriarPessoa();
+        var inativada = await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa.Id}/inativacao",
+            new AlterarSituacaoPessoaRequest(pessoa.Versao, new DateOnly(2026, 1, 1), "Mudança de cidade")));
+        var ativos = await Ler<PessoasResponse>(await api.GetTenant("/api/v1/pessoas", api.IgrejaA));
+        Assert.DoesNotContain(ativos.Pessoas, x => x.Id == pessoa.Id);
+        var todos = await Ler<PessoasResponse>(await api.GetTenant("/api/v1/pessoas?incluirInativos=true", api.IgrejaA));
+        Assert.False(todos.Pessoas.Single(x => x.Id == pessoa.Id).Ativa);
+        var ficha = await Pessoa(pessoa.Id);
+        Assert.False(ficha.Ativa); Assert.Single(ficha.AlteracoesSituacao);
+        await api.NaIgreja(api.IgrejaB, async db =>
+        {
+            db.VinculosIgreja.Add(new VinculoIgreja { IgrejaId = api.IgrejaB, UsuarioId = api.UsuarioId, Permissoes = Permissoes.Todas });
+            await db.SaveChangesAsync();
+        });
+        try
+        {
+            Assert.Equal(HttpStatusCode.NotFound, (await Enviar($"/api/v1/pessoas/{pessoa.Id}/reativacao",
+                new AlterarSituacaoPessoaRequest(inativada.Versao, new DateOnly(2026, 2, 1), "Retorno"), igreja: api.IgrejaB)).StatusCode);
+        }
+        finally
+        {
+            await api.NaIgreja(api.IgrejaB, async db =>
+            {
+                db.VinculosIgreja.Remove(await db.VinculosIgreja.SingleAsync());
+                await db.SaveChangesAsync();
+            });
+        }
+        await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa.Id}/reativacao",
+            new AlterarSituacaoPessoaRequest(inativada.Versao, new DateOnly(2026, 2, 1), "Retorno")));
+        ficha = await Pessoa(pessoa.Id);
+        Assert.True(ficha.Ativa); Assert.Equal(2, ficha.AlteracoesSituacao.Count);
+    }
+
+    [Fact]
     public async Task ValidacaoCsrfEPermissoesSaoObrigatorios()
     {
         Assert.Equal(HttpStatusCode.BadRequest, (await Enviar("/api/v1/pessoas", Dados(""))).StatusCode);

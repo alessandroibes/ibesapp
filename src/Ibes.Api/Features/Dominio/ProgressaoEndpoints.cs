@@ -46,6 +46,7 @@ public static class ProgressaoEndpoints
         {
             var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(p => p.Id == id, ct);
             if (pessoa is null) return Results.NotFound();
+            Exigir(pessoa.Ativa, "Uma pessoa inativa não pode iniciar uma candidatura.");
             Exigir(pessoa.DataNascimento is { } nascimento && Idade(nascimento, relogio.Hoje) >= 9, "Informe data de nascimento compatível com a jornada ER.");
             Operacao.ConferirVersao(pessoa, request.Versao);
             Exigir(!await db.Set<JornadaEmbaixador>().AnyAsync(j => j.PessoaId == id, ct), "A pessoa já possui uma trajetória.");
@@ -119,6 +120,7 @@ public static class ProgressaoEndpoints
     {
         await Operacao.ExigirConselheiro(db, tenant, relogio.Hoje, ct);
         var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(p => p.Id == id, ct) ?? throw new RegistroNaoEncontradoException();
+        Exigir(pessoa.Ativa, "A progressão não pode ser alterada enquanto a pessoa estiver inativa.");
         var jornada = await Jornadas(db).SingleOrDefaultAsync(j => j.PessoaId == id, ct) ?? throw new RegistroNaoEncontradoException();
         Operacao.ConferirVersao(jornada, versao);
         return (pessoa, jornada);

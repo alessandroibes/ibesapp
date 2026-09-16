@@ -12,7 +12,7 @@ test("agenda, visitante, chamada e primeira reunião preservada após cancelamen
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await page
-    .getByRole("tab", { name: "Agenda e reuniões", exact: true })
+    .getByRole("link", { name: "Agenda e reuniões", exact: true })
     .click();
   const sufixo = Date.now();
   const titulo = `Reunião E2E ${sufixo}`;
@@ -103,11 +103,15 @@ test("agenda, visitante, chamada e primeira reunião preservada após cancelamen
     path: "../../artifacts/operacao-mobile.png",
     fullPage: true,
   });
+  await page.getByRole("button", { name: "Áreas de trabalho" }).click();
   await page
-    .getByRole("tab", { name: "Pessoas e jornada", exact: true })
+    .getByRole("link", { name: "Pessoas e jornada", exact: true })
     .click();
   await page.getByLabel("Buscar pelo nome").fill(visitante);
-  await page.getByRole("button", { name: visitante, exact: true }).click();
+  await page
+    .getByRole("row", { name: new RegExp(visitante) })
+    .getByRole("link", { name: "Visualizar" })
+    .click();
   await expect(
     page.locator("dt", { hasText: "Primeira reunião" }).locator("+ dd"),
   ).toHaveText("01/06/2024");

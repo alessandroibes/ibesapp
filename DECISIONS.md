@@ -75,6 +75,8 @@
 - Primeira reunião é derivada da primeira presença registrada.
 - Ficha do ER agrega dados pessoais, responsáveis, igreja/batismo, admissão, progressão, frequência, carteira, Bíblia, foto e observações.
 - Responsáveis são extensíveis, embora UI inicial destaque pai e mãe.
+- A inativação acontece no cadastro de Pessoa, com data e motivo, preserva todo o histórico e permite reativação explícita.
+- Pessoas inativas ficam fora das listas operacionais por padrão, inclusive relatórios de ativos, aniversariantes, aptidões, escalas e novos vínculos. A consulta histórica e a edição cadastral permanecem disponíveis.
 
 ## Competições
 - Catálogo de provas reutilizável.

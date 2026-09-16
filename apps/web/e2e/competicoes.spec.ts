@@ -12,14 +12,14 @@ test("aptidão, elegibilidade e finalização da escalação", async ({ page }) 
 
   const sufixo = Date.now();
   const nome = `Competidor E2E ${sufixo}`;
-  await page.getByText("Cadastrar pessoa", { exact: true }).click();
+  await page.getByRole("link", { name: "Adicionar pessoa" }).click();
   const pessoa = page.getByRole("form", { name: "Nova pessoa" });
   await pessoa.getByLabel("Nome completo").fill(nome);
   await pessoa.getByLabel("Data de nascimento").fill("2010-01-01");
   await pessoa.getByRole("button", { name: "Salvar" }).click();
   await page.getByRole("button", { name: "Iniciar trajetória" }).click();
 
-  await page.getByRole("tab", { name: "Competições", exact: true }).click();
+  await page.getByRole("link", { name: "Competições", exact: true }).click();
   const modalidadeNome = `Natação E2E ${sufixo}`;
   const provaNome = `Revezamento E2E ${sufixo}`;
   const modalidade = page.getByRole("form", { name: "Nova modalidade" });

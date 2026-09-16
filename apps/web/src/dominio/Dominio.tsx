@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
+import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { criarApi } from "./api";
 import { Pessoas } from "./Pessoas";
 import { Instituicao } from "./Instituicao";
@@ -8,7 +9,6 @@ import { Organizacao } from "./Organizacao";
 import { Competicoes } from "./Competicoes";
 import { Financeiro } from "./Financeiro";
 import { AcervoHistorico } from "./AcervoHistorico";
-import { Button } from "../components/ui/button";
 
 type IconeNome =
   | "pessoas"
@@ -144,24 +144,17 @@ export function Dominio({
       permissao: "acervo.consultar",
     },
   ].filter((s) => permissoes.includes(s.permissao));
-  const [secao, setSecao] = useState(secoes[0]?.id ?? "");
   const [menuAberto, setMenuAberto] = useState(false);
   const botaoMenu = useRef<HTMLButtonElement>(null);
   const api = useMemo(() => criarApi(igrejaId), [igrejaId]);
-  const atual = secoes.find((item) => item.id === secao);
-  const selecionar = (id: string) => {
-    const estavaAberto = menuAberto;
-    setSecao(id);
-    setMenuAberto(false);
-    if (estavaAberto)
-      requestAnimationFrame(() =>
-        document.getElementById(`painel-${id}`)?.focus({ preventScroll: true }),
-      );
-  };
+  const location = useLocation();
+  const secao =
+    location.pathname.split("/").filter(Boolean)[0] ?? secoes[0]?.id;
+  const atual = secoes.find((item) => item.id === secao) ?? secoes[0];
   const abrirMenu = () => {
     setMenuAberto(true);
     requestAnimationFrame(() =>
-      document.getElementById(`aba-${secao}`)?.focus({ preventScroll: true }),
+      document.getElementById(`link-${secao}`)?.focus({ preventScroll: true }),
     );
   };
   const fecharMenu = () => {
@@ -170,42 +163,6 @@ export function Dominio({
       botaoMenu.current?.focus({ preventScroll: true }),
     );
   };
-  const conteudo =
-    secao === "pessoas" ? (
-      <Pessoas api={api} igrejaId={igrejaId} permissoes={permissoes} />
-    ) : secao === "instituicao" ? (
-      <Instituicao
-        api={api}
-        editar={permissoes.includes("embaixada.editar")}
-        podeConsultarPessoas={permissoes.includes("pessoas.consultar")}
-      />
-    ) : secao === "manuais" ? (
-      <Manuais api={api} editar={permissoes.includes("manuais.gerenciar")} />
-    ) : secao === "agenda" ? (
-      <Agenda api={api} permissoes={permissoes} />
-    ) : secao === "organizacao" ? (
-      <Organizacao
-        api={api}
-        gerenciar={permissoes.includes("organizacao.gerenciar")}
-      />
-    ) : secao === "competicoes" ? (
-      <Competicoes
-        api={api}
-        gerenciar={permissoes.includes("competicoes.gerenciar")}
-      />
-    ) : secao === "financeiro" ? (
-      <Financeiro
-        api={api}
-        gerenciar={permissoes.includes("financeiro.gerenciar")}
-      />
-    ) : secao === "acervo" ? (
-      <AcervoHistorico
-        api={api}
-        igrejaId={igrejaId}
-        gerenciar={permissoes.includes("acervo.gerenciar")}
-      />
-    ) : null;
-
   return (
     <div className="dominio">
       <button
@@ -242,51 +199,23 @@ export function Dominio({
             ×
           </button>
         </div>
-        <nav
-          aria-label="Gestão da Embaixada"
-          role="tablist"
-          aria-orientation="vertical"
-        >
-          {secoes.map((s, indice) => (
-            <Button
+        <nav aria-label="Gestão da Embaixada">
+          {secoes.map((s) => (
+            <Link
               key={s.id}
-              id={`aba-${s.id}`}
-              role="tab"
-              variant="outline"
+              id={`link-${s.id}`}
+              to={`/${s.id}`}
               className={`item-navegacao${s.id === secao ? " item-navegacao-ativo" : ""}`}
               aria-label={s.nome}
-              aria-selected={s.id === secao}
-              aria-controls={`painel-${s.id}`}
-              tabIndex={s.id === secao ? 0 : -1}
-              onClick={() => selecionar(s.id)}
-              onKeyDown={(evento) => {
-                const deslocamento =
-                  evento.key === "ArrowDown" || evento.key === "ArrowRight"
-                    ? 1
-                    : evento.key === "ArrowUp" || evento.key === "ArrowLeft"
-                      ? -1
-                      : 0;
-                const destino =
-                  evento.key === "Home"
-                    ? 0
-                    : evento.key === "End"
-                      ? secoes.length - 1
-                      : deslocamento
-                        ? (indice + deslocamento + secoes.length) %
-                          secoes.length
-                        : -1;
-                if (destino < 0) return;
-                evento.preventDefault();
-                document.getElementById(`aba-${secoes[destino].id}`)?.focus();
-                selecionar(secoes[destino].id);
-              }}
+              aria-current={s.id === secao ? "page" : undefined}
+              onClick={() => setMenuAberto(false)}
             >
               <Icone nome={s.id as IconeNome} />
               <span>
                 <strong>{s.nome}</strong>
                 <small>{s.resumo}</small>
               </span>
-            </Button>
+            </Link>
           ))}
         </nav>
       </aside>
@@ -300,14 +229,113 @@ export function Dominio({
             <strong>{atual?.nome}</strong>
           </div>
         </div>
-        <div
-          id={`painel-${secao}`}
-          role="tabpanel"
-          aria-labelledby={`aba-${secao}`}
-          tabIndex={-1}
-          className="painel-dominio"
-        >
-          {conteudo}
+        <div className="painel-dominio">
+          <Routes>
+            <Route
+              index
+              element={
+                secoes[0] ? (
+                  <Navigate to={`/${secoes[0].id}`} replace />
+                ) : (
+                  <p>Você não possui acesso às áreas de trabalho.</p>
+                )
+              }
+            />
+            {secoes.some((x) => x.id === "pessoas") && (
+              <Route
+                path="/pessoas/*"
+                element={
+                  <Pessoas
+                    api={api}
+                    igrejaId={igrejaId}
+                    permissoes={permissoes}
+                  />
+                }
+              />
+            )}
+            {secoes.some((x) => x.id === "instituicao") && (
+              <Route
+                path="/instituicao"
+                element={
+                  <Instituicao
+                    api={api}
+                    editar={permissoes.includes("embaixada.editar")}
+                    podeConsultarPessoas={permissoes.includes(
+                      "pessoas.consultar",
+                    )}
+                  />
+                }
+              />
+            )}
+            {secoes.some((x) => x.id === "manuais") && (
+              <Route
+                path="/manuais"
+                element={
+                  <Manuais
+                    api={api}
+                    editar={permissoes.includes("manuais.gerenciar")}
+                  />
+                }
+              />
+            )}
+            {secoes.some((x) => x.id === "agenda") && (
+              <Route
+                path="/agenda"
+                element={<Agenda api={api} permissoes={permissoes} />}
+              />
+            )}
+            {secoes.some((x) => x.id === "organizacao") && (
+              <Route
+                path="/organizacao"
+                element={
+                  <Organizacao
+                    api={api}
+                    gerenciar={permissoes.includes("organizacao.gerenciar")}
+                  />
+                }
+              />
+            )}
+            {secoes.some((x) => x.id === "competicoes") && (
+              <Route
+                path="/competicoes"
+                element={
+                  <Competicoes
+                    api={api}
+                    gerenciar={permissoes.includes("competicoes.gerenciar")}
+                  />
+                }
+              />
+            )}
+            {secoes.some((x) => x.id === "financeiro") && (
+              <Route
+                path="/financeiro"
+                element={
+                  <Financeiro
+                    api={api}
+                    gerenciar={permissoes.includes("financeiro.gerenciar")}
+                  />
+                }
+              />
+            )}
+            {secoes.some((x) => x.id === "acervo") && (
+              <Route
+                path="/acervo"
+                element={
+                  <AcervoHistorico
+                    api={api}
+                    igrejaId={igrejaId}
+                    gerenciar={permissoes.includes("acervo.gerenciar")}
+                  />
+                }
+              />
+            )}
+            <Route
+              path="*"
+              element={
+                secoes[0] ? <Navigate to={`/${secoes[0].id}`} replace /> : null
+              }
+            />
+          </Routes>
         </div>
       </div>
     </div>

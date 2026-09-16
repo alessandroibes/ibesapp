@@ -200,7 +200,7 @@ public static class CompeticoesEndpoints
         var configuracao = await db.Set<ProvaCompeticao>().AsNoTracking().Include(x => x.Categorias).SingleOrDefaultAsync(x => x.Id == provaCompeticaoId && x.CompeticaoId == competicaoId, ct) ?? throw new RegistroNaoEncontradoException();
         var aptos = await db.Set<AptidaoProva>().AsNoTracking().Where(x => x.ProvaId == configuracao.ProvaId && x.DataInicio <= hoje && (x.DataFim == null || x.DataFim >= hoje)).Select(x => x.PessoaId).Distinct().ToListAsync(ct);
         var jornadas = await db.Set<JornadaEmbaixador>().AsNoTracking().Where(x => aptos.Contains(x.PessoaId)).ToListAsync(ct);
-        var pessoas = await db.Set<Pessoa>().AsNoTracking().Where(x => jornadas.Select(j => j.PessoaId).Contains(x.Id)).ToListAsync(ct);
+        var pessoas = await db.Set<Pessoa>().AsNoTracking().Where(x => x.Ativa && jornadas.Select(j => j.PessoaId).Contains(x.Id)).ToListAsync(ct);
         var conflitos = await Conflitos(configuracao, db, ct);
         return pessoas.Where(p => p.DataNascimento is { } nascimento && configuracao.Elegivel(nascimento, competicao.DataBaseCategoria))
             .OrderBy(p => p.Nome).Select(p => new CandidatoEscalacaoResponse(p.Id, p.Nome, FaixaEtaria(p.DataNascimento!.Value, competicao.DataBaseCategoria)!, conflitos.GetValueOrDefault(p.Id) ?? [])).ToList();
@@ -244,8 +244,8 @@ public static class CompeticoesEndpoints
     private static async Task ExigirCandidatoOuEmbaixador(AppDbContext db, Guid pessoaId, DateOnly data, CancellationToken ct)
     {
         var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(x => x.Id == pessoaId, ct) ?? throw new RegistroNaoEncontradoException();
-        Exigir(await db.Set<JornadaEmbaixador>().AnyAsync(x => x.PessoaId == pessoaId, ct) && pessoa.DataNascimento is { } nascimento && Idade(nascimento, data) is >= 9 and < 18,
-            "Somente Candidatos e Embaixadores podem receber aptidão nesta data.");
+        Exigir(pessoa.Ativa && await db.Set<JornadaEmbaixador>().AnyAsync(x => x.PessoaId == pessoaId, ct) && pessoa.DataNascimento is { } nascimento && Idade(nascimento, data) is >= 9 and < 18,
+            "Somente Candidatos e Embaixadores ativos podem receber aptidão nesta data.");
     }
 }
 
