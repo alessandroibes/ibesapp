@@ -20,6 +20,19 @@ Na Fase 3, use **Agenda e reuniões** no web para cadastrar tipos/promotoras, at
 
 Na Fase 6, use **Financeiro** para controlar entradas e saídas gerais ou por evento/iniciativa e **Acervo histórico** para manter a linha do tempo, fotos e documentos da Embaixada. Consulte [financeiro e acervo](docs/architecture/FINANCEIRO-E-ACERVO-HISTORICO.md) e [validações](docs/quality/FINANCEIRO-ACERVO-VALIDATION.md).
 
+## Evolução visual web
+
+A reorganização visual das funcionalidades existentes está planejada em [UX-REDESIGN-ROADMAP.md](plans/UX-REDESIGN-ROADMAP.md). Execute os prompts abaixo em ordem e registre cada etapa em commit próprio:
+
+1. `prompts/06-design-system-shell.md`;
+2. `prompts/07-pessoas-jornada-ux.md`;
+3. `prompts/08-agenda-operacao-ux.md`;
+4. `prompts/09-organizacao-competicoes-ux.md`;
+5. `prompts/10-modulos-administrativos-ux.md`;
+6. `prompts/11-ux-consolidacao.md`.
+
+As etapas reorganizam rotas, componentes e apresentação sem criar regras de negócio. Dashboard, Relatórios, identidade visual oficial e reformulação do aplicativo React Native permanecem fora desse ciclo até que seus requisitos sejam definidos.
+
 ## Produto inicial
 Sistema multi-organização para gestão de Embaixadas de Embaixadores do Rei, começando pela Embaixada James Jackson Taylor (Embaixada J. J. Taylor).
 

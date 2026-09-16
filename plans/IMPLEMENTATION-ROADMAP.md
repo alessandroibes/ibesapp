@@ -23,3 +23,7 @@ Financeiro básico, acervo histórico e relatórios.
 
 ## Fase 7 — Qualidade/release
 Performance, acessibilidade, segurança, observabilidade, backup/restauração e release.
+
+## Ciclo de evolução visual web
+
+Após as Fases funcionais 0 a 6, executar sequencialmente as Etapas UX 06 a 11 descritas em `plans/UX-REDESIGN-ROADMAP.md`. Esse ciclo reorganiza a experiência das funcionalidades existentes e não amplia as regras de negócio.
