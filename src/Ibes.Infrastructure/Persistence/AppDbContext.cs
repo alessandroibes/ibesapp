@@ -26,6 +26,7 @@ public sealed partial class AppDbContext(DbContextOptions<AppDbContext> options,
         ConfigurarDominio(b);
         ConfigurarOperacao(b);
         ConfigurarOrganizacao(b);
+        ConfigurarCompeticoes(b);
         b.Entity<Usuario>().ToTable("usuarios", "identidade");
         b.Entity<IdentityRole<Guid>>().ToTable("papeis", "identidade");
         b.Entity<IdentityUserRole<Guid>>().ToTable("usuarios_papeis", "identidade");
@@ -87,6 +88,8 @@ public sealed partial class AppDbContext(DbContextOptions<AppDbContext> options,
                 throw new InvalidOperationException("Histórico de frequência é imutável.");
             if (entry.Entity is Ibes.ConsuladosDiretoria.ResultadoEleicao && entry.State != EntityState.Added)
                 throw new InvalidOperationException("Resultado de eleição é imutável.");
+            if (entry.Entity is Ibes.Competicoes.AlteracaoEscalacao && entry.State != EntityState.Added)
+                throw new InvalidOperationException("Histórico da escalação é imutável.");
             if (entry.State != EntityState.Added && entry.Entity is VersaoManual or TarefaManual or Manual or ConclusaoRequisito or ConclusaoTarefa or CerimoniaReconhecimento)
                 throw new InvalidOperationException("Registro histórico ou versão de manual imutável.");
             if (entry.Entity is JornadaPosto && entry.State == EntityState.Modified && entry.Property(nameof(JornadaPosto.VersaoManualId)).IsModified)

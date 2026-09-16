@@ -33,7 +33,7 @@ public sealed class MigracoesTests
         var script = migrador.GenerateScript(options: MigrationsSqlGenerationOptions.Idempotent);
         await db.Database.ExecuteSqlRawAsync(script);
         await db.Database.ExecuteSqlRawAsync(script);
-        Assert.Equal(4, (await db.Database.GetAppliedMigrationsAsync()).Count());
+        Assert.Equal(5, (await db.Database.GetAppliedMigrationsAsync()).Count());
         Assert.Single(await db.Igrejas.ToListAsync());
     }
 }

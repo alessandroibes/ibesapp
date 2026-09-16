@@ -421,6 +421,11 @@ footer {
   gap: 18px;
   align-items: start;
 }
+.prova-competicao {
+  border-top: 3px solid #b68a35;
+  margin-top: 24px;
+  padding-top: 18px;
+}
 @media (max-width: 1050px) {
   .calendario-agenda {
     grid-template-columns: 1fr;

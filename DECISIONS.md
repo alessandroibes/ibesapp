@@ -84,6 +84,9 @@
 - Revezamentos podem exigir exatamente 4 titulares e permitir reservas conforme regulamento.
 - Biografia Missionária possui missionário/referência variável por competição.
 - Conhecimentos Gerais da Bíblia possui livro de referência variável por competição.
+- Confirmação da Fase 5: Candidatos e Embaixadores podem receber aptidão e participar das competições, desde que sejam elegíveis na data-base.
+- O máximo de participantes de uma prova considera conjuntamente titulares e reservas; reservas também respeitam seu limite específico.
+- Escalação finalizada não pode ser alterada. Um Conselheiro pode reabri-la explicitamente, preservando o acontecimento na auditoria e no histórico da escalação.
 
 ## Agenda
 - Confirmação da Fase 3: frequência usa Presença com Pontualidade, Presença com Atraso, Falta e Falta Justificada. Ausência de lançamento não equivale a falta.

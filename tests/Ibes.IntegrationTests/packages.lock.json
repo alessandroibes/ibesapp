@@ -1137,6 +1137,7 @@
       "ibes.api": {
         "type": "Project",
         "dependencies": {
+          "Ibes.Competicoes": "[1.0.0, )",
           "Ibes.ConsuladosDiretoria": "[1.0.0, )",
           "Ibes.Infrastructure": "[1.0.0, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.10, )",
@@ -1146,6 +1147,12 @@
           "OpenTelemetry.Extensions.Hosting": "[1.18.0, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.18.0, )",
           "OpenTelemetry.Instrumentation.Http": "[1.18.0, )"
+        }
+      },
+      "ibes.competicoes": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
         }
       },
       "ibes.consuladosdiretoria": {
@@ -1173,6 +1180,7 @@
         "type": "Project",
         "dependencies": {
           "Ibes.AgendaAtividades": "[1.0.0, )",
+          "Ibes.Competicoes": "[1.0.0, )",
           "Ibes.ConsuladosDiretoria": "[1.0.0, )",
           "Ibes.Embaixadas": "[1.0.0, )",
           "Ibes.Foundation": "[1.0.0, )",

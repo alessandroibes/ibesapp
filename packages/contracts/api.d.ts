@@ -2167,6 +2167,717 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/competicoes/catalogo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ModalidadeResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/catalogo/modalidades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ModalidadeRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/catalogo/modalidades/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarModalidadeRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/catalogo/provas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProvaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/catalogo/provas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarProvaRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/aptidoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    pessoaId?: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AptidaoResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AptidaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/aptidoes/{id}/encerramento": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EncerrarAptidaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CompeticaoResumoResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CompeticaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CompeticaoDetalheResponse"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarCompeticaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/{id}/provas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProvaCompeticaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/provas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarProvaCompeticaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/{competicaoId}/provas/{provaCompeticaoId}/candidatos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    competicaoId: string;
+                    provaCompeticaoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CandidatoEscalacaoResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/escalacoes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EscalacaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EscalacaoResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/escalacoes/{id}/finalizacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VersaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EscalacaoResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/competicoes/escalacoes/{id}/reabertura": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ReabrirEscalacaoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["EscalacaoResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2178,6 +2889,12 @@ export interface components {
             versaoManualId: string;
             /** Format: date */
             dataAdmissao: string;
+        };
+        AlteracaoEscalacaoResponse: {
+            tipo: components["schemas"]["TipoAlteracaoEscalacao"];
+            /** Format: date-time */
+            registradoEm: string;
+            motivo: null | string;
         };
         AlteracaoFrequenciaResponse: {
             /** Format: uuid */
@@ -2207,15 +2924,68 @@ export interface components {
             quantidadeVagas: number | string;
             ativo: boolean;
         };
+        AlterarCompeticaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            dados: components["schemas"]["CompeticaoRequest"];
+        };
         AlterarConsuladoRequest: {
             /** Format: uuid */
             versao: string;
             nome: string;
         };
+        AlterarModalidadeRequest: {
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            ativa: boolean;
+        };
         AlterarPessoaRequest: {
             /** Format: uuid */
             versao: string;
             dados: components["schemas"]["DadosPessoa"];
+        };
+        AlterarProvaCompeticaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            versaoEscalacao: string;
+            dados: components["schemas"]["ProvaCompeticaoRequest"];
+        };
+        AlterarProvaRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            modalidadeId: string;
+            nome: string;
+            natureza: components["schemas"]["NaturezaProva"];
+            tipoReferencia: components["schemas"]["TipoReferenciaProva"];
+            ativa: boolean;
+        };
+        AptidaoRequest: {
+            /** Format: uuid */
+            pessoaId: string;
+            /** Format: uuid */
+            provaId: string;
+            /** Format: date */
+            dataInicio: string;
+        };
+        AptidaoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            pessoaId: string;
+            pessoa: string;
+            /** Format: uuid */
+            provaId: string;
+            prova: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            motivoFim: null | string;
         };
         AtividadeDetalheResponse: {
             /** Format: uuid */
@@ -2276,6 +3046,13 @@ export interface components {
             tipos: components["schemas"]["NomeAgendaResponse"][];
             modelos: components["schemas"]["ModeloResponse"][];
         };
+        CandidatoEscalacaoResponse: {
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            faixaEtaria: string;
+            conflitos: string[];
+        };
         CargoRequest: {
             nome: string;
             /** Format: int32 */
@@ -2291,6 +3068,7 @@ export interface components {
             quantidadeVagas: number | string;
             ativo: boolean;
         };
+        CategoriaCompeticao: number;
         CerimoniaRequest: {
             /** Format: uuid */
             versao: string;
@@ -2318,6 +3096,49 @@ export interface components {
             total: number | string;
             pessoas: components["schemas"]["PessoaChamada"][];
             contagens: components["schemas"]["ContagemFrequencia"][];
+        };
+        CompeticaoDetalheResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            /** Format: date */
+            dataBaseCategoria: string;
+            local: null | string;
+            observacoes: null | string;
+            provas: components["schemas"]["ProvaCompeticaoResponse"][];
+        };
+        CompeticaoRequest: {
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            /** Format: date */
+            dataBaseCategoria: string;
+            local: null | string;
+            observacoes: null | string;
+        };
+        CompeticaoResumoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: string;
+            /** Format: date */
+            dataBaseCategoria: string;
+            local: null | string;
+            /** Format: int32 */
+            quantidadeProvas: number | string;
         };
         ConcluirPostoRequest: {
             /** Format: uuid */
@@ -2500,6 +3321,13 @@ export interface components {
             /** Format: uuid */
             versaoEmbaixada: string;
         };
+        EncerrarAptidaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataFim: string;
+            motivo: string;
+        };
         EncerrarOrganizacaoRequest: {
             /** Format: uuid */
             versao: string;
@@ -2512,6 +3340,21 @@ export interface components {
             versao: string;
             /** Format: date */
             dataFim: string;
+        };
+        EscalacaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            participantes: components["schemas"]["ParticipanteEscalacaoRequest"][];
+        };
+        EscalacaoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            situacao: components["schemas"]["SituacaoEscalacao"];
+            participantes: components["schemas"]["ParticipanteEscalacaoResponse"][];
+            alteracoes: components["schemas"]["AlteracaoEscalacaoResponse"][];
+            avisos: string[];
         };
         ExcecaoRequest: {
             /** Format: uuid */
@@ -2544,6 +3387,7 @@ export interface components {
             situacao: number | string;
             observacoes: null | string;
         };
+        FuncaoEscalacao: number;
         IdResponse: {
             /** Format: uuid */
             id: string;
@@ -2657,6 +3501,18 @@ export interface components {
             /** Format: date */
             dataInicio: string;
         };
+        ModalidadeRequest: {
+            nome: string;
+        };
+        ModalidadeResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            ativa: boolean;
+            provas: components["schemas"]["ProvaResponse"][];
+        };
         ModeloRequest: {
             nome: string;
             itens: components["schemas"]["ItemRoteiro"][];
@@ -2671,6 +3527,7 @@ export interface components {
             nome: string;
             itens: components["schemas"]["ItemRoteiro"][];
         };
+        NaturezaProva: number;
         NomeAgendaRequest: {
             nome: string;
         };
@@ -2752,6 +3609,17 @@ export interface components {
             /** Format: date */
             hoje: string;
         };
+        ParticipanteEscalacaoRequest: {
+            /** Format: uuid */
+            pessoaId: string;
+            funcao: components["schemas"]["FuncaoEscalacao"];
+        };
+        ParticipanteEscalacaoResponse: {
+            /** Format: uuid */
+            pessoaId: string;
+            nome: string;
+            funcao: components["schemas"]["FuncaoEscalacao"];
+        };
         PessoaChamada: {
             /** Format: uuid */
             pessoaId: string;
@@ -2822,6 +3690,77 @@ export interface components {
             detail?: null | string;
             instance?: null | string;
         };
+        ProvaCompeticaoRequest: {
+            /** Format: uuid */
+            provaId: string;
+            categorias: components["schemas"]["CategoriaCompeticao"][];
+            /** Format: int32 */
+            minimoTitulares: number | string;
+            /** Format: int32 */
+            maximoParticipantes: number | string;
+            /** Format: int32 */
+            maximoReservas: number | string;
+            /** Format: int32 */
+            quantidadeExataTitulares: null | number | string;
+            referencia: null | string;
+            /** Format: date */
+            data: null | string;
+            /** Format: time */
+            horaInicio: null | string;
+            /** Format: time */
+            horaFim: null | string;
+        };
+        ProvaCompeticaoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: uuid */
+            provaId: string;
+            prova: string;
+            modalidade: string;
+            natureza: components["schemas"]["NaturezaProva"];
+            tipoReferencia: components["schemas"]["TipoReferenciaProva"];
+            categorias: components["schemas"]["CategoriaCompeticao"][];
+            /** Format: int32 */
+            minimoTitulares: number | string;
+            /** Format: int32 */
+            maximoParticipantes: number | string;
+            /** Format: int32 */
+            maximoReservas: number | string;
+            /** Format: int32 */
+            quantidadeExataTitulares: null | number | string;
+            referencia: null | string;
+            /** Format: date */
+            data: null | string;
+            /** Format: time */
+            horaInicio: null | string;
+            /** Format: time */
+            horaFim: null | string;
+            escalacao: components["schemas"]["EscalacaoResponse"];
+        };
+        ProvaRequest: {
+            /** Format: uuid */
+            modalidadeId: string;
+            nome: string;
+            natureza: components["schemas"]["NaturezaProva"];
+            tipoReferencia: components["schemas"]["TipoReferenciaProva"];
+        };
+        ProvaResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            natureza: components["schemas"]["NaturezaProva"];
+            tipoReferencia: components["schemas"]["TipoReferenciaProva"];
+            ativa: boolean;
+        };
+        ReabrirEscalacaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            motivo: string;
+        };
         RequisitoResponse: {
             /** Format: int32 */
             requisito: number | string;
@@ -2884,6 +3823,7 @@ export interface components {
         SessaoResponse: {
             igrejas: components["schemas"]["IgrejaResponse"][];
         };
+        SituacaoEscalacao: number;
         TarefaJornadaResponse: {
             /** Format: uuid */
             id: string;
@@ -2896,6 +3836,8 @@ export interface components {
             id: string;
             nome: string;
         };
+        TipoAlteracaoEscalacao: number;
+        TipoReferenciaProva: number;
         TransferenciaRequest: {
             /** Format: uuid */
             versao: string;

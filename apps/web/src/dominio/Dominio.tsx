@@ -5,6 +5,7 @@ import { Instituicao } from "./Instituicao";
 import { Manuais } from "./Manuais";
 import { Agenda } from "./Agenda";
 import { Organizacao } from "./Organizacao";
+import { Competicoes } from "./Competicoes";
 import { Button } from "../components/ui/button";
 export function Dominio({
   igrejaId,
@@ -30,6 +31,11 @@ export function Dominio({
       id: "organizacao",
       nome: "Consulados e Diretoria",
       permissao: "organizacao.consultar",
+    },
+    {
+      id: "competicoes",
+      nome: "Competições",
+      permissao: "competicoes.consultar",
     },
   ].filter((s) => permissoes.includes(s.permissao));
   const [secao, setSecao] = useState(secoes[0]?.id ?? "");
@@ -66,6 +72,12 @@ export function Dominio({
         <Organizacao
           api={api}
           gerenciar={permissoes.includes("organizacao.gerenciar")}
+        />
+      )}
+      {secao === "competicoes" && (
+        <Competicoes
+          api={api}
+          gerenciar={permissoes.includes("competicoes.gerenciar")}
         />
       )}
     </div>
