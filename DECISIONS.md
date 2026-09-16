@@ -14,6 +14,7 @@
 - PostgreSQL.
 - React + TypeScript + Vite.
 - Tailwind CSS + shadcn/ui com design system próprio.
+- A interface web adota composição visual de painel administrativo inspirada no Tailwind Admin, com sidebar responsiva, cabeçalho operacional, superfícies neutras e páginas em cartões. O sistema visual permanece próprio; não há dependência obrigatória do template.
 - React Native + Expo + Expo Router.
 - ASP.NET Core Identity + OpenIddict.
 - Containers + PostgreSQL gerenciado.
