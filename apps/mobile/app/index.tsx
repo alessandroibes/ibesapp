@@ -30,12 +30,41 @@ const discovery = {
   tokenEndpoint: `${api}/connect/token`,
 };
 type Igreja = components["schemas"]["IgrejaResponse"];
+type Modulo = "operacao" | "pessoas" | "organizacao" | "competicoes";
+
+const modulosDisponiveis = (permissoes: string[]) =>
+  [
+    {
+      id: "operacao" as const,
+      nome: "Agenda",
+      visivel:
+        permissoes.includes("agenda.consultar") ||
+        permissoes.includes("frequencia.consultar"),
+    },
+    {
+      id: "pessoas" as const,
+      nome: "Pessoas",
+      visivel: permissoes.includes("pessoas.consultar"),
+    },
+    {
+      id: "organizacao" as const,
+      nome: "Organização",
+      visivel: permissoes.includes("organizacao.consultar"),
+    },
+    {
+      id: "competicoes" as const,
+      nome: "Competições",
+      visivel: permissoes.includes("competicoes.consultar"),
+    },
+  ].filter((item) => item.visivel);
+
 export default function Inicio() {
   const [sessao, setSessao] = useState<Sessao | null>(null);
   const [igrejas, setIgrejas] = useState<Igreja[]>([]);
   const [selecionada, setSelecionada] = useState("");
   const [embaixada, setEmbaixada] = useState("");
   const [permissoes, setPermissoes] = useState<string[]>([]);
+  const [modulo, setModulo] = useState<Modulo>("operacao");
   const [loading, setLoading] = useState(true);
   const [carregandoIgrejas, setCarregandoIgrejas] = useState(false);
   const [erro, setErro] = useState("");
@@ -126,8 +155,10 @@ export default function Inicio() {
         embaixada: string;
         permissoes?: string[];
       };
+      const novosModulos = modulosDisponiveis(data.permissoes ?? []);
       setEmbaixada(data.embaixada);
       setPermissoes(data.permissoes ?? []);
+      if (novosModulos[0]) setModulo(novosModulos[0].id);
     } catch {
       setErro(
         "Não foi possível acessar a Igreja. Entre novamente se sua sessão expirou.",
@@ -148,11 +179,15 @@ export default function Inicio() {
       setErro("Não foi possível encerrar a sessão. Tente novamente.");
     }
   }
+  const modulos = modulosDisponiveis(permissoes);
   return (
     <SafeAreaView style={styles.page}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.marca}>EMBAIXADORES DO REI</Text>
-        <Text accessibilityRole="header" style={styles.title}>
+        <Text
+          accessibilityRole="header"
+          style={[styles.title, sessao && styles.titleAutenticado]}
+        >
           Cuidar de cada jornada.
         </Text>
         <Text style={styles.subtitle}>
@@ -237,41 +272,74 @@ export default function Inicio() {
                   <Text accessibilityRole="header" style={styles.heading}>
                     {embaixada}
                   </Text>
-                  {(permissoes.includes("agenda.consultar") ||
-                    permissoes.includes("frequencia.consultar")) && (
-                    <Operacao
-                      key={`operacao-${selecionada}`}
-                      api={api}
-                      token={sessao.accessToken}
-                      igrejaId={selecionada}
-                      permissoes={permissoes}
-                    />
-                  )}
-                  {permissoes.includes("pessoas.consultar") && (
-                    <Pessoas
-                      key={selecionada}
-                      api={api}
-                      token={sessao.accessToken}
-                      igrejaId={selecionada}
-                      permissoes={permissoes}
-                    />
-                  )}
-                  {permissoes.includes("organizacao.consultar") && (
-                    <Organizacao
-                      key={`organizacao-${selecionada}`}
-                      api={api}
-                      token={sessao.accessToken}
-                      igrejaId={selecionada}
-                    />
-                  )}
-                  {permissoes.includes("competicoes.consultar") && (
-                    <Competicoes
-                      key={`competicoes-${selecionada}`}
-                      api={api}
-                      token={sessao.accessToken}
-                      igrejaId={selecionada}
-                    />
-                  )}
+                  <Text style={styles.rotuloModulos}>Áreas de trabalho</Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.modulos}
+                    accessibilityRole="tablist"
+                  >
+                    {modulos.map((item) => (
+                      <Pressable
+                        key={item.id}
+                        accessibilityRole="tab"
+                        accessibilityState={{ selected: modulo === item.id }}
+                        onPress={() => setModulo(item.id)}
+                        style={[
+                          styles.moduloBotao,
+                          modulo === item.id && styles.moduloAtivo,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.moduloTexto,
+                            modulo === item.id && styles.moduloTextoAtivo,
+                          ]}
+                        >
+                          {item.nome}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                  {modulo === "operacao" &&
+                    (permissoes.includes("agenda.consultar") ||
+                      permissoes.includes("frequencia.consultar")) && (
+                      <Operacao
+                        key={`operacao-${selecionada}`}
+                        api={api}
+                        token={sessao.accessToken}
+                        igrejaId={selecionada}
+                        permissoes={permissoes}
+                      />
+                    )}
+                  {modulo === "pessoas" &&
+                    permissoes.includes("pessoas.consultar") && (
+                      <Pessoas
+                        key={selecionada}
+                        api={api}
+                        token={sessao.accessToken}
+                        igrejaId={selecionada}
+                        permissoes={permissoes}
+                      />
+                    )}
+                  {modulo === "organizacao" &&
+                    permissoes.includes("organizacao.consultar") && (
+                      <Organizacao
+                        key={`organizacao-${selecionada}`}
+                        api={api}
+                        token={sessao.accessToken}
+                        igrejaId={selecionada}
+                      />
+                    )}
+                  {modulo === "competicoes" &&
+                    permissoes.includes("competicoes.consultar") && (
+                      <Competicoes
+                        key={`competicoes-${selecionada}`}
+                        api={api}
+                        token={sessao.accessToken}
+                        igrejaId={selecionada}
+                      />
+                    )}
                 </>
               )}
               <Pressable
@@ -284,8 +352,12 @@ export default function Inicio() {
             </>
           )}
         </View>
-        <Text style={styles.footer}>“Somos embaixadores por Cristo.”</Text>
-        <Text style={styles.body}>2 Coríntios 5:20</Text>
+        {!sessao && (
+          <>
+            <Text style={styles.footer}>“Somos embaixadores por Cristo.”</Text>
+            <Text style={styles.body}>2 Coríntios 5:20</Text>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -301,6 +373,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   title: { fontSize: 40, fontWeight: "600", color: "#183a38", marginTop: 24 },
+  titleAutenticado: { fontSize: 30, marginTop: 8 },
   subtitle: { color: "#526258", fontSize: 17, lineHeight: 26 },
   card: {
     backgroundColor: "#fffdf8",
@@ -329,5 +402,25 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   error: { color: "#972b25", fontSize: 16 },
+  rotuloModulos: {
+    color: "#526258",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.4,
+    textTransform: "uppercase",
+  },
+  modulos: { gap: 8, paddingVertical: 2 },
+  moduloBotao: {
+    minHeight: 44,
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#71817c",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  moduloAtivo: { backgroundColor: "#183a38", borderColor: "#183a38" },
+  moduloTexto: { color: "#183a38", fontSize: 15, fontWeight: "600" },
+  moduloTextoAtivo: { color: "#fff" },
   footer: { fontSize: 18, color: "#526258", marginTop: 18 },
 });

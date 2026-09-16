@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import { Button } from "../components/ui/button";
 import { type Api, useConsulta } from "./api";
 import type { components } from "../../../../packages/contracts/api";
@@ -30,10 +30,15 @@ export function Formulario({
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const mensagem = useRef<HTMLParagraphElement>(null);
   return (
     <form
       aria-label={titulo}
       className="formulario-dominio"
+      onInput={() => {
+        if (erro) setErro("");
+        if (sucesso) setSucesso(false);
+      }}
       onSubmit={async (e) => {
         e.preventDefault();
         const dados = Object.fromEntries(
@@ -47,6 +52,7 @@ export function Formulario({
           setSucesso(true);
         } catch (e) {
           setErro(e instanceof Error ? e.message : "Não foi possível salvar.");
+          requestAnimationFrame(() => mensagem.current?.focus());
         } finally {
           setSalvando(false);
         }
@@ -99,8 +105,16 @@ export function Formulario({
         </div>
         <Button type="submit">{salvando ? "Salvando…" : texto}</Button>
       </fieldset>
-      {erro && <p role="alert">{erro}</p>}
-      {sucesso && <p role="status">Registro salvo.</p>}
+      {erro && (
+        <p ref={mensagem} role="alert" tabIndex={-1}>
+          {erro}
+        </p>
+      )}
+      {sucesso && (
+        <p role="status" aria-live="polite">
+          Registro salvo.
+        </p>
+      )}
     </form>
   );
 }
@@ -123,6 +137,22 @@ export function Estado({
         </div>
       )}
     </>
+  );
+}
+
+export function EstadoConsultas({
+  consultas,
+  atualizar,
+}: {
+  consultas: { loading: boolean; erro: string }[];
+  atualizar: () => void;
+}) {
+  return (
+    <Estado
+      loading={consultas.some((x) => x.loading)}
+      erro={consultas.map((x) => x.erro).find(Boolean) ?? ""}
+      atualizar={atualizar}
+    />
   );
 }
 export function SeletorPessoa({

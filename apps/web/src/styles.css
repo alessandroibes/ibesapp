@@ -6,6 +6,10 @@
   --primary: #183a38;
   --primary-foreground: #fff;
   --ring: #9b6b12;
+  --surface: #fffdf8;
+  --border: #cbd1c3;
+  --muted: #526258;
+  --shadow: 0 12px 34px rgb(24 58 56 / 8%);
 }
 @theme inline {
   --color-background: var(--background);
@@ -22,6 +26,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, sans-serif;
+  line-height: 1.5;
 }
 a {
   color: inherit;
@@ -76,6 +81,23 @@ header {
 main {
   padding: 60px 9% 24px;
 }
+.app-autenticado main {
+  padding-top: 34px;
+}
+.abertura-operacional {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.6fr);
+  align-items: end;
+  gap: 28px;
+}
+.abertura-operacional h1 {
+  font-size: clamp(34px, 4vw, 52px);
+}
+.abertura-operacional .introducao {
+  margin: 0 0 5px;
+  justify-self: end;
+  text-align: right;
+}
 .eyebrow {
   font-size: 11px;
   font-weight: 800;
@@ -112,6 +134,17 @@ h1 em {
   grid-template-columns: 1fr 1fr;
   gap: 32px;
   min-height: 200px;
+}
+.painel-operacional {
+  min-height: 0;
+  margin-top: 24px;
+  padding: 22px 26px;
+  grid-template-columns: minmax(180px, 0.65fr) minmax(0, 1.35fr);
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+.painel-operacional h2 {
+  font-size: 23px;
 }
 h2 {
   font-family: Georgia, serif;
@@ -212,10 +245,25 @@ footer {
   main {
     padding: 40px 6% 12px;
   }
+  .app-autenticado main {
+    padding-top: 26px;
+  }
+  .abertura-operacional {
+    display: block;
+  }
+  .abertura-operacional .introducao {
+    margin: 12px 0 0;
+    text-align: left;
+  }
   .painel {
     grid-template-columns: 1fr;
     padding: 24px;
     gap: 24px;
+  }
+  .painel-operacional {
+    margin-top: 20px;
+    padding: 20px;
+    gap: 14px;
   }
   .introducao {
     font-size: 16px;
@@ -231,11 +279,42 @@ footer {
   margin: 28px 0 48px;
   display: grid;
   gap: 24px;
+  min-width: 0;
+}
+.navegacao-dominio {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 12px 0;
+  background: rgb(246 244 237 / 96%);
+}
+.navegacao-dominio > p {
+  margin: 0 0 9px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .dominio nav {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 3px 3px 9px;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+.dominio nav button {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+.painel-dominio {
+  min-width: 0;
+  scroll-margin-top: 90px;
 }
 .dominio section,
 .dominio article {
@@ -314,6 +393,7 @@ footer {
 }
 .pessoas-lista {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
   gap: 12px;
   padding: 0;
   list-style: none;
@@ -324,6 +404,7 @@ footer {
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
+  align-content: flex-start;
 }
 .pessoas-lista li > span {
   font-size: 13px;
@@ -421,6 +502,13 @@ footer {
   gap: 18px;
   align-items: start;
 }
+.grade-organizacao > .formulario-dominio {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
 .prova-competicao {
   border-top: 3px solid #b68a35;
   margin-top: 24px;
@@ -464,5 +552,15 @@ footer {
 @media (max-width: 500px) {
   .botoes-chamada {
     grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

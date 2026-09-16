@@ -12,7 +12,7 @@ test("agenda, visitante, chamada e primeira reunião preservada após cancelamen
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await page
-    .getByRole("button", { name: "Agenda e reuniões", exact: true })
+    .getByRole("tab", { name: "Agenda e reuniões", exact: true })
     .click();
   const sufixo = Date.now();
   const titulo = `Reunião E2E ${sufixo}`;
@@ -104,7 +104,7 @@ test("agenda, visitante, chamada e primeira reunião preservada após cancelamen
     fullPage: true,
   });
   await page
-    .getByRole("button", { name: "Pessoas e jornada", exact: true })
+    .getByRole("tab", { name: "Pessoas e jornada", exact: true })
     .click();
   await page.getByLabel("Buscar pelo nome").fill(visitante);
   await page.getByRole("button", { name: visitante, exact: true }).click();

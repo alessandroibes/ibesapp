@@ -19,7 +19,7 @@ test("aptidão, elegibilidade e finalização da escalação", async ({ page }) 
   await pessoa.getByRole("button", { name: "Salvar" }).click();
   await page.getByRole("button", { name: "Iniciar trajetória" }).click();
 
-  await page.getByRole("button", { name: "Competições", exact: true }).click();
+  await page.getByRole("tab", { name: "Competições", exact: true }).click();
   const modalidadeNome = `Natação E2E ${sufixo}`;
   const provaNome = `Revezamento E2E ${sufixo}`;
   const modalidade = page.getByRole("form", { name: "Nova modalidade" });

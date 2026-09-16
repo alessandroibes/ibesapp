@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import type { components } from "../../../../packages/contracts/api";
 import { Button } from "../components/ui/button";
 import { type Api, dataBr, hoje, useConsulta } from "./api";
-import { Estado, Formulario, SeletorPessoa } from "./componentes";
+import {
+  Estado,
+  EstadoConsultas,
+  Formulario,
+  SeletorPessoa,
+} from "./componentes";
 
 type Modalidade = components["schemas"]["ModalidadeResponse"];
 type Resumo = components["schemas"]["CompeticaoResumoResponse"];
@@ -59,9 +64,10 @@ export function Competicoes({
         Aptidão é definida por Conselheiro. A lista de escalação mostra somente
         Candidatos e Embaixadores aptos e elegíveis na data-base do regulamento.
       </p>
-      <Estado {...catalogo} atualizar={atualizar} />
-      <Estado {...competicoes} atualizar={atualizar} />
-      <Estado {...aptidoes} atualizar={atualizar} />
+      <EstadoConsultas
+        consultas={[catalogo, competicoes, aptidoes]}
+        atualizar={atualizar}
+      />
       {gerenciar && (
         <div className="grade-organizacao">
           <Formulario

@@ -80,8 +80,9 @@ export function App() {
       setSaindo(false);
     }
   }
+  const areaAtiva = estado === "pronto" && !!contexto && !erroContexto;
   return (
-    <div className="app">
+    <div className={`app${areaAtiva ? " app-autenticado" : ""}`}>
       <a className="skip" href="#conteudo">
         Pular para o conteúdo
       </a>
@@ -104,26 +105,43 @@ export function App() {
         )}
       </header>
       <main id="conteudo">
-        <section className="abertura">
-          <p className="eyebrow">UM PROPÓSITO QUE NOS UNE</p>
-          <h1>
-            Cuidar de cada jornada.
-            <br />
-            <em>Construir juntos.</em>
-          </h1>
-          <p className="introducao">
-            Um espaço para apoiar Conselheiros e liderança adulta no serviço de
-            sua Embaixada.
+        <section
+          className={`abertura${areaAtiva ? " abertura-operacional" : ""}`}
+        >
+          <p className="eyebrow">
+            {areaAtiva ? "GESTÃO DA EMBAIXADA" : "UM PROPÓSITO QUE NOS UNE"}
           </p>
+          {areaAtiva ? (
+            <>
+              <h1>{contexto.embaixada}</h1>
+              <p className="introducao">{contexto.igreja}</p>
+            </>
+          ) : (
+            <>
+              <h1>
+                Cuidar de cada jornada.
+                <br />
+                <em>Construir juntos.</em>
+              </h1>
+              <p className="introducao">
+                Um espaço para apoiar Conselheiros e liderança adulta no serviço
+                de sua Embaixada.
+              </p>
+            </>
+          )}
         </section>
         <section
-          className="painel"
+          className={`painel${areaAtiva ? " painel-operacional" : ""}`}
           aria-labelledby="titulo-acesso"
           aria-busy={estado === "loading"}
         >
           <div>
-            <p className="eyebrow">SUA EMBAIXADA</p>
-            <h2 id="titulo-acesso">Nosso ponto de encontro</h2>
+            <p className="eyebrow">
+              {areaAtiva ? "CONTEXTO ATUAL" : "SUA EMBAIXADA"}
+            </p>
+            <h2 id="titulo-acesso">
+              {areaAtiva ? "Igreja selecionada" : "Nosso ponto de encontro"}
+            </h2>
           </div>
           {estado === "loading" && <p role="status">Verificando seu acesso…</p>}
           {estado === "anonimo" && (
@@ -165,13 +183,9 @@ export function App() {
                     ))}
                   </select>
                   {contexto ? (
-                    <div role="status">
-                      <h3>{contexto.embaixada}</h3>
-                      <p>
-                        Consulte pessoas, acompanhe a jornada ER e mantenha os
-                        registros da sua Embaixada.
-                      </p>
-                    </div>
+                    <p role="status">
+                      Você está trabalhando em {contexto.embaixada}.
+                    </p>
                   ) : (
                     <p role="status">Carregando sua Embaixada…</p>
                   )}
@@ -180,12 +194,14 @@ export function App() {
             </div>
           )}
         </section>
-        <aside className="nota">
-          <span aria-hidden="true">✦</span>
-          <p>
-            “Somos embaixadores por Cristo.”<small>2 Coríntios 5:20</small>
-          </p>
-        </aside>
+        {!areaAtiva && (
+          <aside className="nota">
+            <span aria-hidden="true">✦</span>
+            <p>
+              “Somos embaixadores por Cristo.”<small>2 Coríntios 5:20</small>
+            </p>
+          </aside>
+        )}
         {estado === "pronto" &&
         contexto?.permissoes?.length &&
         !erroContexto ? (

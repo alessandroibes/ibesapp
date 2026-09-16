@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { type Api, dataBr, hoje, useConsulta } from "./api";
-import { Estado, Formulario } from "./componentes";
+import { EstadoConsultas, Formulario } from "./componentes";
 
 type Referencia = { id: string; nome: string };
 type Referencias = { pessoas: Referencia[]; atividades: Referencia[] };
@@ -89,9 +89,10 @@ export function Financeiro({
         Controle simples das entradas e saídas em reais, gerais ou relacionadas
         a eventos, pessoas e iniciativas.
       </p>
-      {[referencias, iniciativas, lancamentos, resumo].map((x, i) => (
-        <Estado key={i} {...x} atualizar={atualizar} />
-      ))}
+      <EstadoConsultas
+        consultas={[referencias, iniciativas, lancamentos, resumo]}
+        atualizar={atualizar}
+      />
       <label>
         Filtrar por iniciativa
         <select

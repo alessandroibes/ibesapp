@@ -7,6 +7,14 @@ import {
 import Inicio from "../app/index";
 import * as sessao from "../lib/sessao";
 import * as AuthSession from "expo-auth-session";
+jest.mock("../components/Operacao", () => {
+  const Texto = jest.requireActual("react-native").Text;
+  return { Operacao: () => <Texto>Conteúdo da agenda</Texto> };
+});
+jest.mock("../components/Pessoas", () => {
+  const Texto = jest.requireActual("react-native").Text;
+  return { Pessoas: () => <Texto>Conteúdo de pessoas</Texto> };
+});
 jest.mock("../lib/sessao", () => ({
   carregarSessao: jest.fn().mockResolvedValue(null),
   guardarSessao: jest.fn(),
@@ -37,7 +45,10 @@ test("autentica com PKCE, seleciona Igreja e encerra sessão local", async () =>
     })
     .mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ embaixada: "Embaixada A" }),
+      json: async () => ({
+        embaixada: "Embaixada A",
+        permissoes: ["agenda.consultar", "pessoas.consultar"],
+      }),
     });
   global.fetch = fetcher;
   render(<Inicio />);
@@ -51,6 +62,12 @@ test("autentica com PKCE, seleciona Igreja e encerra sessão local", async () =>
   );
   fireEvent.press(await screen.findByRole("button", { name: "Igreja A" }));
   expect(await screen.findByText("Embaixada A")).toBeTruthy();
+  expect(screen.getByRole("tab", { name: "Agenda" })).toBeSelected();
+  expect(screen.getByText("Conteúdo da agenda")).toBeTruthy();
+  fireEvent.press(screen.getByRole("tab", { name: "Pessoas" }));
+  expect(screen.getByRole("tab", { name: "Pessoas" })).toBeSelected();
+  expect(screen.getByText("Conteúdo de pessoas")).toBeTruthy();
+  expect(screen.queryByText("Conteúdo da agenda")).toBeNull();
   expect(AuthSession.exchangeCodeAsync).toHaveBeenCalledWith(
     expect.objectContaining({ extraParams: { code_verifier: "verifier" } }),
     expect.anything(),

@@ -11,7 +11,7 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     .getByLabel("Senha", { exact: true })
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await page.getByRole("button", { name: "Manuais", exact: true }).click();
+  await page.getByRole("tab", { name: "Manuais", exact: true }).click();
   const edicao = `Edição fictícia E2E ${Date.now()}`;
   await page.getByLabel("Identificação exata da edição").fill(edicao);
   await page
@@ -25,7 +25,7 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     page.getByText(`Embaixador Escudeiro · ${edicao}`),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "Pessoas e jornada", exact: true })
+    .getByRole("tab", { name: "Pessoas e jornada", exact: true })
     .click();
   await page.getByText("Cadastrar pessoa", { exact: true }).click();
   const nova = page.getByRole("form", { name: "Nova pessoa" });

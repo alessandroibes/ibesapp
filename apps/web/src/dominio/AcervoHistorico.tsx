@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "../components/ui/button";
 import { type Api, dataBr, hoje, useConsulta } from "./api";
-import { Estado, Formulario } from "./componentes";
+import { EstadoConsultas, Formulario } from "./componentes";
 
 type Referencia = { id: string; nome: string };
 type Referencias = { pessoas: Referencia[]; atividades: Referencia[] };
@@ -127,8 +127,10 @@ export function AcervoHistorico({
         Memória institucional organizada em uma linha do tempo anual ou
         retrospectiva.
       </p>
-      <Estado {...referencias} atualizar={atualizar} />
-      <Estado {...marcos} atualizar={atualizar} />
+      <EstadoConsultas
+        consultas={[referencias, marcos]}
+        atualizar={atualizar}
+      />
       <div className="acoes-dominio">
         <label>
           Ano

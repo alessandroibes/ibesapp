@@ -1,7 +1,12 @@
 import { useState } from "react";
 import type { components } from "../../../../packages/contracts/api";
 import { type Api, useConsulta, hoje, dataBr } from "./api";
-import { Estado, Formulario, SeletorPessoa, type Campo } from "./componentes";
+import {
+  EstadoConsultas,
+  Formulario,
+  SeletorPessoa,
+  type Campo,
+} from "./componentes";
 import { Button } from "../components/ui/button";
 import { Chamada, lerRoteiro } from "./Chamada";
 type Catalogos = components["schemas"]["CadastrosAgendaResponse"];
@@ -308,8 +313,10 @@ export function Agenda({
       >
         Hoje
       </Button>
-      <Estado {...catalogos} atualizar={atualizar} />
-      <Estado {...consulta} atualizar={atualizar} />
+      <EstadoConsultas
+        consultas={[catalogos, consulta]}
+        atualizar={atualizar}
+      />
       {consulta.dados?.length === 0 && (
         <p>Nenhum compromisso neste período e filtros.</p>
       )}
