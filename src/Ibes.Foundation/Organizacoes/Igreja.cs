@@ -49,8 +49,13 @@ public static class Permissoes
     public const string GerenciarOrganizacao = "organizacao.gerenciar";
     public const string ConsultarCompeticoes = "competicoes.consultar";
     public const string GerenciarCompeticoes = "competicoes.gerenciar";
+    public const string ConsultarFinanceiro = "financeiro.consultar";
+    public const string GerenciarFinanceiro = "financeiro.gerenciar";
+    public const string ConsultarAcervo = "acervo.consultar";
+    public const string GerenciarAcervo = "acervo.gerenciar";
     public static readonly string[] Todas = [ConsultarFundacao, ConsultarAuditoria, ConsultarPessoas, EditarPessoas,
         ConsultarEmbaixada, EditarEmbaixada, ConsultarProgressao, RegistrarProgressao, GerenciarManuais,
         ConsultarAgenda, EditarAgenda, ConsultarFrequencia, RegistrarFrequencia,
-        ConsultarOrganizacao, GerenciarOrganizacao, ConsultarCompeticoes, GerenciarCompeticoes];
+        ConsultarOrganizacao, GerenciarOrganizacao, ConsultarCompeticoes, GerenciarCompeticoes,
+        ConsultarFinanceiro, GerenciarFinanceiro, ConsultarAcervo, GerenciarAcervo];
 }

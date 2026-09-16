@@ -455,6 +455,12 @@
           "System.Composition.Runtime": "9.0.0"
         }
       },
+      "ibes.acervohistorico": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
       "ibes.agendaatividades": {
         "type": "Project",
         "dependencies": {
@@ -474,6 +480,12 @@
         }
       },
       "ibes.embaixadas": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
+      "ibes.financeiro": {
         "type": "Project",
         "dependencies": {
           "Ibes.Foundation": "[1.0.0, )"

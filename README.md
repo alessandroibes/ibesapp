@@ -1,6 +1,6 @@
 # ER — Starter completo para Codex
 
-Fundação executável e **Fases 1, 2 e 3** disponíveis: cadastros, jornada ER, reuniões, frequência com visitantes e agenda recorrente. O escopo implementado termina no prompt `02-operacao-agenda.md`.
+Fundação executável e **Fases 1 a 6** disponíveis: cadastros, jornada ER, operação semanal, organização interna, competições, financeiro simples e acervo histórico. O escopo implementado termina no prompt `05-financeiro-historia.md`.
 
 ```powershell
 ./scripts/dev-setup.ps1
@@ -17,6 +17,8 @@ Para as Fases 1 e 2, consulte [funcionalidades e decisões técnicas](docs/archi
 Fonte de verdade consolidada para o sistema de gestão da Organização Embaixadores do Rei.
 
 Na Fase 3, use **Agenda e reuniões** no web para cadastrar tipos/promotoras, atividades e modelos; prepare uma ocorrência como reunião para abrir a chamada no web ou mobile. Consulte [operação e agenda](docs/architecture/OPERACAO-AGENDA.md) e [validações](docs/quality/OPERACAO-AGENDA-VALIDATION.md).
+
+Na Fase 6, use **Financeiro** para controlar entradas e saídas gerais ou por evento/iniciativa e **Acervo histórico** para manter a linha do tempo, fotos e documentos da Embaixada. Consulte [financeiro e acervo](docs/architecture/FINANCEIRO-E-ACERVO-HISTORICO.md) e [validações](docs/quality/FINANCEIRO-ACERVO-VALIDATION.md).
 
 ## Produto inicial
 Sistema multi-organização para gestão de Embaixadas de Embaixadores do Rei, começando pela Embaixada James Jackson Taylor (Embaixada J. J. Taylor).

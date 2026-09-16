@@ -10,6 +10,8 @@
     <ProjectReference Include="../Ibes.Infrastructure/Ibes.Infrastructure.csproj" />
     <ProjectReference Include="../Modules/Ibes.ConsuladosDiretoria/Ibes.ConsuladosDiretoria.csproj" />
     <ProjectReference Include="../Modules/Ibes.Competicoes/Ibes.Competicoes.csproj" />
+    <ProjectReference Include="../Modules/Ibes.Financeiro/Ibes.Financeiro.csproj" />
+    <ProjectReference Include="../Modules/Ibes.AcervoHistorico/Ibes.AcervoHistorico.csproj" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" PrivateAssets="all" />

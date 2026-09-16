@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -19,6 +19,8 @@
     <ProjectReference Include="../../src/Ibes.Api/Ibes.Api.csproj" />
     <ProjectReference Include="../../src/Modules/Ibes.ConsuladosDiretoria/Ibes.ConsuladosDiretoria.csproj" />
     <ProjectReference Include="../../src/Modules/Ibes.Competicoes/Ibes.Competicoes.csproj" />
+    <ProjectReference Include="../../src/Modules/Ibes.Financeiro/Ibes.Financeiro.csproj" />
+    <ProjectReference Include="../../src/Modules/Ibes.AcervoHistorico/Ibes.AcervoHistorico.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.10" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.12.0" />
     <PackageReference Include="SSH.NET" Version="2026.0.0" />

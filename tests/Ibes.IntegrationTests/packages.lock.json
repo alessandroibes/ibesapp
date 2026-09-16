@@ -1128,6 +1128,12 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "ibes.acervohistorico": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
       "ibes.agendaatividades": {
         "type": "Project",
         "dependencies": {
@@ -1137,8 +1143,10 @@
       "ibes.api": {
         "type": "Project",
         "dependencies": {
+          "Ibes.AcervoHistorico": "[1.0.0, )",
           "Ibes.Competicoes": "[1.0.0, )",
           "Ibes.ConsuladosDiretoria": "[1.0.0, )",
+          "Ibes.Financeiro": "[1.0.0, )",
           "Ibes.Infrastructure": "[1.0.0, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.10, )",
           "Microsoft.OpenApi": "[2.7.5, )",
@@ -1167,6 +1175,12 @@
           "Ibes.Foundation": "[1.0.0, )"
         }
       },
+      "ibes.financeiro": {
+        "type": "Project",
+        "dependencies": {
+          "Ibes.Foundation": "[1.0.0, )"
+        }
+      },
       "ibes.foundation": {
         "type": "Project"
       },
@@ -1179,10 +1193,12 @@
       "ibes.infrastructure": {
         "type": "Project",
         "dependencies": {
+          "Ibes.AcervoHistorico": "[1.0.0, )",
           "Ibes.AgendaAtividades": "[1.0.0, )",
           "Ibes.Competicoes": "[1.0.0, )",
           "Ibes.ConsuladosDiretoria": "[1.0.0, )",
           "Ibes.Embaixadas": "[1.0.0, )",
+          "Ibes.Financeiro": "[1.0.0, )",
           "Ibes.Foundation": "[1.0.0, )",
           "Ibes.Frequencia": "[1.0.0, )",
           "Ibes.Pessoas": "[1.0.0, )",

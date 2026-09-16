@@ -8,6 +8,8 @@ using Ibes.Foundation.Domain;
 using Ibes.Pessoas;
 using Ibes.Embaixadas;
 using Ibes.Progressao;
+using Ibes.Financeiro;
+using Ibes.AcervoHistorico;
 
 namespace Ibes.Foundation.Persistence;
 
@@ -27,6 +29,7 @@ public sealed partial class AppDbContext(DbContextOptions<AppDbContext> options,
         ConfigurarOperacao(b);
         ConfigurarOrganizacao(b);
         ConfigurarCompeticoes(b);
+        ConfigurarFinanceiroEAcervo(b);
         b.Entity<Usuario>().ToTable("usuarios", "identidade");
         b.Entity<IdentityRole<Guid>>().ToTable("papeis", "identidade");
         b.Entity<IdentityUserRole<Guid>>().ToTable("usuarios_papeis", "identidade");
@@ -103,7 +106,9 @@ public sealed partial class AppDbContext(DbContextOptions<AppDbContext> options,
                     throw new InvalidOperationException("Auditoria é imutável.");
                 continue;
             }
-            Auditoria.Add(new RegistroAuditoria
+            var semAuditoriaFuncional = entry.Entity is IniciativaFinanceira or LancamentoFinanceiro or
+                MarcoHistorico or PessoaMarcoHistorico or AnexoMarcoHistorico;
+            if (!semAuditoriaFuncional) Auditoria.Add(new RegistroAuditoria
             {
                 IgrejaId = tenant.IgrejaId,
                 UsuarioId = tenant.UsuarioId,

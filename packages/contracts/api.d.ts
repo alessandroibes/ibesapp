@@ -2878,6 +2878,687 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/financeiro/referencias": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReferenciasFinanceirasResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/financeiro/iniciativas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IniciativaFinanceiraResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["IniciativaFinanceiraRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/financeiro/iniciativas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarIniciativaFinanceiraRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query: {
+                    versao: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/financeiro/lancamentos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    inicio?: string;
+                    fim?: string;
+                    atividadeId?: string;
+                    iniciativaId?: string;
+                    pessoaId?: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LancamentoFinanceiroResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LancamentoFinanceiroRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/financeiro/resumo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    inicio?: string;
+                    fim?: string;
+                    atividadeId?: string;
+                    iniciativaId?: string;
+                    pessoaId?: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ResumoFinanceiroResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/financeiro/lancamentos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarLancamentoFinanceiroRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query: {
+                    versao: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/acervo-historico/referencias": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReferenciasAcervoResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/acervo-historico/marcos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    ano?: number | string;
+                    categoria?: string;
+                    pessoaId?: string;
+                    atividadeId?: string;
+                    ordemCrescente?: boolean;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MarcoHistoricoResponse"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MarcoHistoricoRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/acervo-historico/marcos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MarcoHistoricoResponse"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarMarcoHistoricoRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query: {
+                    versao: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/acervo-historico/marcos/{marcoId}/anexos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    marcoId: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    marcoId: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query: {
+                    versao: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    marcoId: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/acervo-historico/marcos/{marcoId}/anexos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    marcoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2934,6 +3615,43 @@ export interface components {
             versao: string;
             nome: string;
         };
+        AlterarIniciativaFinanceiraRequest: {
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            descricao: null | string;
+        };
+        AlterarLancamentoFinanceiroRequest: {
+            /** Format: uuid */
+            versao: string;
+            tipo: components["schemas"]["TipoLancamentoFinanceiro"];
+            /** Format: date */
+            data: string;
+            /** Format: double */
+            valor: number | string;
+            motivo: string;
+            descricao: null | string;
+            /** Format: uuid */
+            pessoaId: null | string;
+            /** Format: uuid */
+            atividadeAgendaId: null | string;
+            /** Format: uuid */
+            iniciativaFinanceiraId: null | string;
+        };
+        AlterarMarcoHistoricoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            titulo: string;
+            descricao: string;
+            categoria: string;
+            /** Format: uuid */
+            atividadeAgendaId: null | string;
+            pessoaIds: string[];
+        };
         AlterarModalidadeRequest: {
             /** Format: uuid */
             versao: string;
@@ -2961,6 +3679,17 @@ export interface components {
             natureza: components["schemas"]["NaturezaProva"];
             tipoReferencia: components["schemas"]["TipoReferenciaProva"];
             ativa: boolean;
+        };
+        AnexoMarcoHistoricoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nomeArquivo: string;
+            tipoConteudo: string;
+            descricao: null | string;
+            /** Format: int64 */
+            tamanho: number | string;
         };
         AptidaoRequest: {
             /** Format: uuid */
@@ -3399,6 +4128,18 @@ export interface components {
             igrejaId: string;
             nome: string;
         };
+        IniciativaFinanceiraRequest: {
+            nome: string;
+            descricao: null | string;
+        };
+        IniciativaFinanceiraResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            nome: string;
+            descricao: null | string;
+        };
         ItemRoteiro: {
             titulo: string;
             /** Format: int32 */
@@ -3420,6 +4161,43 @@ export interface components {
             requisitos: components["schemas"]["RequisitoResponse"][];
             postos: components["schemas"]["PostoResponse"][];
             cerimonias: components["schemas"]["CerimoniaResponse"][];
+        };
+        LancamentoFinanceiroRequest: {
+            tipo: components["schemas"]["TipoLancamentoFinanceiro"];
+            /** Format: date */
+            data: string;
+            /** Format: double */
+            valor: number | string;
+            motivo: string;
+            descricao: null | string;
+            /** Format: uuid */
+            pessoaId: null | string;
+            /** Format: uuid */
+            atividadeAgendaId: null | string;
+            /** Format: uuid */
+            iniciativaFinanceiraId: null | string;
+        };
+        LancamentoFinanceiroResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            tipo: components["schemas"]["TipoLancamentoFinanceiro"];
+            /** Format: date */
+            data: string;
+            /** Format: double */
+            valor: number | string;
+            motivo: string;
+            descricao: null | string;
+            /** Format: uuid */
+            pessoaId: null | string;
+            pessoa: null | string;
+            /** Format: uuid */
+            atividadeAgendaId: null | string;
+            atividade: null | string;
+            /** Format: uuid */
+            iniciativaFinanceiraId: null | string;
+            iniciativa: null | string;
         };
         LiderancaRequest: {
             /** Format: uuid */
@@ -3480,6 +4258,39 @@ export interface components {
             nomePosto: string;
             identificacao: string;
             tarefas: components["schemas"]["TarefaResponse"][];
+        };
+        MarcoHistoricoRequest: {
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            titulo: string;
+            descricao: string;
+            categoria: string;
+            /** Format: uuid */
+            atividadeAgendaId: null | string;
+            pessoaIds: string[];
+        };
+        MarcoHistoricoResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataInicio: string;
+            /** Format: date */
+            dataFim: null | string;
+            titulo: string;
+            descricao: string;
+            categoria: string;
+            /** Format: uuid */
+            atividadeAgendaId: null | string;
+            atividade: null | string;
+            /** Format: uuid */
+            autorId: string;
+            autor: string;
+            pessoas: components["schemas"]["PessoaRelacionadaResponse"][];
+            anexos: components["schemas"]["AnexoMarcoHistoricoResponse"][];
         };
         MembroConsuladoResponse: {
             /** Format: uuid */
@@ -3633,6 +4444,11 @@ export interface components {
             situacao: null | number | string;
             observacoes: null | string;
         };
+        PessoaRelacionadaResponse: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+        };
         PessoaResponse: {
             /** Format: uuid */
             id: string;
@@ -3761,6 +4577,24 @@ export interface components {
             versao: string;
             motivo: string;
         };
+        ReferenciaAcervoResponse: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+        };
+        ReferenciaFinanceiraResponse: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+        };
+        ReferenciasAcervoResponse: {
+            pessoas: components["schemas"]["ReferenciaAcervoResponse"][];
+            atividades: components["schemas"]["ReferenciaAcervoResponse"][];
+        };
+        ReferenciasFinanceirasResponse: {
+            pessoas: components["schemas"]["ReferenciaFinanceiraResponse"][];
+            atividades: components["schemas"]["ReferenciaFinanceiraResponse"][];
+        };
         RequisitoResponse: {
             /** Format: int32 */
             requisito: number | string;
@@ -3791,6 +4625,16 @@ export interface components {
             dataInicio: string;
             /** Format: date */
             dataFim: null | string;
+        };
+        ResumoFinanceiroResponse: {
+            /** Format: double */
+            entradas: number | string;
+            /** Format: double */
+            saidas: number | string;
+            /** Format: double */
+            saldo: number | string;
+            /** Format: int32 */
+            quantidadeLancamentos: number | string;
         };
         ReuniaoResponse: {
             /** Format: uuid */
@@ -3837,6 +4681,7 @@ export interface components {
             nome: string;
         };
         TipoAlteracaoEscalacao: number;
+        TipoLancamentoFinanceiro: number;
         TipoReferenciaProva: number;
         TransferenciaRequest: {
             /** Format: uuid */

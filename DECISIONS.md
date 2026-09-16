@@ -97,3 +97,11 @@
 - Atividades podem ser internas ou promovidas por entidades externas.
 - Deve suportar recorrência, prazos, eventos de um ou vários dias, horário, local, valor, entidade promotora, status e observações.
 - Reuniões podem utilizar roteiros/modelos reutilizáveis.
+
+## Financeiro e memória histórica
+- O financeiro da Embaixada é um controle simples de caixa, independente do controle financeiro mais amplo da Igreja.
+- Cada lançamento é uma entrada ou saída com data, valor e motivo obrigatórios e descrição opcional.
+- Lançamentos podem ser relacionados opcionalmente a uma pessoa, atividade da agenda ou iniciativa financeira, permitindo acompanhar inscrições, camisas, ofertas e campanhas.
+- Lançamentos financeiros podem ser editados e excluídos livremente, sem histórico funcional de alterações.
+- Marcos históricos registram data ou período, título, descrição, categoria, pessoas relacionadas, atividade relacionada e autoria.
+- O acervo aceita fotos e documentos privados. Marcos e anexos podem ser editados e removidos livremente, sem histórico funcional de alterações.

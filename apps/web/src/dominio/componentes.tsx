@@ -87,6 +87,7 @@ export function Formulario({
                   id={`${id}-${c.nome}`}
                   name={c.nome}
                   type={c.tipo ?? "text"}
+                  step={c.tipo === "number" ? "any" : undefined}
                   required={c.obrigatorio}
                   maxLength={c.limite ?? 200}
                   defaultValue={String(iniciais[c.nome] ?? "")}
