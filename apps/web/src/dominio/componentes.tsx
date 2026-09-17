@@ -1,5 +1,13 @@
 import { useId, useRef, useState, type ReactNode } from "react";
 import { Button } from "../components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../components/ui/dialog";
 import { type Api, useConsulta } from "./api";
 import type { components } from "../../../../packages/contracts/api";
 
@@ -137,6 +145,33 @@ export function Formulario({
         </p>
       )}
     </form>
+  );
+}
+
+export function FormularioDialogo({
+  titulo,
+  descricao,
+  gatilho,
+  children,
+}: {
+  titulo: string;
+  descricao: string;
+  gatilho: string;
+  children: ReactNode;
+}) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">{gatilho}</Button>
+      </DialogTrigger>
+      <DialogContent className="dialogo-formulario">
+        <DialogHeader>
+          <DialogTitle>{titulo}</DialogTitle>
+          <DialogDescription>{descricao}</DialogDescription>
+        </DialogHeader>
+        {children}
+      </DialogContent>
+    </Dialog>
   );
 }
 export function Estado({

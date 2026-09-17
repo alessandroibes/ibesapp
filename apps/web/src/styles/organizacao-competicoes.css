@@ -1,0 +1,192 @@
+.modulo-organizacao,
+.modulo-competicoes {
+  display: grid;
+  min-width: 0;
+  gap: 1.5rem;
+}
+
+.navegacao-contextual,
+.atalhos-detalhe {
+  display: flex;
+  max-width: 100%;
+  gap: 0.25rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+}
+
+.navegacao-contextual a,
+.atalhos-detalhe a {
+  flex: 0 0 auto;
+  padding: 0.75rem 1rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.navegacao-contextual a.active,
+.navegacao-contextual a:hover,
+.atalhos-detalhe a:hover {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.resumo-operacional,
+.grade-listagem,
+.grade-detalhe,
+.grade-cargos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.resumo-operacional .ds-card-title {
+  font-size: 2rem;
+}
+
+.grade-listagem .ds-card,
+.grade-detalhe .ds-card {
+  min-width: 0;
+}
+
+.linha-titulo,
+.item-cargo,
+.lista-registros > li,
+.destaque-pessoa {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.linha-titulo > :first-child,
+.item-cargo > div,
+.lista-registros > li > div,
+.destaque-pessoa > div {
+  min-width: 0;
+}
+
+.grade-listagem .ds-card-content,
+.grade-detalhe .ds-card-content,
+.pilha-provas,
+.editor-escalacao {
+  display: grid;
+  gap: 1rem;
+}
+
+.grade-listagem .ds-card-content p,
+.destaque-pessoa,
+.item-cargo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.grade-listagem svg,
+.destaque-pessoa svg,
+.item-cargo > svg {
+  width: 1.1rem;
+  flex: 0 0 auto;
+  color: var(--primary);
+}
+
+.lista-registros {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-registros > li,
+.item-cargo {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.lista-registros > li:last-child,
+.item-cargo:last-child {
+  border-bottom: 0;
+}
+
+.lista-registros strong,
+.lista-registros span,
+.lista-registros small,
+.item-cargo strong,
+.item-cargo span,
+.destaque-pessoa strong,
+.destaque-pessoa span {
+  display: block;
+}
+
+.lista-registros span,
+.lista-registros small,
+.item-cargo span,
+.destaque-pessoa span,
+.texto-contexto {
+  color: var(--muted);
+}
+
+.acoes-linha,
+.acoes-cabecalho,
+.limites-escalacao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dialogo-formulario {
+  width: min(44rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.limites-escalacao {
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.limites-escalacao span {
+  padding-right: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.pilha-provas {
+  margin-top: 1rem;
+}
+
+.editor-escalacao {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.editor-escalacao select {
+  min-width: 9rem;
+}
+
+.aviso-conflito {
+  color: var(--warning-foreground, #854d0e) !important;
+}
+
+@media (max-width: 767px) {
+  .resumo-operacional,
+  .grade-listagem,
+  .grade-detalhe,
+  .grade-cargos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .linha-titulo,
+  .lista-registros > li,
+  .item-cargo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .acoes-linha > *,
+  .acoes-cabecalho > * {
+    flex: 1 1 auto;
+  }
+}

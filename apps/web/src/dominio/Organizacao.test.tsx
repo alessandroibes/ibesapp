@@ -1,92 +1,130 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
-import { Organizacao } from "./Organizacao";
+import { OrganizacaoNova } from "./OrganizacaoNova";
 
-describe("Organização interna", () => {
-  it("apresenta histórico, Cônsul e preferência de vínculo com a Igreja", async () => {
-    const api = vi.fn().mockResolvedValue({
-      hoje: "2026-09-15",
-      cargos: [
+const dados = {
+  hoje: "2026-09-17",
+  cargos: [
+    {
+      id: "cargo",
+      versao: "v",
+      nome: "Secretário",
+      quantidadeVagas: 1,
+      ativo: true,
+    },
+  ],
+  consulados: [
+    {
+      id: "consulado",
+      versao: "v",
+      nome: "Davi",
+      dataInicio: "2024-01-01",
+      dataFim: null,
+      membros: [
         {
-          id: "cargo",
+          id: "membro",
           versao: "v",
-          nome: "Secretário",
-          quantidadeVagas: 1,
-          ativo: true,
-        },
-      ],
-      consulados: [
-        {
-          id: "consulado",
-          versao: "v",
-          nome: "Davi",
+          pessoaId: "p1",
+          nome: "João",
           dataInicio: "2024-01-01",
           dataFim: null,
-          membros: [
-            {
-              id: "membro",
-              versao: "v",
-              pessoaId: "pessoa",
-              nome: "João",
-              dataInicio: "2024-01-01",
-              dataFim: null,
-              motivoFim: null,
-            },
-          ],
-          consules: [
-            {
-              id: "consul",
-              versao: "v",
-              pessoaId: "pessoa",
-              nome: "João",
-              dataInicio: "2024-02-01",
-              dataFim: null,
-              motivoFim: null,
-            },
-          ],
+          motivoFim: null,
         },
-      ],
-      mandatos: [
         {
-          id: "mandato",
+          id: "antigo",
           versao: "v",
-          nome: "Diretoria 2026",
-          dataInicio: "2026-01-01",
-          dataFim: "2026-12-31",
-          observacoes: null,
-          eleicoes: [],
-          ocupacoes: [
-            {
-              id: "ocupacao",
-              versao: "v",
-              cargoId: "cargo",
-              cargo: "Secretário",
-              pessoaId: "pessoa",
-              nome: "João",
-              dataInicio: "2026-01-01",
-              dataFim: null,
-              motivoFim: null,
-              membroIgreja: true,
-            },
-          ],
+          pessoaId: "p2",
+          nome: "Pedro",
+          dataInicio: "2023-01-01",
+          dataFim: "2023-12-31",
+          motivoFim: "Transferência",
         },
       ],
-    });
-    render(<Organizacao api={api} gerenciar={false} />);
+      consules: [
+        {
+          id: "consul",
+          versao: "v",
+          pessoaId: "p1",
+          nome: "João",
+          dataInicio: "2024-02-01",
+          dataFim: null,
+          motivoFim: null,
+        },
+      ],
+    },
+  ],
+  mandatos: [
+    {
+      id: "mandato",
+      versao: "v",
+      nome: "Diretoria 2026",
+      dataInicio: "2026-01-01",
+      dataFim: "2026-12-31",
+      observacoes: null,
+      eleicoes: [],
+      ocupacoes: [
+        {
+          id: "ocupacao",
+          versao: "v",
+          cargoId: "cargo",
+          cargo: "Secretário",
+          pessoaId: "p1",
+          nome: "João",
+          dataInicio: "2026-01-01",
+          dataFim: null,
+          motivoFim: null,
+          membroIgreja: true,
+        },
+      ],
+    },
+  ],
+};
+
+describe("Organização interna", () => {
+  it("separa lista, detalhe, vigentes e histórico em URLs estáveis", async () => {
+    const api = vi.fn().mockResolvedValue(dados);
+    render(
+      <MemoryRouter initialEntries={["/organizacao/consulados"]}>
+        <Routes>
+          <Route
+            path="/organizacao/*"
+            element={<OrganizacaoNova api={api} gerenciar />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(
+      await screen.findByRole("heading", { name: "Consulados" }),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("link", { name: "Ver detalhes" }));
     expect(
       await screen.findByRole("heading", { name: "Consulado Davi" }),
     ).toBeInTheDocument();
+    expect(screen.getByText(/Pedro · membro/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Transferir" }));
     expect(
-      screen.getByText("Membro desta Igreja", { exact: false }),
+      screen.getByRole("form", { name: "Transferir João" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Postos e cargos não alteram permissões/),
-    ).toBeInTheDocument();
-    expect(api).toHaveBeenCalledWith(
-      "/organizacao",
-      undefined,
-      undefined,
-      expect.any(AbortSignal),
+  });
+
+  it("distingue mandato atual e informa preferência de vínculo sem bloquear", async () => {
+    const api = vi.fn().mockResolvedValue(dados);
+    render(
+      <MemoryRouter initialEntries={["/organizacao/mandatos/mandato"]}>
+        <Routes>
+          <Route
+            path="/organizacao/*"
+            element={<OrganizacaoNova api={api} gerenciar={false} />}
+          />
+        </Routes>
+      </MemoryRouter>,
     );
+    expect(await screen.findByText("Mandato atual")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Membro desta Igreja.*informação, sem bloqueio/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/acumular cargos.*Cônsul/)).toBeInTheDocument();
   });
 });

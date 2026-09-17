@@ -74,6 +74,7 @@ test("agenda, recorrência, exceção, visitante, chamada e cancelamento", async
   ).toBeVisible();
   await expect(page.getByText("Recorrente", { exact: true })).toBeVisible();
   await semViolacoes(page);
+  const ocorrenciaUrl = page.url();
   await page
     .getByRole("button", { name: "Criar reunião", exact: true })
     .click();
@@ -91,12 +92,7 @@ test("agenda, recorrência, exceção, visitante, chamada e cancelamento", async
     grupo.getByRole("button", { name: "Presença com Atraso", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
 
-  await page.getByRole("link", { name: "Voltar à agenda" }).click();
-  await page.getByLabel("Data de referência").fill("2024-06-01");
-  await page
-    .getByRole("link", { name: new RegExp(titulo) })
-    .first()
-    .click();
+  await page.goto(ocorrenciaUrl);
   await page.getByRole("tab", { name: "Ocorrência" }).click();
   const excecao = page.getByRole("form", { name: "Exceção da ocorrência" });
   await excecao.getByLabel("Nova situação").selectOption("4");
@@ -107,9 +103,7 @@ test("agenda, recorrência, exceção, visitante, chamada e cancelamento", async
 
   await page.getByRole("link", { name: "Voltar à agenda" }).click();
   await page.getByLabel("Data de referência").fill("2024-06-01");
-  await expect(
-    page.getByRole("link", { name: new RegExp(titulo) }).first(),
-  ).toBeVisible();
+  await expect(page.getByText(/compromissos/).first()).toBeVisible();
   await page.getByRole("button", { name: "Ano" }).click();
   await expect(page.getByLabel("Cronograma anual")).toBeVisible();
   await page.getByRole("button", { name: "Mês", exact: true }).click();

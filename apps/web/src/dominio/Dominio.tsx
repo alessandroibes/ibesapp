@@ -33,11 +33,11 @@ import {
 } from "../components/ui";
 import { AcervoHistorico } from "./AcervoHistorico";
 import { criarApi } from "./api";
-import { Competicoes } from "./Competicoes";
+import { CompeticoesNova } from "./CompeticoesNova";
 import { Financeiro } from "./Financeiro";
 import { Instituicao } from "./Instituicao";
 import { Manuais } from "./Manuais";
-import { Organizacao } from "./Organizacao";
+import { OrganizacaoNova } from "./OrganizacaoNova";
 import { Pessoas } from "./Pessoas";
 
 const Agenda = lazy(() =>
@@ -329,9 +329,9 @@ export function Dominio({
             )}
             {secoes.some((x) => x.id === "organizacao") && (
               <Route
-                path="/organizacao"
+                path="/organizacao/*"
                 element={
-                  <Organizacao
+                  <OrganizacaoNova
                     api={api}
                     gerenciar={permissoes.includes("organizacao.gerenciar")}
                   />
@@ -340,9 +340,9 @@ export function Dominio({
             )}
             {secoes.some((x) => x.id === "competicoes") && (
               <Route
-                path="/competicoes"
+                path="/competicoes/*"
                 element={
-                  <Competicoes
+                  <CompeticoesNova
                     api={api}
                     gerenciar={permissoes.includes("competicoes.gerenciar")}
                   />

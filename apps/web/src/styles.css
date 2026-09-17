@@ -3,6 +3,7 @@
 @import "./styles/design-system.css";
 @import "./styles/pessoas.css";
 @import "./styles/agenda.css";
+@import "./styles/organizacao-competicoes.css";
 @source "./";
 
 * {
