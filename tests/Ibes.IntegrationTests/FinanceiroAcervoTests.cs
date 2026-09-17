@@ -65,6 +65,23 @@ public sealed class FinanceiroAcervoTests(ApiFixture api) : IClassFixture<ApiFix
     }
 
     [Fact]
+    public async Task UploadRejeitaTipoDeclaradoQuandoConteudoNaoEPermitido()
+    {
+        var marco = await Ler<IdResponse>(await Enviar("/api/v1/acervo-historico/marcos", new MarcoHistoricoRequest(new DateOnly(2026, 9, 6), null,
+            "Documento inválido", "Validação do conteúdo real do arquivo.", "Outro", null, [])));
+        var form = new MultipartFormDataContent();
+        form.Add(new StringContent(marco.Versao.ToString()), "versao");
+        form.Add(new ByteArrayContent(Encoding.UTF8.GetBytes("<script>alert('arquivo falso')</script>"))
+        { Headers = { ContentType = new("application/pdf") } }, "arquivo", "registro.pdf");
+
+        var response = await Enviar($"/api/v1/acervo-historico/marcos/{marco.Id}/anexos", conteudo: form);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var detalhe = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("Envie uma foto PNG/JPEG ou um documento PDF.", detalhe.GetProperty("title").GetString());
+    }
+
+    [Fact]
     public async Task FinanceiroEAcervoNaoGeramAuditoriaFuncional()
     {
         int antes = 0;

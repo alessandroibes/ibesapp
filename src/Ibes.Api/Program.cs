@@ -111,6 +111,9 @@ builder.Services.AddRateLimiter(o =>
     o.AddPolicy("autenticacao", c => RateLimitPartition.GetFixedWindowLimiter(
         c.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    o.AddPolicy("upload", c => RateLimitPartition.GetFixedWindowLimiter(
+        c.User.Identity?.Name ?? c.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 });
 builder.Services.AddOpenIddict()
     .AddCore(o => o.UseEntityFrameworkCore().UseDbContext<AppDbContext>())
@@ -157,6 +160,9 @@ app.Use(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    context.Response.Headers["Permissions-Policy"] = "camera=(), geolocation=(), microphone=()";
+    context.Response.Headers["Cross-Origin-Opener-Policy"] = "same-origin";
+    context.Response.Headers["Cross-Origin-Resource-Policy"] = "same-origin";
     context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
     context.Response.Headers["X-Trace-Id"] = Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
     if (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/bff") || context.Request.Path.StartsWithSegments("/conta"))
@@ -166,8 +172,8 @@ app.Use(async (context, next) =>
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseRateLimiter();
 app.UseAuthentication();
+app.UseRateLimiter();
 app.Use(async (context, next) =>
 {
     if (context.User.Identity?.IsAuthenticated == true && context.Request.Headers.Authorization.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
@@ -208,7 +214,8 @@ app.MapFinanceiro();
 app.MapAcervoHistorico();
 app.MapHealthChecks("/health/live", new() { Predicate = _ => false }).AllowAnonymous();
 app.MapHealthChecks("/health/ready", new() { Predicate = c => c.Tags.Contains("ready") }).AllowAnonymous();
-app.MapOpenApi().AllowAnonymous();
+if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
+    app.MapOpenApi().AllowAnonymous();
 app.MapFallbackToFile("index.html").AllowAnonymous();
 app.Run();
 

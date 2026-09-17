@@ -5,6 +5,7 @@ using Ibes.Foundation.Domain;
 using Ibes.Foundation.Organizacoes;
 using Ibes.Foundation.Persistence;
 using Ibes.Pessoas;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ibes.Api.Features.Dominio;
@@ -84,14 +85,18 @@ public static class AcervoHistoricoEndpoints
             var anexo = new AnexoMarcoHistorico { IgrejaId = tenant.IgrejaId, MarcoHistoricoId = marcoId, Descricao = descricao };
             await AplicarArquivo(anexo, arquivo, ct); db.Add(anexo); await db.SaveChangesAsync(ct);
             return TypedResults.Created($"/api/v1/acervo-historico/marcos/{marcoId}/anexos/{anexo.Id}", new IdResponse(anexo.Id, anexo.Versao));
-        }).RequireAuthorization(Permissoes.GerenciarAcervo);
+        }).RequireAuthorization(Permissoes.GerenciarAcervo)
+            .RequireRateLimiting("upload")
+            .WithMetadata(new RequestSizeLimitAttribute(11 * 1024 * 1024));
 
         g.MapPut("/marcos/{marcoId:guid}/anexos/{id:guid}", async (Guid marcoId, Guid id, HttpRequest request, AppDbContext db, CancellationToken ct) =>
         {
             var anexo = await db.Set<AnexoMarcoHistorico>().SingleOrDefaultAsync(x => x.Id == id && x.MarcoHistoricoId == marcoId, ct) ?? throw new RegistroNaoEncontradoException();
             var (versao, arquivo, descricao) = await LerFormulario(request, ct); Operacao.ConferirVersao(anexo, versao); anexo.Descricao = descricao;
             await AplicarArquivo(anexo, arquivo, ct); await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(anexo.Id, anexo.Versao));
-        }).RequireAuthorization(Permissoes.GerenciarAcervo);
+        }).RequireAuthorization(Permissoes.GerenciarAcervo)
+            .RequireRateLimiting("upload")
+            .WithMetadata(new RequestSizeLimitAttribute(11 * 1024 * 1024));
 
         g.MapDelete("/marcos/{marcoId:guid}/anexos/{id:guid}", async (Guid marcoId, Guid id, Guid versao, AppDbContext db, CancellationToken ct) =>
         {

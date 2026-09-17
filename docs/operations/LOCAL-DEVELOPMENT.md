@@ -78,7 +78,7 @@ Os testes .NET iniciam seu próprio PostgreSQL descartável com Testcontainers; 
 
 ## Contrato e migrações
 
-OpenAPI: `https://localhost:7443/openapi/v1.json`. Em `apps/web`, salvar esse JSON em `artifacts/openapi.json` e gerar tipos:
+OpenAPI em `Development` e `Testing`: `https://localhost:7443/openapi/v1.json`. O endpoint não é publicado em produção. Em `apps/web`, salvar esse JSON em `artifacts/openapi.json` e gerar tipos:
 
 ```powershell
 curl.exe -kfsS https://localhost:7443/openapi/v1.json -o ../../artifacts/openapi.json

@@ -4,6 +4,7 @@ using Ibes.Foundation.Organizacoes;
 using Ibes.Foundation.Persistence;
 using Ibes.Pessoas;
 using Ibes.Progressao;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static Ibes.Foundation.Domain.Datas;
 
@@ -157,7 +158,9 @@ public static class PessoasEndpoints
             var foto = await db.Set<FotoPessoa>().SingleOrDefaultAsync(f => f.PessoaId == id, ct);
             if (foto is null) { foto = new FotoPessoa { IgrejaId = tenant.IgrejaId, PessoaId = id }; db.Add(foto); }
             foto.Conteudo = bytes; foto.TipoConteudo = tipo!; await db.SaveChangesAsync(ct); return Results.NoContent();
-        }).RequireAuthorization(Permissoes.EditarPessoas);
+        }).RequireAuthorization(Permissoes.EditarPessoas)
+            .RequireRateLimiting("upload")
+            .WithMetadata(new RequestSizeLimitAttribute(2_200_000));
     }
 
     private static void ValidarAlteracaoSituacao(Pessoa pessoa, AlterarSituacaoPessoaRequest request, DateOnly hoje)
