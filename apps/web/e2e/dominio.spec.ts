@@ -11,7 +11,22 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     .getByLabel("Senha", { exact: true })
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Igreja e Embaixada", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Igreja", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Embaixada", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Editar dados institucionais" }).click();
+  await expect(
+    page.getByRole("form", { name: "Dados institucionais" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Cancelar" }).click();
   await page.getByRole("link", { name: "Manuais", exact: true }).click();
+  await page.getByRole("link", { name: "Cadastrar versão" }).click();
   const edicao = `Edição fictícia E2E ${Date.now()}`;
   await page.getByLabel("Identificação exata da edição").fill(edicao);
   await page
@@ -21,9 +36,8 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     .getByRole("form", { name: "Nova versão do manual" })
     .getByRole("button", { name: "Salvar" })
     .click();
-  await expect(
-    page.getByText(`Embaixador Escudeiro · ${edicao}`),
-  ).toBeVisible();
+  await page.getByRole("link", { name: "Cancelar" }).click();
+  await expect(page.getByText(edicao)).toBeVisible();
   await page
     .getByRole("link", { name: "Pessoas e jornada", exact: true })
     .click();

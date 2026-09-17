@@ -292,7 +292,7 @@ export function Dominio({
             )}
             {secoes.some((x) => x.id === "instituicao") && (
               <Route
-                path="/instituicao"
+                path="/instituicao/*"
                 element={
                   <Instituicao
                     api={api}
@@ -306,7 +306,7 @@ export function Dominio({
             )}
             {secoes.some((x) => x.id === "manuais") && (
               <Route
-                path="/manuais"
+                path="/manuais/*"
                 element={
                   <Manuais
                     api={api}
@@ -351,7 +351,7 @@ export function Dominio({
             )}
             {secoes.some((x) => x.id === "financeiro") && (
               <Route
-                path="/financeiro"
+                path="/financeiro/*"
                 element={
                   <Financeiro
                     api={api}
@@ -362,7 +362,7 @@ export function Dominio({
             )}
             {secoes.some((x) => x.id === "acervo") && (
               <Route
-                path="/acervo"
+                path="/acervo/*"
                 element={
                   <AcervoHistorico
                     api={api}

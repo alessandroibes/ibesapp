@@ -1,0 +1,96 @@
+.modulo-administrativo {
+  display: grid;
+  gap: var(--space-6);
+}
+.filtros-administrativos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-4);
+  align-items: end;
+}
+.resumo-cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+}
+.resumo-cartoes > div {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+.resumo-cartoes dt,
+.dados-estruturados dt {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+.resumo-cartoes dd {
+  margin: 0.35rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.dados-estruturados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+}
+.dados-estruturados dd {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+.grade-listagem,
+.grade-detalhes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-5);
+}
+.linha-titulo,
+.item-anexo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.item-anexo {
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.item-anexo small {
+  display: block;
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}
+.lista-tarefas {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  list-style: none;
+  counter-reset: tarefa;
+}
+.lista-tarefas li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.lista-tarefas li span {
+  display: grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--muted);
+  font-weight: 700;
+}
+.lista-administrativa {
+  margin: 0;
+}
+@media (max-width: 640px) {
+  .linha-titulo,
+  .item-anexo {
+    flex-direction: column;
+  }
+}

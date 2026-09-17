@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { Financeiro } from "./Financeiro";
 import { AcervoHistorico } from "./AcervoHistorico";
 import type { Api } from "./api";
@@ -64,7 +65,11 @@ describe("Financeiro e acervo histórico", () => {
         },
       ];
     }) as unknown as Api;
-    render(<AcervoHistorico api={api} igrejaId="igreja" gerenciar={false} />);
+    render(
+      <MemoryRouter>
+        <AcervoHistorico api={api} igrejaId="igreja" gerenciar={false} />
+      </MemoryRouter>,
+    );
     expect(
       await screen.findByRole("heading", { name: "Primeiro acampamento" }),
     ).toBeInTheDocument();

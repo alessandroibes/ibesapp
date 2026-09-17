@@ -4,6 +4,7 @@
 @import "./styles/pessoas.css";
 @import "./styles/agenda.css";
 @import "./styles/organizacao-competicoes.css";
+@import "./styles/administrativos.css";
 @source "./";
 
 * {

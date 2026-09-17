@@ -13,11 +13,14 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
   const sufixo = Date.now();
   const iniciativaNome = `Camisas E2E ${sufixo}`;
   await page.getByRole("link", { name: "Financeiro", exact: true }).click();
-  const iniciativa = page.getByRole("form", { name: "Nova iniciativa" });
+  await page.getByRole("button", { name: "Nova iniciativa" }).click();
+  const iniciativa = page.getByRole("form", { name: "Dados da iniciativa" });
   await iniciativa.getByLabel("Nome").fill(iniciativaNome);
   await iniciativa.getByRole("button", { name: "Salvar" }).click();
+  await page.keyboard.press("Escape");
 
-  const lancamento = page.getByRole("form", { name: "Novo lançamento" });
+  await page.getByRole("button", { name: "Novo lançamento" }).click();
+  const lancamento = page.getByRole("form", { name: "Dados do lançamento" });
   await lancamento
     .getByLabel("Movimentação")
     .selectOption({ label: "Entrada" });
@@ -30,6 +33,7 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
   await lancamento
     .getByRole("button", { name: "Registrar lançamento" })
     .click();
+  await page.keyboard.press("Escape");
   await expect(
     page.getByText("16/09/2026 · Pagamento de camisa").first(),
   ).toBeVisible();
@@ -38,8 +42,9 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
   await page
     .getByRole("link", { name: "Acervo histórico", exact: true })
     .click();
+  await page.getByRole("link", { name: "Novo marco" }).click();
   const titulo = `Acampamento E2E ${sufixo}`;
-  const marco = page.getByRole("form", { name: "Novo marco histórico" });
+  const marco = page.getByRole("form", { name: "Dados do marco" });
   await marco.getByLabel("Data inicial").fill("2026-09-16");
   await marco.getByLabel("Título").fill(titulo);
   await marco.getByLabel("Categoria").selectOption({ label: "Acampamento" });
@@ -47,7 +52,8 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
   await marco.getByRole("button", { name: "Registrar marco" }).click();
   const artigo = page.getByRole("article").filter({ hasText: titulo });
   await expect(artigo).toBeVisible();
-  await artigo.getByRole("button", { name: "Anexar", exact: true }).click();
+  await artigo.getByRole("button", { name: "Ver detalhes" }).click();
+  await page.getByRole("button", { name: "Adicionar anexo" }).click();
   const anexo = page.getByRole("form", { name: "Anexar foto ou documento" });
   await anexo.getByLabel("Arquivo").setInputFiles({
     name: "memoria.pdf",
@@ -55,9 +61,7 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
     buffer: Buffer.from("%PDF-1.7\nmemoria"),
   });
   await anexo.getByRole("button", { name: "Enviar anexo" }).click();
-  await expect(
-    artigo.getByRole("button", { name: "memoria.pdf" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Baixar" })).toBeVisible();
 
   expect(
     (
@@ -66,4 +70,12 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
         .analyze()
     ).violations,
   ).toEqual([]);
+  for (const largura of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width: largura, height: 900 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  }
 });
