@@ -1,8 +1,25 @@
 import { useState } from "react";
 import type { components } from "../../../../packages/contracts/api";
-import { type Api, useConsulta, dataBr } from "./api";
-import { Estado, Formulario } from "./componentes";
-import { Button } from "../components/ui/button";
+import { ClipboardCheck, UserPlus, UsersRound } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  Input,
+  Label,
+  PageSkeleton,
+  Pagination,
+} from "../components/ui";
+import { type Api, dataBr, useConsulta } from "./api";
+import { Formulario } from "./componentes";
+
 export const estadosFrequencia = [
   "Presença com Pontualidade",
   "Presença com Atraso",
@@ -12,13 +29,13 @@ export const estadosFrequencia = [
 export function lerRoteiro(texto: string) {
   return texto
     .split("\n")
-    .filter((l) => l.trim())
-    .map((l) => {
-      const [titulo, minutos, ...obs] = l.split("|");
+    .filter((linha) => linha.trim())
+    .map((linha) => {
+      const [titulo, minutos, ...observacoes] = linha.split("|");
       return {
         titulo: titulo.trim(),
         duracaoMinutos: minutos?.trim() ? Number(minutos) : null,
-        observacoes: obs.join("|").trim() || null,
+        observacoes: observacoes.join("|").trim() || null,
       };
     });
 }
@@ -40,15 +57,20 @@ export function Chamada({
   const [salvando, setSalvando] = useState(false);
   const [historicoPessoa, setHistoricoPessoa] = useState("");
   const [aviso, setAviso] = useState("");
-  const atualizar = () => setRevisao((r) => r + 1);
+  const atualizar = () => setRevisao((valor) => valor + 1);
   const reuniao = useConsulta<components["schemas"]["ReuniaoResponse"]>(
     api,
-    `/reunioes/${reuniaoId}`,
+    "/reunioes/" + reuniaoId,
     revisao,
   );
   const chamada = useConsulta<components["schemas"]["ChamadaResponse"]>(
     api,
-    `/reunioes/${reuniaoId}/chamada?busca=${encodeURIComponent(busca)}&pagina=${pagina}`,
+    "/reunioes/" +
+      reuniaoId +
+      "/chamada?busca=" +
+      encodeURIComponent(busca) +
+      "&pagina=" +
+      pagina,
     revisao,
   );
   const historico = useConsulta<
@@ -56,24 +78,29 @@ export function Chamada({
   >(
     api,
     historicoPessoa
-      ? `/reunioes/${reuniaoId}/frequencia/${historicoPessoa}/historico`
+      ? "/reunioes/" +
+          reuniaoId +
+          "/frequencia/" +
+          historicoPessoa +
+          "/historico"
       : null,
     revisao,
   );
   async function marcar(
-    p: components["schemas"]["PessoaChamada"],
+    pessoa: components["schemas"]["PessoaChamada"],
     situacao: number,
   ) {
+    if (salvando) return;
     setErro("");
     setAviso("");
     setSalvando(true);
     try {
       await api(
-        `/reunioes/${reuniaoId}/frequencia/${p.pessoaId}`,
-        { versao: p.versao, situacao, observacoes: p.observacoes },
+        "/reunioes/" + reuniaoId + "/frequencia/" + pessoa.pessoaId,
+        { versao: pessoa.versao, situacao, observacoes: pessoa.observacoes },
         "PUT",
       );
-      setAviso(`${p.nome}: ${estadosFrequencia[situacao - 1]}.`);
+      setAviso(pessoa.nome + ": " + estadosFrequencia[situacao - 1] + ".");
       atualizar();
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Não foi possível registrar.");
@@ -82,231 +109,328 @@ export function Chamada({
     }
   }
   return (
-    <section aria-label="Chamada da reunião">
-      <Estado {...reuniao} atualizar={atualizar} />
+    <section className="chamada-reuniao" aria-label="Chamada da reunião">
+      {reuniao.loading && <PageSkeleton label="Carregando reunião" />}
+      {reuniao.erro && (
+        <Alert variant="danger">
+          <AlertDescription>{reuniao.erro}</AlertDescription>
+          <Button size="sm" onClick={atualizar}>
+            Tentar novamente
+          </Button>
+        </Alert>
+      )}
       {reuniao.dados && (
         <>
-          <h2>{reuniao.dados.titulo}</h2>
-          <p>
-            {dataBr(reuniao.dados.data)} ·{" "}
-            {Number(reuniao.dados.situacao) === 4
-              ? "Cancelada — presenças continuam contando para a primeira reunião."
-              : "Chamada e roteiro"}
-          </p>
-          <details>
-            <summary>Roteiro da reunião</summary>
-            <ol>
-              {reuniao.dados.roteiro.map((i, n) => (
-                <li key={n}>
-                  {i.titulo}{" "}
-                  {i.duracaoMinutos != null && `· ${i.duracaoMinutos} min`}{" "}
-                  {i.observacoes}
-                </li>
-              ))}
-            </ol>
-            {reuniao.dados.roteiro.length === 0 && (
+          <header className="cabecalho-chamada">
+            <div>
+              <p className="caminho-interno">Reunião / Chamada</p>
+              <h2>{reuniao.dados.titulo}</h2>
               <p>
-                Sem roteiro. A reunião não exige execução rígida de um modelo.
+                {dataBr(reuniao.dados.data)} ·{" "}
+                {Number(reuniao.dados.situacao) === 4
+                  ? "Cancelada"
+                  : "Em operação"}
               </p>
-            )}
-            {editarRoteiro && (
-              <Formulario
-                key={reuniao.dados.versao}
-                titulo="Editar roteiro desta reunião"
-                campos={[
-                  {
-                    nome: "itens",
-                    rotulo:
-                      "Um bloco por linha: título | minutos | observações",
-                    tipo: "textarea",
-                  },
-                ]}
-                iniciais={{
-                  itens: reuniao.dados.roteiro
-                    .map(
-                      (i) =>
-                        `${i.titulo} | ${i.duracaoMinutos ?? ""} | ${i.observacoes ?? ""}`,
-                    )
-                    .join("\n"),
-                }}
-                salvar={async (d) => {
-                  await api(
-                    `/reunioes/${reuniaoId}/roteiro`,
-                    {
-                      versao: reuniao.dados!.versao,
-                      itens: lerRoteiro(d.itens),
-                    },
-                    "PUT",
-                  );
-                  atualizar();
-                }}
-              />
-            )}
-          </details>
+            </div>
+            <Badge
+              variant={
+                Number(reuniao.dados.situacao) === 4 ? "danger" : "success"
+              }
+            >
+              {Number(reuniao.dados.situacao) === 4
+                ? "Reunião cancelada"
+                : "Chamada aberta"}
+            </Badge>
+          </header>
+          {Number(reuniao.dados.situacao) === 4 && (
+            <Alert variant="warning">
+              <AlertDescription>
+                As frequências permanecem disponíveis como histórico e as
+                presenças continuam contando para a primeira reunião.
+              </AlertDescription>
+            </Alert>
+          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>Roteiro da reunião</CardTitle>
+              <CardDescription>
+                O modelo orienta a reunião sem exigir execução rígida.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ol className="roteiro-reuniao">
+                {reuniao.dados.roteiro.map((item, indice) => (
+                  <li key={indice}>
+                    <strong>{item.titulo}</strong>
+                    {item.duracaoMinutos != null && (
+                      <span>{item.duracaoMinutos} min</span>
+                    )}
+                    {item.observacoes && <p>{item.observacoes}</p>}
+                  </li>
+                ))}
+              </ol>
+              {reuniao.dados.roteiro.length === 0 && (
+                <EmptyState
+                  title="Reunião sem roteiro"
+                  description="A chamada pode ser realizada normalmente."
+                />
+              )}
+              {editarRoteiro && (
+                <details>
+                  <summary>Editar roteiro desta reunião</summary>
+                  <Formulario
+                    key={reuniao.dados.versao}
+                    titulo="Editar roteiro desta reunião"
+                    campos={[
+                      {
+                        nome: "itens",
+                        rotulo:
+                          "Um bloco por linha: título | minutos | observações",
+                        tipo: "textarea",
+                      },
+                    ]}
+                    iniciais={{
+                      itens: reuniao.dados.roteiro
+                        .map(
+                          (item) =>
+                            item.titulo +
+                            " | " +
+                            (item.duracaoMinutos ?? "") +
+                            " | " +
+                            (item.observacoes ?? ""),
+                        )
+                        .join("\n"),
+                    }}
+                    salvar={async (dados) => {
+                      await api(
+                        "/reunioes/" + reuniaoId + "/roteiro",
+                        {
+                          versao: reuniao.dados!.versao,
+                          itens: lerRoteiro(dados.itens),
+                        },
+                        "PUT",
+                      );
+                      atualizar();
+                    }}
+                  />
+                </details>
+              )}
+            </CardContent>
+          </Card>
         </>
       )}
-      <p>
-        Sem lançamento não significa falta. Busque pelo nome para incluir uma
-        pessoa já cadastrada.
-      </p>
-      <label>
-        Buscar pessoa na chamada
-        <input
-          value={busca}
-          onChange={(e) => {
-            setBusca(e.target.value);
-            setPagina(1);
-          }}
-          maxLength={100}
-        />
-      </label>
-      <Estado {...chamada} atualizar={atualizar} />
-      {erro && <p role="alert">{erro}</p>}
-      {aviso && <p role="status">{aviso}</p>}
+      <Card>
+        <CardHeader>
+          <CardTitle>Frequência</CardTitle>
+          <CardDescription>
+            Sem lançamento não significa falta. Busque um cadastro existente ou
+            adicione um visitante.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Label htmlFor="busca-chamada">
+            Buscar pessoa na chamada
+            <Input
+              id="busca-chamada"
+              value={busca}
+              onChange={(evento) => {
+                setBusca(evento.target.value);
+                setPagina(1);
+              }}
+              maxLength={100}
+            />
+          </Label>
+        </CardContent>
+      </Card>
+      {chamada.loading && <PageSkeleton label="Carregando chamada" />}
+      {chamada.erro && (
+        <Alert variant="danger">
+          <AlertDescription>{chamada.erro}</AlertDescription>
+          <Button size="sm" onClick={atualizar}>
+            Tentar novamente
+          </Button>
+        </Alert>
+      )}
+      {erro && (
+        <Alert variant="danger">
+          <AlertDescription>{erro}</AlertDescription>
+        </Alert>
+      )}
+      {aviso && (
+        <Alert variant="success">
+          <AlertDescription>{aviso}</AlertDescription>
+        </Alert>
+      )}
       {chamada.dados && (
         <>
-          <p>
-            {chamada.dados.contagens
-              .map(
-                (c) =>
-                  `${estadosFrequencia[Number(c.situacao) - 1]}: ${c.quantidade}`,
-              )
-              .join(" · ") || "Nenhuma frequência lançada."}
-          </p>
-          {chamada.dados.pessoas.length === 0 && (
-            <p>
-              Nenhuma pessoa nesta lista. Busque um cadastro existente ou
-              cadastre um visitante.
-            </p>
-          )}
-          <ul className="lista-dominio">
-            {chamada.dados.pessoas.map((p) => (
-              <li key={p.pessoaId}>
-                <strong>
-                  {p.nome} · {p.condicao}
-                </strong>
-                <span>
-                  {p.situacao
-                    ? estadosFrequencia[Number(p.situacao) - 1]
-                    : "Sem lançamento"}
-                </span>
-                {registrar && (
-                  <div
-                    className="botoes-chamada"
-                    role="group"
-                    aria-label={`Frequência de ${p.nome}`}
-                  >
-                    {estadosFrequencia.map((e, i) => (
-                      <Button
-                        key={e}
-                        disabled={salvando}
-                        aria-pressed={Number(p.situacao) === i + 1}
-                        variant={
-                          Number(p.situacao) === i + 1 ? "default" : "outline"
-                        }
-                        onClick={() => void marcar(p, i + 1)}
-                      >
-                        {e}
-                      </Button>
-                    ))}
-                  </div>
-                )}
-                {p.frequenciaId && (
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => setHistoricoPessoa(p.pessoaId)}
-                    >
-                      Ver histórico de {p.nome}
-                    </Button>
-                    {registrar && (
-                      <details>
-                        <summary>Observação ou justificativa</summary>
-                        <Formulario
-                          titulo={`Observação de ${p.nome}`}
-                          campos={[
-                            {
-                              nome: "observacoes",
-                              rotulo: "Observação",
-                              tipo: "textarea",
-                              limite: 1000,
-                            },
-                          ]}
-                          iniciais={{ observacoes: p.observacoes }}
-                          salvar={async (d) => {
-                            await api(
-                              `/reunioes/${reuniaoId}/frequencia/${p.pessoaId}`,
-                              {
-                                versao: p.versao,
-                                situacao: p.situacao,
-                                observacoes: d.observacoes || null,
-                              },
-                              "PUT",
-                            );
-                            atualizar();
-                          }}
-                        />
-                      </details>
-                    )}
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-          <div className="acoes-dominio">
-            <Button
-              disabled={pagina === 1}
-              onClick={() => setPagina((p) => p - 1)}
-            >
-              Anterior
-            </Button>
-            <span>Página {pagina}</span>
-            <Button
-              disabled={pagina * 30 >= Number(chamada.dados.total)}
-              onClick={() => setPagina((p) => p + 1)}
-            >
-              Próxima
-            </Button>
+          <div className="resumo-chamada">
+            {estadosFrequencia.map((estado, indice) => {
+              const contagem = chamada.dados!.contagens.find(
+                (item) => Number(item.situacao) === indice + 1,
+              );
+              return (
+                <Badge key={estado} variant="neutral">
+                  {estado}: {Number(contagem?.quantidade ?? 0)}
+                </Badge>
+              );
+            })}
           </div>
+          {chamada.dados.pessoas.length === 0 ? (
+            <EmptyState
+              icon={<UsersRound aria-hidden="true" />}
+              title="Nenhuma pessoa nesta lista"
+              description="Ajuste a busca ou cadastre um visitante."
+            />
+          ) : (
+            <div className="grade-pessoas-chamada">
+              {chamada.dados.pessoas.map((pessoa) => (
+                <article
+                  className="cartao-pessoa-chamada"
+                  key={pessoa.pessoaId}
+                >
+                  <div>
+                    <h3>{pessoa.nome}</h3>
+                    <p>{pessoa.condicao}</p>
+                  </div>
+                  <Badge variant={pessoa.situacao ? "primary" : "neutral"}>
+                    {pessoa.situacao
+                      ? estadosFrequencia[Number(pessoa.situacao) - 1]
+                      : "Sem lançamento"}
+                  </Badge>
+                  {registrar && (
+                    <div
+                      className="botoes-chamada"
+                      role="group"
+                      aria-label={"Frequência de " + pessoa.nome}
+                    >
+                      {estadosFrequencia.map((estado, indice) => (
+                        <Button
+                          key={estado}
+                          disabled={salvando}
+                          aria-pressed={Number(pessoa.situacao) === indice + 1}
+                          variant={
+                            Number(pessoa.situacao) === indice + 1
+                              ? "default"
+                              : "outline"
+                          }
+                          onClick={() => void marcar(pessoa, indice + 1)}
+                        >
+                          {estado}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                  {pessoa.frequenciaId && (
+                    <div className="acoes-pessoa-chamada">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setHistoricoPessoa(pessoa.pessoaId)}
+                      >
+                        Ver histórico
+                      </Button>
+                      {registrar && (
+                        <details>
+                          <summary>Observação ou justificativa</summary>
+                          <Formulario
+                            titulo={"Observação de " + pessoa.nome}
+                            campos={[
+                              {
+                                nome: "observacoes",
+                                rotulo: "Observação",
+                                tipo: "textarea",
+                                limite: 1000,
+                              },
+                            ]}
+                            iniciais={{ observacoes: pessoa.observacoes }}
+                            salvar={async (dados) => {
+                              await api(
+                                "/reunioes/" +
+                                  reuniaoId +
+                                  "/frequencia/" +
+                                  pessoa.pessoaId,
+                                {
+                                  versao: pessoa.versao,
+                                  situacao: pessoa.situacao,
+                                  observacoes: dados.observacoes || null,
+                                },
+                                "PUT",
+                              );
+                              atualizar();
+                            }}
+                          />
+                        </details>
+                      )}
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+          <Pagination
+            page={pagina}
+            canPrevious={pagina > 1}
+            canNext={pagina * 30 < Number(chamada.dados.total)}
+            onPrevious={() => setPagina((valor) => valor - 1)}
+            onNext={() => setPagina((valor) => valor + 1)}
+          />
         </>
       )}
       {registrar && (
-        <details>
-          <summary>Cadastrar visitante</summary>
-          <p>
-            Pesquise antes para evitar duplicar a mesma pessoa. Não cria
-            candidatura nem presume presença.
-          </p>
-          <Formulario
-            titulo="Novo visitante"
-            campos={[
-              { nome: "nome", rotulo: "Nome do visitante", obrigatorio: true },
-            ]}
-            salvar={async (d) => {
-              await api(`/reunioes/${reuniaoId}/visitantes`, d);
-              setBusca(d.nome);
-              setPagina(1);
-              atualizar();
-            }}
-          />
-        </details>
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <UserPlus aria-hidden="true" /> Cadastrar visitante
+            </CardTitle>
+            <CardDescription>
+              Pesquise antes para evitar duplicidade. O cadastro não cria
+              candidatura nem presume presença.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Formulario
+              titulo="Novo visitante"
+              campos={[
+                {
+                  nome: "nome",
+                  rotulo: "Nome do visitante",
+                  obrigatorio: true,
+                },
+              ]}
+              salvar={async (dados) => {
+                await api("/reunioes/" + reuniaoId + "/visitantes", dados);
+                setBusca(dados.nome);
+                setPagina(1);
+                atualizar();
+              }}
+            />
+          </CardContent>
+        </Card>
       )}
       {historicoPessoa && (
-        <section>
-          <h3>Histórico da frequência</h3>
-          <Estado {...historico} atualizar={atualizar} />
+        <section className="historico-chamada">
+          <h3>
+            <ClipboardCheck aria-hidden="true" /> Histórico da frequência
+          </h3>
+          {historico.loading && <PageSkeleton label="Carregando histórico" />}
+          {historico.erro && (
+            <Alert variant="danger">
+              <AlertDescription>{historico.erro}</AlertDescription>
+            </Alert>
+          )}
           <ol>
-            {historico.dados?.map((h) => (
-              <li key={h.id}>
-                {new Date(h.createdAt).toLocaleString("pt-BR")} ·{" "}
-                {h.situacaoAnterior
-                  ? estadosFrequencia[Number(h.situacaoAnterior) - 1]
+            {historico.dados?.map((item) => (
+              <li key={item.id}>
+                {new Date(item.createdAt).toLocaleString("pt-BR")} ·{" "}
+                {item.situacaoAnterior
+                  ? estadosFrequencia[Number(item.situacaoAnterior) - 1]
                   : "Sem lançamento"}{" "}
-                → {estadosFrequencia[Number(h.situacao) - 1]} {h.observacoes}
+                → {estadosFrequencia[Number(item.situacao) - 1]}{" "}
+                {item.observacoes}
               </li>
             ))}
           </ol>
-          <Button onClick={() => setHistoricoPessoa("")}>
+          <Button variant="outline" onClick={() => setHistoricoPessoa("")}>
             Fechar histórico
           </Button>
         </section>

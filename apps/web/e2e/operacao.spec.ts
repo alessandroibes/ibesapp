@@ -1,7 +1,19 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-test("agenda, visitante, chamada e primeira reunião preservada após cancelamento", async ({
+test.setTimeout(60_000);
+
+async function semViolacoes(page: import("@playwright/test").Page) {
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+}
+
+test("agenda, recorrência, exceção, visitante, chamada e cancelamento", async ({
   page,
 }) => {
   await page.goto("/");
@@ -14,91 +26,109 @@ test("agenda, visitante, chamada e primeira reunião preservada após cancelamen
   await page
     .getByRole("link", { name: "Agenda e reuniões", exact: true })
     .click();
+  await semViolacoes(page);
+
   const sufixo = Date.now();
-  const titulo = `Reunião E2E ${sufixo}`;
-  const visitante = `Visitante E2E ${sufixo}`;
-  await page.getByText("Tipos e entidades promotoras", { exact: true }).click();
-  const p = page.getByRole("form", { name: "Nova entidade promotora" });
-  await p.getByLabel("Nome da promotora").fill(`Promotora ${sufixo}`);
-  await p.getByRole("button", { name: "Salvar" }).click();
-  await expect(
-    page
-      .getByLabel("Filtrar por promotora")
-      .locator("option", { hasText: `Promotora ${sufixo}` }),
-  ).toHaveCount(1);
-  const t = page.getByRole("form", { name: "Novo tipo de atividade" });
-  await t.getByLabel("Nome do tipo").fill(`Tipo ${sufixo}`);
-  await t.getByRole("button", { name: "Salvar" }).click();
-  await expect(
-    page
-      .getByLabel("Filtrar por tipo")
-      .locator("option", { hasText: `Tipo ${sufixo}` }),
-  ).toHaveCount(1);
-  await page.getByLabel("Data de referência").fill("2024-06-01");
-  await page.getByLabel("Visualização").selectOption("hoje");
-  await page.getByText("Cadastrar atividade ou prazo", { exact: true }).click();
-  const a = page.getByRole("form", { name: "Nova atividade", exact: true });
-  await a.getByLabel("Título da atividade").fill(titulo);
-  await a
+  const titulo = "Reunião E2E " + sufixo;
+  const visitante = "Visitante E2E " + sufixo;
+  const nomePromotora = "Promotora " + sufixo;
+  const nomeTipo = "Tipo " + sufixo;
+
+  await page.getByRole("link", { name: "Configurações" }).click();
+  await page.getByRole("tab", { name: "Promotoras" }).click();
+  const promotora = page.getByRole("form", { name: "Nova entidade promotora" });
+  await promotora.getByLabel("Nome da promotora").fill(nomePromotora);
+  await promotora.getByRole("button", { name: "Salvar" }).click();
+  await expect(page.getByText(nomePromotora, { exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Tipos" }).click();
+  const tipo = page.getByRole("form", { name: "Novo tipo de atividade" });
+  await tipo.getByLabel("Nome do tipo").fill(nomeTipo);
+  await tipo.getByRole("button", { name: "Salvar" }).click();
+  await expect(page.getByText(nomeTipo, { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Voltar à agenda" }).click();
+
+  await page.getByRole("link", { name: "Nova atividade" }).click();
+  await semViolacoes(page);
+  const atividade = page.getByRole("form", {
+    name: "Nova atividade",
+    exact: true,
+  });
+  await atividade.getByLabel("Título da atividade").fill(titulo);
+  await atividade
     .getByLabel("Tipo de atividade")
-    .selectOption({ label: `Tipo ${sufixo}` });
-  await a
+    .selectOption({ label: nomeTipo });
+  await atividade
     .getByLabel("Entidade promotora")
-    .selectOption({ label: `Promotora ${sufixo}` });
-  await a.getByLabel("Data inicial").fill("2024-06-01");
-  await a.getByLabel("Data final").fill("2024-06-01");
-  await a.getByRole("button", { name: "Salvar" }).click();
-  await page.getByRole("button", { name: new RegExp(titulo) }).click();
-  await page
-    .getByRole("button", { name: "Criar reunião", exact: true })
-    .click();
+    .selectOption({ label: nomePromotora });
+  await atividade.getByLabel("Data inicial").fill("2024-06-01");
+  await atividade.getByLabel("Data final").fill("2024-06-01");
+  await atividade
+    .locator('select[name="periodicidade"]')
+    .selectOption({ label: "Semanal" });
+  await atividade.locator('input[name="diasSemana"]').fill("6");
+  await atividade.getByLabel("Repetir até (opcional)").fill("2024-06-15");
+  await atividade.getByRole("button", { name: "Salvar" }).click();
+
   await expect(
     page.getByRole("heading", { name: titulo, exact: true }),
   ).toBeVisible();
-  await page.getByText("Cadastrar visitante", { exact: true }).click();
-  const v = page.getByRole("form", { name: "Novo visitante" });
-  await v.getByLabel("Nome do visitante").fill(visitante);
-  await v.getByRole("button", { name: "Salvar" }).click();
-  const grupo = page.getByRole("group", { name: `Frequência de ${visitante}` });
+  await expect(page.getByText("Recorrente", { exact: true })).toBeVisible();
+  await semViolacoes(page);
+  await page
+    .getByRole("button", { name: "Criar reunião", exact: true })
+    .click();
+  await expect(page.getByText("Chamada aberta", { exact: true })).toBeVisible();
+  await semViolacoes(page);
+
+  const novoVisitante = page.getByRole("form", { name: "Novo visitante" });
+  await novoVisitante.getByLabel("Nome do visitante").fill(visitante);
+  await novoVisitante.getByRole("button", { name: "Salvar" }).click();
+  const grupo = page.getByRole("group", { name: "Frequência de " + visitante });
   await grupo
     .getByRole("button", { name: "Presença com Atraso", exact: true })
     .click();
   await expect(
     grupo.getByRole("button", { name: "Presença com Atraso", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: new RegExp(titulo) }).click();
+
+  await page.getByRole("link", { name: "Voltar à agenda" }).click();
+  await page.getByLabel("Data de referência").fill("2024-06-01");
   await page
-    .getByText("Alterar ou cancelar esta ocorrência", { exact: true })
+    .getByRole("link", { name: new RegExp(titulo) })
+    .first()
     .click();
-  const e = page.getByRole("form", { name: "Exceção da ocorrência" });
-  await e.getByLabel("Nova situação").selectOption("4");
-  await e.getByRole("button", { name: "Salvar" }).click();
+  await page.getByRole("tab", { name: "Ocorrência" }).click();
+  const excecao = page.getByRole("form", { name: "Exceção da ocorrência" });
+  await excecao.getByLabel("Nova situação").selectOption("4");
+  await excecao.getByRole("button", { name: "Salvar" }).click();
   await expect(
-    page.getByRole("button", { name: new RegExp(`${titulo}.*Cancelada`) }),
+    page.getByText(/permanece visível como histórico/),
   ).toBeVisible();
-  await page.getByLabel("Visualização").selectOption("ano");
+
+  await page.getByRole("link", { name: "Voltar à agenda" }).click();
+  await page.getByLabel("Data de referência").fill("2024-06-01");
   await expect(
-    page.getByRole("heading", { name: "junho", exact: true }),
+    page.getByRole("link", { name: new RegExp(titulo) }).first(),
   ).toBeVisible();
-  await page.getByLabel("Visualização").selectOption("mes");
-  await expect(page.getByLabel("Calendário", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Ano" }).click();
+  await expect(page.getByLabel("Cronograma anual")).toBeVisible();
+  await page.getByRole("button", { name: "Mês", exact: true }).click();
+  await expect(page.getByLabel("Calendário mensal")).toBeVisible();
+  await semViolacoes(page);
   await page.screenshot({
     path: "../../artifacts/agenda-desktop.png",
     fullPage: true,
   });
-  expect(
-    (
-      await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
-        .analyze()
-    ).violations,
-  ).toEqual([]);
-  await page.setViewportSize({ width: 390, height: 844 });
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
-    ),
-  ).toBe(true);
+
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await page.setViewportSize({ width: 320, height: 844 });
   await page.screenshot({
     path: "../../artifacts/operacao-mobile.png",
     fullPage: true,

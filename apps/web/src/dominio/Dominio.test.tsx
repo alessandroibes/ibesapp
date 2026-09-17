@@ -51,7 +51,7 @@ describe("Navegação do domínio", () => {
     expect(
       screen.getByRole("link", { name: /Agenda e reuniões/ }),
     ).toHaveAttribute("aria-current", "page");
-    expect(screen.getByText("Agenda aberta")).toBeInTheDocument();
+    expect(await screen.findByText("Agenda aberta")).toBeInTheDocument();
     expect(screen.queryByText("Pessoas abertas")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: /Competições/ }),

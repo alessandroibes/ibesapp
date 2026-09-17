@@ -1,4 +1,11 @@
-import { useMemo, useRef, useState, type ComponentType } from "react";
+import {
+  lazy,
+  Suspense,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+} from "react";
 import {
   Archive,
   BookOpen,
@@ -17,6 +24,7 @@ import {
   Badge,
   Button,
   PageHeader,
+  PageSkeleton,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -24,7 +32,6 @@ import {
   SheetTrigger,
 } from "../components/ui";
 import { AcervoHistorico } from "./AcervoHistorico";
-import { Agenda } from "./Agenda";
 import { criarApi } from "./api";
 import { Competicoes } from "./Competicoes";
 import { Financeiro } from "./Financeiro";
@@ -32,6 +39,10 @@ import { Instituicao } from "./Instituicao";
 import { Manuais } from "./Manuais";
 import { Organizacao } from "./Organizacao";
 import { Pessoas } from "./Pessoas";
+
+const Agenda = lazy(() =>
+  import("./Agenda").then((modulo) => ({ default: modulo.Agenda })),
+);
 
 type Icone = ComponentType<LucideProps>;
 type Grupo = "Gestão" | "Operação" | "Organização" | "Administração";
@@ -306,8 +317,14 @@ export function Dominio({
             )}
             {secoes.some((x) => x.id === "agenda") && (
               <Route
-                path="/agenda"
-                element={<Agenda api={api} permissoes={permissoes} />}
+                path="/agenda/*"
+                element={
+                  <Suspense
+                    fallback={<PageSkeleton label="Carregando agenda" />}
+                  >
+                    <Agenda api={api} permissoes={permissoes} />
+                  </Suspense>
+                }
               />
             )}
             {secoes.some((x) => x.id === "organizacao") && (

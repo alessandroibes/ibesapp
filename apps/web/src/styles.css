@@ -2,6 +2,7 @@
 @import "./styles/tokens.css";
 @import "./styles/design-system.css";
 @import "./styles/pessoas.css";
+@import "./styles/agenda.css";
 @source "./";
 
 * {
