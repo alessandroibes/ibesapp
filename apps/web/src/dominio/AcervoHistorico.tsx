@@ -1,5 +1,10 @@
 import { useState, type FormEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -67,8 +72,15 @@ export function AcervoHistorico({
   gerenciar: boolean;
 }) {
   const [revisao, setRevisao] = useState(0);
-  const [ano, setAno] = useState("");
-  const [categoria, setCategoria] = useState("");
+  const [filtros, setFiltros] = useSearchParams();
+  const ano = filtros.get("ano") ?? "";
+  const categoria = filtros.get("categoria") ?? "";
+  const alterarFiltro = (nome: string, valor: string) => {
+    const seguintes = new URLSearchParams(filtros);
+    if (valor) seguintes.set(nome, valor);
+    else seguintes.delete(nome);
+    setFiltros(seguintes, { replace: true });
+  };
   const [anexando, setAnexando] = useState<{ marco: Marco; anexo?: Anexo }>();
   const [erroAnexo, setErroAnexo] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -253,14 +265,14 @@ export function AcervoHistorico({
             min="1"
             max="9999"
             value={ano}
-            onChange={(e) => setAno(e.target.value)}
+            onChange={(e) => alterarFiltro("ano", e.target.value)}
           />
         </label>
         <label>
           Categoria
           <select
             value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
+            onChange={(e) => alterarFiltro("categoria", e.target.value)}
           >
             <option value="">Todas</option>
             {categorias.map((x) => (
@@ -293,109 +305,13 @@ export function AcervoHistorico({
                   ? ` · ${x.pessoas.map((p) => p.nome).join(", ")}`
                   : ""}
               </small>
-              {x.anexos.map((a) => (
-                <div className="acoes-dominio" key={a.id}>
-                  <Button variant="outline" onClick={() => void baixar(x, a)}>
-                    {a.nomeArquivo}
-                  </Button>
-                  {gerenciar && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => setAnexando({ marco: x, anexo: a })}
-                      >
-                        Substituir anexo
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => void excluirAnexo(x, a)}
-                      >
-                        Remover anexo
-                      </Button>
-                    </>
-                  )}
-                </div>
-              ))}
-              {gerenciar && (
-                <div className="acoes-dominio">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      navigate(`/acervo/${x.id}/editar`);
-                    }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate(`/acervo/${x.id}`)}
-                  >
-                    Ver detalhes
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setConfirmacao({ marco: x })}
-                  >
-                    Excluir
-                  </Button>
-                </div>
-              )}
+              <Button asChild variant="outline">
+                <Link to={`/acervo/${x.id}`}>Ver detalhes</Link>
+              </Button>
             </article>
           </li>
         ))}
       </ol>
-      {anexando && (
-        <form aria-label="Anexar foto ou documento" onSubmit={enviarAnexo}>
-          <fieldset>
-            <legend>
-              {anexando.anexo ? "Substituir anexo" : "Anexar"} em{" "}
-              {anexando.marco.titulo}
-            </legend>
-            <label>
-              Arquivo *
-              <input
-                name="arquivo"
-                type="file"
-                accept="image/png,image/jpeg,application/pdf"
-                required
-              />
-            </label>
-            <label>
-              Descrição
-              <input
-                name="descricao"
-                maxLength={500}
-                defaultValue={anexando.anexo?.descricao}
-              />
-            </label>
-            <Button type="submit" disabled={enviando}>
-              {enviando
-                ? "Enviando…"
-                : anexando.anexo
-                  ? "Salvar anexo"
-                  : "Enviar anexo"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setAnexando(undefined)}
-            >
-              Cancelar
-            </Button>
-          </fieldset>
-          {erroAnexo && <p role="alert">{erroAnexo}</p>}
-        </form>
-      )}
-      {sucessoAnexo && <p role="status">{sucessoAnexo}</p>}
-      <ConfirmarRemocao
-        valor={confirmacao}
-        fechar={() => setConfirmacao(undefined)}
-        confirmar={() =>
-          confirmacao?.anexo
-            ? excluirAnexo(confirmacao.marco, confirmacao.anexo)
-            : confirmacao && excluir(confirmacao.marco)
-        }
-      />
     </section>
   );
 }
@@ -534,7 +450,10 @@ function DetalheMarco({
           {gerenciar && (
             <div className="acoes-dominio">
               <Button onClick={editar}>Editar</Button>
-              <Button variant="outline" onClick={() => confirmar({ marco })}>
+              <Button
+                variant="destructive"
+                onClick={() => confirmar({ marco })}
+              >
                 Excluir
               </Button>
             </div>
@@ -567,7 +486,7 @@ function DetalheMarco({
                   {gerenciar && (
                     <>
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         onClick={() => anexar({ marco, anexo: a })}
                       >
                         Substituir
@@ -620,8 +539,10 @@ function ConfirmarRemocao({
         </AlertDialogDescription>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={confirmar}>
-            Confirmar remoção
+          <AlertDialogAction asChild>
+            <Button variant="destructive" onClick={confirmar}>
+              Confirmar remoção
+            </Button>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

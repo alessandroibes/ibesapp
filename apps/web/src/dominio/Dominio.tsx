@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import {
+  AccessDeniedState,
   Badge,
   Button,
   PageHeader,
@@ -253,16 +254,15 @@ export function Dominio({
             />
           </SheetContent>
         </Sheet>
-        {atual && (
+        {atual && ["pessoas", "agenda"].includes(atual.id) && (
           <PageHeader
             title={atual.nome}
             description={atual.resumo}
             breadcrumbs={[{ label: "Embaixada" }, { label: atual.nome }]}
             meta={
-              <>
-                <Badge variant="primary">{nomeEmbaixada}</Badge>
-                <span className="metadado-igreja">{nomeIgreja}</span>
-              </>
+              <span className="metadado-igreja">
+                {nomeEmbaixada} · {nomeIgreja}
+              </span>
             }
           />
         )}
@@ -274,7 +274,7 @@ export function Dominio({
                 secoes[0] ? (
                   <Navigate to={`/${secoes[0].id}`} replace />
                 ) : (
-                  <p>Você não possui acesso às áreas de trabalho.</p>
+                  <AccessDeniedState description="Você não possui acesso às áreas de trabalho desta Igreja." />
                 )
               }
             />

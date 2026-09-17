@@ -845,21 +845,6 @@ select:focus,
   height: auto;
   padding: 11px;
 }
-.grade-organizacao {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
-  gap: 16px;
-  align-items: start;
-  margin: 20px 0;
-}
-.grade-organizacao > .formulario-dominio {
-  margin: 0;
-}
-.prova-competicao {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
 .resumo-financeiro {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;

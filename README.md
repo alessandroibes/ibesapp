@@ -1,6 +1,6 @@
 # ER — Starter completo para Codex
 
-Fundação executável e **Fases 1 a 6** disponíveis: cadastros, jornada ER, operação semanal, organização interna, competições, financeiro simples e acervo histórico. O escopo implementado termina no prompt `05-financeiro-historia.md`.
+Fundação executável, **Fases 1 a 6** e ciclo de evolução visual web disponíveis: cadastros, jornada ER, operação semanal, organização interna, competições, financeiro simples e acervo histórico em uma experiência responsiva e acessível. O escopo implementado termina no prompt `11-ux-consolidacao.md`.
 
 ```powershell
 ./scripts/dev-setup.ps1
@@ -31,7 +31,7 @@ A reorganização visual das funcionalidades existentes está planejada em [UX-R
 5. `prompts/10-modulos-administrativos-ux.md`;
 6. `prompts/11-ux-consolidacao.md`.
 
-As etapas reorganizam rotas, componentes e apresentação sem criar regras de negócio. Dashboard, Relatórios, identidade visual oficial e reformulação do aplicativo React Native permanecem fora desse ciclo até que seus requisitos sejam definidos.
+As etapas foram concluídas e reorganizam rotas, componentes e apresentação sem criar regras de negócio. Consulte o [mapa de telas](docs/ux/SCREEN-MAP.md), o [sistema de UX](docs/ux/UX-SYSTEM.md) e a [validação final](docs/quality/UX-REDESIGN-VALIDATION.md). Dashboard, Relatórios, identidade visual oficial e reformulação do aplicativo React Native permanecem fora desse ciclo até que seus requisitos sejam definidos.
 
 ## Produto inicial
 Sistema multi-organização para gestão de Embaixadas de Embaixadores do Rei, começando pela Embaixada James Jackson Taylor (Embaixada J. J. Taylor).

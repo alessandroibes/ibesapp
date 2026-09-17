@@ -25,3 +25,14 @@ Agenda deve oferecer mês, semana/lista e cronograma anual. Status concluído de
 A evolução planejada da interface web, seus padrões por tipo de tela e os limites para não alterar regras de negócio estão definidos em `docs/ux/UX-REDESIGN.md` e `plans/UX-REDESIGN-ROADMAP.md`.
 
 Os tokens, componentes fundamentais, variantes e regras de composição da fundação web estão documentados em `docs/ux/DESIGN-SYSTEM-COMPONENTS.md`.
+
+## Padrões consolidados
+
+- Cada tela possui um único `PageHeader`; o shell identifica o tenant sem repetir o título do módulo.
+- A ação principal usa botão primário. Cancelar e voltar usam `outline`; ações discretas usam `ghost`; exclusão e remoção usam `destructive` e confirmação descritiva.
+- `PageSkeleton` representa carregamento, `EmptyState` representa ausência de conteúdo e `Alert` representa erro, conflito ou falta de permissão. Sucesso é anunciado por `role="status"`.
+- Filtros restauráveis ficam na URL somente quando não contêm dados pessoais. Buscas por nome permanecem em memória local.
+- Listagens levam ao detalhe; formulários extensos usam página própria e ações curtas usam diálogo.
+- Rotas desconhecidas retornam à entrada permitida do módulo. Rotas sem permissão não são expostas na navegação e continuam protegidas pela API.
+- A página não cria rolagem horizontal entre 320 e 1440 px. Tabelas e abas podem usar rolagem localizada quando necessária.
+- Movimento respeita `prefers-reduced-motion`; foco permanece visível e retorna ao acionador ao fechar camadas.

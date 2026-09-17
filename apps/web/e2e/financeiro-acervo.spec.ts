@@ -38,6 +38,14 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
     page.getByText("16/09/2026 · Pagamento de camisa").first(),
   ).toBeVisible();
   await expect(page.getByText(/R\$\s*75,50/).first()).toBeVisible();
+  await page.getByLabel("Data inicial").fill("2026-09-01");
+  await expect(page).toHaveURL(/inicio=2026-09-01/);
+  await page.reload();
+  await expect(page.getByLabel("Data inicial")).toHaveValue("2026-09-01");
+  await page.screenshot({
+    path: "../../artifacts/financeiro-desktop.png",
+    fullPage: true,
+  });
 
   await page
     .getByRole("link", { name: "Acervo histórico", exact: true })
@@ -52,7 +60,7 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
   await marco.getByRole("button", { name: "Registrar marco" }).click();
   const artigo = page.getByRole("article").filter({ hasText: titulo });
   await expect(artigo).toBeVisible();
-  await artigo.getByRole("button", { name: "Ver detalhes" }).click();
+  await artigo.getByRole("link", { name: "Ver detalhes" }).click();
   await page.getByRole("button", { name: "Adicionar anexo" }).click();
   const anexo = page.getByRole("form", { name: "Anexar foto ou documento" });
   await anexo.getByLabel("Arquivo").setInputFiles({
@@ -62,6 +70,11 @@ test("controle financeiro e linha do tempo histórica", async ({ page }) => {
   });
   await anexo.getByRole("button", { name: "Enviar anexo" }).click();
   await expect(page.getByRole("button", { name: "Baixar" })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: "../../artifacts/acervo-mobile.png",
+    fullPage: true,
+  });
 
   expect(
     (

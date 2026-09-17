@@ -74,7 +74,7 @@ npm --prefix apps/mobile run lint
 npm --prefix apps/mobile test
 ```
 
-Os testes .NET iniciam seu próprio PostgreSQL descartável com Testcontainers; não usam o banco local da aplicação. Para E2E, manter Compose ativo, instalar Chromium com `npx playwright install chromium` em `apps/web`, carregar `BOOTSTRAP_PASSWORD` de `.env` no ambiente e executar `npx playwright test`. Screenshots ficam em `artifacts/`.
+Os testes .NET iniciam seu próprio PostgreSQL descartável com Testcontainers; não usam o banco local da aplicação. Para E2E, manter Compose ativo, instalar Chromium com `npx playwright install chromium` em `apps/web`, carregar `BOOTSTRAP_PASSWORD` de `.env` no ambiente e executar `npx playwright test --workers=1`. A execução serial evita disputa pelos registros do ambiente demonstrativo. Capturas de referência ficam em `artifacts/`.
 
 ## Contrato e migrações
 

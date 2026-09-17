@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,9 +62,16 @@ export function Financeiro({
   gerenciar: boolean;
 }) {
   const [revisao, setRevisao] = useState(0);
-  const [iniciativaFiltro, setIniciativaFiltro] = useState("");
-  const [inicio, setInicio] = useState("");
-  const [fim, setFim] = useState("");
+  const [filtros, setFiltros] = useSearchParams();
+  const iniciativaFiltro = filtros.get("iniciativa") ?? "";
+  const inicio = filtros.get("inicio") ?? "";
+  const fim = filtros.get("fim") ?? "";
+  const alterarFiltro = (nome: string, valor: string) => {
+    const seguintes = new URLSearchParams(filtros);
+    if (valor) seguintes.set(nome, valor);
+    else seguintes.delete(nome);
+    setFiltros(seguintes, { replace: true });
+  };
   const [editando, setEditando] = useState<Lancamento>();
   const [excluindo, setExcluindo] = useState<Lancamento>();
   const atualizar = () => setRevisao((x) => x + 1);
@@ -165,7 +173,7 @@ export function Financeiro({
           <input
             type="date"
             value={inicio}
-            onChange={(e) => setInicio(e.target.value)}
+            onChange={(e) => alterarFiltro("inicio", e.target.value)}
           />
         </label>
         <label>
@@ -173,14 +181,14 @@ export function Financeiro({
           <input
             type="date"
             value={fim}
-            onChange={(e) => setFim(e.target.value)}
+            onChange={(e) => alterarFiltro("fim", e.target.value)}
           />
         </label>
         <label>
           Filtrar por iniciativa
           <select
             value={iniciativaFiltro}
-            onChange={(e) => setIniciativaFiltro(e.target.value)}
+            onChange={(e) => alterarFiltro("iniciativa", e.target.value)}
           >
             <option value="">Todas as movimentações</option>
             {iniciativaOpcoes.map((x) => (
@@ -331,7 +339,10 @@ export function Financeiro({
                     <Button variant="outline" onClick={() => setEditando(x)}>
                       Editar
                     </Button>
-                    <Button variant="outline" onClick={() => setExcluindo(x)}>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setExcluindo(x)}
+                    >
                       Excluir
                     </Button>
                   </div>
@@ -354,10 +365,13 @@ export function Financeiro({
           </AlertDialogDescription>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => excluindo && void excluir(excluindo)}
-            >
-              Excluir lançamento
+            <AlertDialogAction asChild>
+              <Button
+                variant="destructive"
+                onClick={() => excluindo && void excluir(excluindo)}
+              >
+                Excluir lançamento
+              </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

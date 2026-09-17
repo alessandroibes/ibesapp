@@ -31,7 +31,11 @@ describe("Financeiro e acervo histórico", () => {
         },
       ];
     }) as unknown as Api;
-    render(<Financeiro api={api} gerenciar={false} />);
+    render(
+      <MemoryRouter>
+        <Financeiro api={api} gerenciar={false} />
+      </MemoryRouter>,
+    );
     expect((await screen.findAllByText(/100,00/)).length).toBeGreaterThan(0);
     expect(screen.getByText(/60,00/)).toBeInTheDocument();
     expect(screen.getByText(/40,00/)).toBeInTheDocument();
@@ -66,18 +70,16 @@ describe("Financeiro e acervo histórico", () => {
       ];
     }) as unknown as Api;
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={["/acervo/m"]}>
         <AcervoHistorico api={api} igrejaId="igreja" gerenciar={false} />
       </MemoryRouter>,
     );
     expect(
       await screen.findByRole("heading", { name: "Primeiro acampamento" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Autoria: secretaria@example.test/),
-    ).toHaveTextContent("João");
-    expect(
-      screen.getByRole("button", { name: "foto.jpg" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("secretaria@example.test")).toBeInTheDocument();
+    expect(screen.getByText("João")).toBeInTheDocument();
+    expect(screen.getByText("foto.jpg")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Baixar" })).toBeInTheDocument();
   });
 });

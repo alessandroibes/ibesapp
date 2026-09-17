@@ -39,6 +39,9 @@ test("acesso web, contexto, logout e acessibilidade", async ({ page }) => {
   await expect(page).toHaveURL(/\/agenda$/);
   await page.goBack();
   await expect(page).toHaveURL(/\/instituicao$/);
+  await page.goForward();
+  await expect(page).toHaveURL(/\/agenda$/);
+  await page.goBack();
   expect(
     (
       await new AxeBuilder({ page })

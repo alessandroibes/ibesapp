@@ -1,5 +1,12 @@
 import { useId, useRef, useState, type ReactNode } from "react";
-import { Button } from "../components/ui/button";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  EmptyState,
+  PageSkeleton,
+} from "../components/ui";
 import {
   Dialog,
   DialogContent,
@@ -185,12 +192,21 @@ export function Estado({
 }) {
   return (
     <>
-      {loading && <p role="status">Carregando…</p>}
+      {loading && <PageSkeleton />}
       {erro && (
-        <div role="alert">
-          <p>{erro}</p>
-          <Button onClick={atualizar}>Tentar novamente</Button>
-        </div>
+        <Alert variant={erro.includes("permissão") ? "warning" : "danger"}>
+          <AlertTitle>
+            {erro.includes("permissão")
+              ? "Acesso não autorizado"
+              : erro.includes("mudou") || erro.includes("já existe")
+                ? "Os dados foram atualizados"
+                : "Não foi possível carregar"}
+          </AlertTitle>
+          <AlertDescription>{erro}</AlertDescription>
+          <Button variant="outline" onClick={atualizar}>
+            Tentar novamente
+          </Button>
+        </Alert>
       )}
     </>
   );
@@ -266,7 +282,10 @@ export function SeletorPessoa({
         </select>
       </label>
       {lista.dados?.total === 0 && (
-        <p>Nenhuma pessoa encontrada. Cadastre-a primeiro.</p>
+        <EmptyState
+          title="Nenhuma pessoa encontrada"
+          description="Ajuste a busca ou cadastre a pessoa antes de continuar."
+        />
       )}
     </div>
   );
