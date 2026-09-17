@@ -29,6 +29,8 @@ describe("Navegação do domínio", () => {
       <MemoryRouter initialEntries={["/pessoas"]}>
         <Dominio
           igrejaId="igreja-a"
+          nomeIgreja="Igreja A"
+          nomeEmbaixada="Embaixada A"
           permissoes={["pessoas.consultar", "agenda.consultar"]}
         />
       </MemoryRouter>,
@@ -40,6 +42,9 @@ describe("Navegação do domínio", () => {
       screen.getByRole("link", { name: /Pessoas e jornada/ }),
     ).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Pessoas abertas")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Pessoas e jornada", level: 1 }),
+    ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("link", { name: /Agenda e reuniões/ }),
     );
@@ -51,5 +56,35 @@ describe("Navegação do domínio", () => {
     expect(
       screen.queryByRole("link", { name: /Competições/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it("abre e fecha o painel móvel preservando o foco no acionador", async () => {
+    const usuario = userEvent.setup();
+
+    render(
+      <MemoryRouter initialEntries={["/pessoas"]}>
+        <Dominio
+          igrejaId="igreja-a"
+          nomeIgreja="Igreja A"
+          nomeEmbaixada="Embaixada A"
+          permissoes={["pessoas.consultar"]}
+        />
+      </MemoryRouter>,
+    );
+
+    const acionador = screen.getByRole("button", {
+      name: "Áreas de trabalho",
+    });
+    await usuario.click(acionador);
+
+    expect(
+      screen.getByRole("dialog", { name: "Áreas de trabalho" }),
+    ).toBeInTheDocument();
+    await usuario.keyboard("{Escape}");
+
+    expect(
+      screen.queryByRole("dialog", { name: "Áreas de trabalho" }),
+    ).not.toBeInTheDocument();
+    expect(acionador).toHaveFocus();
   });
 });

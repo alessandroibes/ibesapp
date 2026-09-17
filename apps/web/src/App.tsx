@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button } from "./components/ui/button";
+import { LogOut } from "lucide-react";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  EmptyState,
+  PageSkeleton,
+  Select,
+} from "./components/ui";
 import type { components } from "../../../packages/contracts/api";
 import { Dominio } from "./dominio/Dominio";
 
@@ -140,14 +148,10 @@ export function App() {
               Use sua conta de liderança para continuar.
             </p>
             {estado === "loading" && (
-              <p role="status" className="estado-carregando">
-                Verificando seu acesso…
-              </p>
+              <PageSkeleton label="Verificando seu acesso" />
             )}
             {estado === "pronto" && igrejas.length > 0 && !contexto && (
-              <p role="status" className="estado-carregando">
-                Carregando sua Embaixada…
-              </p>
+              <PageSkeleton label="Carregando sua Embaixada" />
             )}
             {estado === "anonimo" && (
               <Button asChild className="botao-acesso">
@@ -157,15 +161,20 @@ export function App() {
               </Button>
             )}
             {estado === "pronto" && igrejas.length === 0 && (
-              <div className="estado-vazio">
-                <p>Você ainda não possui vínculo com uma Igreja.</p>
-              </div>
+              <EmptyState
+                title="Nenhuma Igreja disponível"
+                description="Você ainda não possui vínculo com uma Igreja."
+              />
             )}
             {(estado === "erro" || erroContexto) && (
-              <div role="alert" className="estado-erro">
-                <p>Não foi possível carregar seu acesso. Tente novamente.</p>
-                <Button onClick={tentarNovamente}>Tentar novamente</Button>
-              </div>
+              <Alert variant="danger">
+                <AlertDescription>
+                  Não foi possível carregar seu acesso. Tente novamente.
+                </AlertDescription>
+                <Button onClick={tentarNovamente} size="sm">
+                  Tentar novamente
+                </Button>
+              </Alert>
             )}
           </section>
         </main>
@@ -182,7 +191,7 @@ export function App() {
         <Marca />
         <div className="contexto-superior">
           <label htmlFor="igreja">Igreja</label>
-          <select
+          <Select
             id="igreja"
             value={igrejaId}
             onChange={(e) => {
@@ -196,33 +205,25 @@ export function App() {
                 {igreja.nome}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <Button
           variant="outline"
           onClick={sair}
           disabled={saindo}
           className="botao-sair"
+          size="sm"
         >
-          {saindo ? "Saindo…" : "Sair"}
+          <LogOut aria-hidden="true" />
+          <span>{saindo ? "Saindo…" : "Sair"}</span>
         </Button>
       </header>
       <main id="conteudo" className="conteudo-app">
-        <div className="cabecalho-pagina">
-          <div>
-            <p className="caminho-pagina">
-              Embaixada <span aria-hidden="true">/</span> Área de trabalho
-            </p>
-            <h1>{contexto.embaixada}</h1>
-            <p>{contexto.igreja}</p>
-          </div>
-          <span className="contexto-ativo">
-            <i aria-hidden="true" /> Contexto ativo
-          </span>
-        </div>
         <Dominio
           key={igrejaId}
           igrejaId={igrejaId}
+          nomeIgreja={contexto.igreja}
+          nomeEmbaixada={contexto.embaixada}
           permissoes={contexto.permissoes ?? []}
         />
       </main>

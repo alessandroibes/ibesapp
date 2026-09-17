@@ -23,3 +23,5 @@ Navegação e cadastros:
 Agenda deve oferecer mês, semana/lista e cronograma anual. Status concluído deve ser visível sem depender apenas de cor. Eventos cancelados devem permanecer no histórico.
 
 A evolução planejada da interface web, seus padrões por tipo de tela e os limites para não alterar regras de negócio estão definidos em `docs/ux/UX-REDESIGN.md` e `plans/UX-REDESIGN-ROADMAP.md`.
+
+Os tokens, componentes fundamentais, variantes e regras de composição da fundação web estão documentados em `docs/ux/DESIGN-SYSTEM-COMPONENTS.md`.

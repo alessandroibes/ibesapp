@@ -1,0 +1,74 @@
+:root {
+  --background: #f6f7fb;
+  --foreground: #172033;
+  --primary: #3448e5;
+  --primary-hover: #293bc5;
+  --primary-foreground: #ffffff;
+  --primary-soft: #eef1ff;
+  --secondary: #eef0f5;
+  --secondary-foreground: #344054;
+  --ring: #3448e5;
+  --surface: #ffffff;
+  --surface-subtle: #f8f9fc;
+  --surface-raised: #ffffff;
+  --border: #e4e7ec;
+  --border-strong: #cfd4dc;
+  --muted: #5c6575;
+  --muted-light: #667085;
+  --success: #067647;
+  --success-soft: #ecfdf3;
+  --danger: #b42318;
+  --danger-soft: #fef3f2;
+  --warning: #b54708;
+  --warning-soft: #fffaeb;
+  --info: #175cd3;
+  --info-soft: #eff8ff;
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-xs: 0 1px 2px rgb(16 24 40 / 5%);
+  --shadow-sm: 0 1px 3px rgb(16 24 40 / 8%), 0 1px 2px rgb(16 24 40 / 4%);
+  --shadow-md: 0 8px 24px rgb(16 24 40 / 9%);
+  --shadow-lg: 0 20px 48px rgb(16 24 40 / 18%);
+  --focus-ring: rgb(70 95 255 / 34%);
+  --header-height: 72px;
+  --sidebar-width: 272px;
+  --z-sidebar: 30;
+  --z-header: 40;
+  --z-overlay: 70;
+  --z-dialog: 80;
+  --z-toast: 100;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-danger: var(--danger);
+  --shadow-xs: var(--shadow-xs);
+}

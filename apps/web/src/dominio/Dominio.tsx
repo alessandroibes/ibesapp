@@ -1,149 +1,193 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ComponentType } from "react";
+import {
+  Archive,
+  BookOpen,
+  Building2,
+  CalendarDays,
+  Landmark,
+  Menu,
+  Network,
+  Trophy,
+  UsersRound,
+  WalletCards,
+  type LucideProps,
+} from "lucide-react";
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { criarApi } from "./api";
-import { Pessoas } from "./Pessoas";
-import { Instituicao } from "./Instituicao";
-import { Manuais } from "./Manuais";
+import {
+  Badge,
+  Button,
+  PageHeader,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "../components/ui";
+import { AcervoHistorico } from "./AcervoHistorico";
 import { Agenda } from "./Agenda";
-import { Organizacao } from "./Organizacao";
+import { criarApi } from "./api";
 import { Competicoes } from "./Competicoes";
 import { Financeiro } from "./Financeiro";
-import { AcervoHistorico } from "./AcervoHistorico";
+import { Instituicao } from "./Instituicao";
+import { Manuais } from "./Manuais";
+import { Organizacao } from "./Organizacao";
+import { Pessoas } from "./Pessoas";
 
-type IconeNome =
-  | "pessoas"
-  | "instituicao"
-  | "manuais"
-  | "agenda"
-  | "organizacao"
-  | "competicoes"
-  | "financeiro"
-  | "acervo";
+type Icone = ComponentType<LucideProps>;
+type Grupo = "Gestão" | "Operação" | "Organização" | "Administração";
+type Secao = {
+  id: string;
+  nome: string;
+  resumo: string;
+  grupo: Grupo;
+  permissao: string;
+  icone: Icone;
+};
 
-function Icone({ nome }: { nome: IconeNome }) {
-  const caminhos: Record<IconeNome, ReactNode> = {
-    pessoas: (
-      <>
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-      </>
-    ),
-    instituicao: (
-      <>
-        <path d="M3 21h18M5 21V10M19 21V10M3 10l9-7 9 7M9 21v-6h6v6" />
-      </>
-    ),
-    manuais: (
-      <>
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z" />
-        <path d="M4 5.5v14A2.5 2.5 0 0 0 6.5 22H20" />
-      </>
-    ),
-    agenda: (
-      <>
-        <rect x="3" y="5" width="18" height="16" rx="2" />
-        <path d="M16 3v4M8 3v4M3 11h18M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01" />
-      </>
-    ),
-    organizacao: (
-      <>
-        <circle cx="12" cy="5" r="3" />
-        <circle cx="5" cy="19" r="3" />
-        <circle cx="19" cy="19" r="3" />
-        <path d="M12 8v4M5 16v-2h14v2" />
-      </>
-    ),
-    competicoes: (
-      <>
-        <path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4" />
-      </>
-    ),
-    financeiro: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 10h18M16 15h2" />
-      </>
-    ),
-    acervo: (
-      <>
-        <rect x="3" y="4" width="18" height="5" rx="1" />
-        <path d="M5 9v11h14V9M10 13h4" />
-      </>
-    ),
-  };
+const todasSecoes: Secao[] = [
+  {
+    id: "pessoas",
+    nome: "Pessoas e jornada",
+    resumo: "Cadastros e progressão",
+    grupo: "Gestão",
+    permissao: "pessoas.consultar",
+    icone: UsersRound,
+  },
+  {
+    id: "instituicao",
+    nome: "Igreja e Embaixada",
+    resumo: "Dados institucionais",
+    grupo: "Gestão",
+    permissao: "embaixada.consultar",
+    icone: Building2,
+  },
+  {
+    id: "manuais",
+    nome: "Manuais",
+    resumo: "Versões e tarefas",
+    grupo: "Gestão",
+    permissao: "progressao.consultar",
+    icone: BookOpen,
+  },
+  {
+    id: "agenda",
+    nome: "Agenda e reuniões",
+    resumo: "Atividades e frequência",
+    grupo: "Operação",
+    permissao: "agenda.consultar",
+    icone: CalendarDays,
+  },
+  {
+    id: "competicoes",
+    nome: "Competições",
+    resumo: "Aptidões e escalações",
+    grupo: "Operação",
+    permissao: "competicoes.consultar",
+    icone: Trophy,
+  },
+  {
+    id: "organizacao",
+    nome: "Consulados e Diretoria",
+    resumo: "Organização e mandatos",
+    grupo: "Organização",
+    permissao: "organizacao.consultar",
+    icone: Network,
+  },
+  {
+    id: "financeiro",
+    nome: "Financeiro",
+    resumo: "Entradas e saídas",
+    grupo: "Administração",
+    permissao: "financeiro.consultar",
+    icone: WalletCards,
+  },
+  {
+    id: "acervo",
+    nome: "Acervo histórico",
+    resumo: "Memória da Embaixada",
+    grupo: "Administração",
+    permissao: "acervo.consultar",
+    icone: Archive,
+  },
+];
+const grupos: Grupo[] = ["Gestão", "Operação", "Organização", "Administração"];
+
+function Navegacao({
+  secoes,
+  secaoAtual,
+  embaixada,
+  igreja,
+  aoNavegar,
+}: {
+  secoes: Secao[];
+  secaoAtual?: string;
+  embaixada: string;
+  igreja: string;
+  aoNavegar?: () => void;
+}) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {caminhos[nome]}
-    </svg>
+    <div className="conteudo-navegacao">
+      <div className="contexto-navegacao">
+        <span className="icone-contexto" aria-hidden="true">
+          <Landmark />
+        </span>
+        <div>
+          <span>Embaixada</span>
+          <strong>{embaixada}</strong>
+          <small>{igreja}</small>
+        </div>
+      </div>
+      <nav aria-label="Gestão da Embaixada">
+        {grupos.map((grupo) => {
+          const itens = secoes.filter((secao) => secao.grupo === grupo);
+          if (itens.length === 0) return null;
+          return (
+            <div className="grupo-navegacao" key={grupo}>
+              <p>{grupo}</p>
+              {itens.map((secao) => {
+                const Icon = secao.icone;
+                return (
+                  <Link
+                    key={secao.id}
+                    to={`/${secao.id}`}
+                    className={`item-navegacao${secao.id === secaoAtual ? " item-navegacao-ativo" : ""}`}
+                    aria-label={secao.nome}
+                    aria-current={secao.id === secaoAtual ? "page" : undefined}
+                    onClick={aoNavegar}
+                  >
+                    <Icon aria-hidden="true" />
+                    <span>
+                      <strong>{secao.nome}</strong>
+                      <small>{secao.resumo}</small>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          );
+        })}
+      </nav>
+      <div className="rodape-navegacao">
+        <Badge variant="success">Contexto ativo</Badge>
+      </div>
+    </div>
   );
 }
 
 export function Dominio({
   igrejaId,
+  nomeIgreja,
+  nomeEmbaixada,
   permissoes,
 }: {
   igrejaId: string;
+  nomeIgreja: string;
+  nomeEmbaixada: string;
   permissoes: string[];
 }) {
-  const secoes = [
-    {
-      id: "pessoas",
-      nome: "Pessoas e jornada",
-      resumo: "Cadastros e progressão",
-      permissao: "pessoas.consultar",
-    },
-    {
-      id: "instituicao",
-      nome: "Igreja e Embaixada",
-      resumo: "Dados institucionais",
-      permissao: "embaixada.consultar",
-    },
-    {
-      id: "manuais",
-      nome: "Manuais",
-      resumo: "Versões e tarefas",
-      permissao: "progressao.consultar",
-    },
-    {
-      id: "agenda",
-      nome: "Agenda e reuniões",
-      resumo: "Atividades e frequência",
-      permissao: "agenda.consultar",
-    },
-    {
-      id: "organizacao",
-      nome: "Consulados e Diretoria",
-      resumo: "Organização e mandatos",
-      permissao: "organizacao.consultar",
-    },
-    {
-      id: "competicoes",
-      nome: "Competições",
-      resumo: "Aptidões e escalações",
-      permissao: "competicoes.consultar",
-    },
-    {
-      id: "financeiro",
-      nome: "Financeiro",
-      resumo: "Entradas e saídas",
-      permissao: "financeiro.consultar",
-    },
-    {
-      id: "acervo",
-      nome: "Acervo histórico",
-      resumo: "Memória da Embaixada",
-      permissao: "acervo.consultar",
-    },
-  ].filter((s) => permissoes.includes(s.permissao));
+  const secoes = todasSecoes.filter((secao) =>
+    permissoes.includes(secao.permissao),
+  );
   const [menuAberto, setMenuAberto] = useState(false);
   const botaoMenu = useRef<HTMLButtonElement>(null);
   const api = useMemo(() => criarApi(igrejaId), [igrejaId]);
@@ -151,84 +195,66 @@ export function Dominio({
   const secao =
     location.pathname.split("/").filter(Boolean)[0] ?? secoes[0]?.id;
   const atual = secoes.find((item) => item.id === secao) ?? secoes[0];
-  const abrirMenu = () => {
-    setMenuAberto(true);
-    requestAnimationFrame(() =>
-      document.getElementById(`link-${secao}`)?.focus({ preventScroll: true }),
-    );
-  };
-  const fecharMenu = () => {
-    setMenuAberto(false);
-    requestAnimationFrame(() =>
-      botaoMenu.current?.focus({ preventScroll: true }),
-    );
-  };
+
   return (
     <div className="dominio">
-      <button
-        ref={botaoMenu}
-        className="abrir-navegacao"
-        type="button"
-        aria-expanded={menuAberto}
-        aria-controls="navegacao-principal"
-        onClick={abrirMenu}
-      >
-        <span aria-hidden="true">☰</span> Áreas de trabalho
-      </button>
-      {menuAberto && (
-        <button
-          className="fundo-navegacao"
-          aria-label="Fechar navegação"
-          onClick={fecharMenu}
+      <aside className="navegacao-dominio navegacao-desktop">
+        <Navegacao
+          secoes={secoes}
+          secaoAtual={secao}
+          embaixada={nomeEmbaixada}
+          igreja={nomeIgreja}
         />
-      )}
-      <aside
-        id="navegacao-principal"
-        className={`navegacao-dominio${menuAberto ? " navegacao-aberta" : ""}`}
-      >
-        <div className="titulo-navegacao">
-          <div>
-            <p>Navegação</p>
-            <strong>Áreas de trabalho</strong>
-          </div>
-          <button
-            type="button"
-            aria-label="Fechar navegação"
-            onClick={fecharMenu}
-          >
-            ×
-          </button>
-        </div>
-        <nav aria-label="Gestão da Embaixada">
-          {secoes.map((s) => (
-            <Link
-              key={s.id}
-              id={`link-${s.id}`}
-              to={`/${s.id}`}
-              className={`item-navegacao${s.id === secao ? " item-navegacao-ativo" : ""}`}
-              aria-label={s.nome}
-              aria-current={s.id === secao ? "page" : undefined}
-              onClick={() => setMenuAberto(false)}
-            >
-              <Icone nome={s.id as IconeNome} />
-              <span>
-                <strong>{s.nome}</strong>
-                <small>{s.resumo}</small>
-              </span>
-            </Link>
-          ))}
-        </nav>
       </aside>
       <div className="area-modulo">
-        <div className="identificacao-modulo">
-          <div className="icone-modulo">
-            {atual && <Icone nome={atual.id as IconeNome} />}
-          </div>
-          <div>
-            <span>Área atual</span>
-            <strong>{atual?.nome}</strong>
-          </div>
-        </div>
+        <Sheet
+          open={menuAberto}
+          onOpenChange={(aberto) => {
+            setMenuAberto(aberto);
+            if (!aberto)
+              requestAnimationFrame(() =>
+                botaoMenu.current?.focus({ preventScroll: true }),
+              );
+          }}
+        >
+          <SheetTrigger asChild>
+            <Button
+              ref={botaoMenu}
+              className="abrir-navegacao"
+              variant="outline"
+            >
+              <Menu aria-hidden="true" /> Áreas de trabalho
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetTitle className="somente-leitor">
+              Áreas de trabalho
+            </SheetTitle>
+            <SheetDescription className="somente-leitor">
+              Navegue pelas áreas permitidas da Embaixada.
+            </SheetDescription>
+            <Navegacao
+              secoes={secoes}
+              secaoAtual={secao}
+              embaixada={nomeEmbaixada}
+              igreja={nomeIgreja}
+              aoNavegar={() => setMenuAberto(false)}
+            />
+          </SheetContent>
+        </Sheet>
+        {atual && (
+          <PageHeader
+            title={atual.nome}
+            description={atual.resumo}
+            breadcrumbs={[{ label: "Embaixada" }, { label: atual.nome }]}
+            meta={
+              <>
+                <Badge variant="primary">{nomeEmbaixada}</Badge>
+                <span className="metadado-igreja">{nomeIgreja}</span>
+              </>
+            }
+          />
+        )}
         <div className="painel-dominio">
           <Routes>
             <Route

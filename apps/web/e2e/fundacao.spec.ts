@@ -19,7 +19,7 @@ test("acesso web, contexto, logout e acessibilidade", async ({ page }) => {
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Embaixada de demonstração" }),
+    page.getByRole("heading", { name: "Pessoas e jornada", level: 1 }),
   ).toBeVisible();
   const primeiraAba = page.getByRole("link", { name: "Pessoas e jornada" });
   await expect(
@@ -31,6 +31,14 @@ test("acesso web, contexto, logout e acessibilidade", async ({ page }) => {
     page.getByRole("link", { name: "Igreja e Embaixada" }),
   ).toHaveAttribute("aria-current", "page");
   await expect(page).toHaveURL(/\/instituicao$/);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Igreja e Embaixada", level: 1 }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Agenda e reuniões" }).click();
+  await expect(page).toHaveURL(/\/agenda$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/instituicao$/);
   expect(
     (
       await new AxeBuilder({ page })
@@ -39,11 +47,27 @@ test("acesso web, contexto, logout e acessibilidade", async ({ page }) => {
     ).violations,
   ).toEqual([]);
   await page.setViewportSize({ width: 390, height: 844 });
+  const botaoMenu = page.getByRole("button", { name: "Áreas de trabalho" });
+  await botaoMenu.click();
+  await expect(
+    page.getByRole("dialog", { name: "Áreas de trabalho" }),
+  ).toBeVisible();
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  await page.keyboard.press("Escape");
+  await expect(botaoMenu).toBeFocused();
+  await page.setViewportSize({ width: 320, height: 844 });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({
     path: "../../artifacts/web-mobile.png",
     fullPage: true,
