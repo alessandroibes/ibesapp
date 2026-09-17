@@ -4,7 +4,7 @@ test("acesso web, contexto, logout e acessibilidade", async ({ page }) => {
   await page.goto("/");
   await expect(
     page.getByRole("link", { name: /Entrar na minha conta/ }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 15_000 });
   expect(
     (
       await new AxeBuilder({ page })

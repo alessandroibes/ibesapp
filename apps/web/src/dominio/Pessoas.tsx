@@ -1,18 +1,65 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { components } from "../../../../packages/contracts/api";
-import { type Api, useConsulta, dataBr, hoje } from "./api";
-import { Estado, Formulario, SeletorPessoa, type Campo } from "./componentes";
-import { Jornada } from "./Jornada";
-import { estadosFrequencia } from "./Chamada";
-import { Button } from "../components/ui/button";
+import { EllipsisVertical, Plus, Search, UsersRound } from "lucide-react";
 import {
   Link,
   Navigate,
   Route,
   Routes,
+  useLocation,
   useNavigate,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
+import {
+  AccessDeniedState,
+  Alert,
+  AlertDescription,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  EmptyState,
+  Input,
+  Label,
+  PageSkeleton,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Timeline,
+  Toolbar,
+} from "../components/ui";
+import { estadosFrequencia } from "./Chamada";
+import { type Api, dataBr, hoje, useConsulta } from "./api";
+import { Estado, Formulario, SeletorPessoa, type Campo } from "./componentes";
+import { Jornada } from "./Jornada";
+
 type AlteracaoSituacao = {
   tipo: number;
   data: string;
@@ -23,29 +70,72 @@ type Pessoa = components["schemas"]["PessoaResponse"] & {
   ativa: boolean;
   alteracoesSituacao: AlteracaoSituacao[];
 };
-type PessoaResumo = {
-  id: string;
-  versao: string;
-  nome: string;
-  dataNascimento?: string | null;
-  situacao?: string | null;
-  ativa: boolean;
+type PessoaResumo = components["schemas"]["PessoaResumo"] & { ativa: boolean };
+type PessoasResposta = {
+  total: number | string;
+  pessoas: PessoaResumo[];
 };
-type PessoasResposta = { total: number; pessoas: PessoaResumo[] };
+type Frequencia = components["schemas"]["FrequenciaPessoaResponse"];
+type AbaPessoa = "resumo" | "jornada" | "frequencia" | "vinculos" | "historico";
+
+const condicoes = [
+  ["todos", "Todos"],
+  ["embaixadores", "Embaixadores"],
+  ["candidatos", "Candidatos"],
+  ["visitantes", "Visitantes"],
+  ["inativos", "Inativos"],
+] as const;
+const abas: AbaPessoa[] = [
+  "resumo",
+  "jornada",
+  "frequencia",
+  "vinculos",
+  "historico",
+];
 const camposPessoa: Campo[] = [
-  { nome: "nome", rotulo: "Nome completo", obrigatorio: true },
-  { nome: "dataNascimento", rotulo: "Data de nascimento", tipo: "date" },
-  { nome: "naturalidade", rotulo: "Naturalidade" },
-  { nome: "whatsApp", rotulo: "WhatsApp", limite: 40 },
-  { nome: "endereco", rotulo: "Endereço", limite: 500 },
-  { nome: "dataBatismo", rotulo: "Data do batismo", tipo: "date" },
-  { nome: "localBatismo", rotulo: "Local do batismo" },
-  { nome: "numeroCarteira", rotulo: "Número da carteira", limite: 80 },
-  { nome: "situacaoCarteira", rotulo: "Situação da carteira", limite: 100 },
+  {
+    nome: "nome",
+    rotulo: "Nome completo",
+    obrigatorio: true,
+    grupo: "Identificação",
+  },
+  {
+    nome: "dataNascimento",
+    rotulo: "Data de nascimento",
+    tipo: "date",
+    grupo: "Identificação",
+  },
+  { nome: "naturalidade", rotulo: "Naturalidade", grupo: "Identificação" },
+  { nome: "whatsApp", rotulo: "WhatsApp", limite: 40, grupo: "Contato" },
+  { nome: "endereco", rotulo: "Endereço", limite: 500, grupo: "Contato" },
+  {
+    nome: "dataBatismo",
+    rotulo: "Data do batismo",
+    tipo: "date",
+    grupo: "Vida eclesiástica",
+  },
+  {
+    nome: "localBatismo",
+    rotulo: "Local do batismo",
+    grupo: "Vida eclesiástica",
+  },
+  {
+    nome: "numeroCarteira",
+    rotulo: "Número da carteira",
+    limite: 80,
+    grupo: "Informações da Embaixada",
+  },
+  {
+    nome: "situacaoCarteira",
+    rotulo: "Situação da carteira",
+    limite: 100,
+    grupo: "Informações da Embaixada",
+  },
   {
     nome: "possuiBiblia",
     rotulo: "Possui Bíblia",
     tipo: "select",
+    grupo: "Informações da Embaixada",
     opcoes: [
       { valor: "true", rotulo: "Sim" },
       { valor: "false", rotulo: "Não" },
@@ -56,16 +146,33 @@ const camposPessoa: Campo[] = [
     rotulo: "Observações",
     tipo: "textarea",
     limite: 4000,
+    grupo: "Observações",
   },
 ];
-function converter(d: Record<string, string>) {
+
+function converter(dados: Record<string, string>) {
   return {
     ...Object.fromEntries(
-      Object.entries(d).map(([k, v]) => [k, v === "" ? null : v]),
+      Object.entries(dados).map(([chave, valor]) => [
+        chave,
+        valor === "" ? null : valor,
+      ]),
     ),
-    possuiBiblia: d.possuiBiblia === "" ? null : d.possuiBiblia === "true",
+    possuiBiblia:
+      dados.possuiBiblia === "" ? null : dados.possuiBiblia === "true",
   };
 }
+
+function obterIniciais(nome: string) {
+  return nome
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0])
+    .join("")
+    .toUpperCase();
+}
+
 function Foto({ igrejaId, pessoa }: { igrejaId: string; pessoa: Pessoa }) {
   const [imagem, setImagem] = useState("");
   useEffect(() => {
@@ -76,29 +183,28 @@ function Foto({ igrejaId, pessoa }: { igrejaId: string; pessoa: Pessoa }) {
         headers: { "X-Igreja-Id": igrejaId },
         signal: controller.signal,
       })
-        .then(async (r) => {
-          if (!r.ok) return;
+        .then(async (resposta) => {
+          if (!resposta.ok) return;
           const reader = new FileReader();
           reader.onload = () => {
             if (!controller.signal.aborted) setImagem(reader.result as string);
           };
-          reader.readAsDataURL(await r.blob());
+          reader.readAsDataURL(await resposta.blob());
         })
         .catch(() => undefined);
     return () => controller.abort();
   }, [igrejaId, pessoa.id, pessoa.possuiFoto, pessoa.versao]);
-  return imagem ? (
-    <img
-      className="foto-pessoa"
-      src={imagem}
-      alt={`Foto de ${pessoa.dados.nome}`}
-    />
-  ) : (
-    <p>
-      {pessoa.possuiFoto
-        ? "Foto indisponível no momento."
-        : "Sem foto cadastrada."}
-    </p>
+  return (
+    <Avatar className="avatar-pessoa">
+      {imagem && (
+        <AvatarImage src={imagem} alt={`Foto de ${pessoa.dados.nome}`} />
+      )}
+      {!imagem && (
+        <AvatarFallback aria-label={`Sem foto de ${pessoa.dados.nome}`}>
+          {obterIniciais(pessoa.dados.nome)}
+        </AvatarFallback>
+      )}
+    </Avatar>
   );
 }
 
@@ -114,35 +220,20 @@ function DialogoSituacao({
   concluido: () => void;
 }) {
   const ativa = pessoa.ativa;
+  const nome = "nome" in pessoa ? pessoa.nome : pessoa.dados.nome;
   return (
-    <div
-      className="fundo-dialogo"
-      role="presentation"
-      onMouseDown={(e) => e.target === e.currentTarget && fechar()}
-    >
-      <section
-        className="dialogo"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="titulo-dialogo-situacao"
-      >
-        <div className="cabecalho-dialogo">
-          <div>
-            <p className="rotulo-secao">Alterar situação</p>
-            <h2 id="titulo-dialogo-situacao">
-              {ativa ? "Inativar" : "Reativar"}{" "}
-              {"nome" in pessoa ? pessoa.nome : pessoa.dados.nome}
-            </h2>
-          </div>
-          <button type="button" aria-label="Fechar" onClick={fechar}>
-            ×
-          </button>
-        </div>
-        <p>
-          {ativa
-            ? "A pessoa deixará de aparecer nas listas e seleções operacionais. Todo o histórico será preservado."
-            : "A pessoa voltará a aparecer nas listas e seleções operacionais."}
-        </p>
+    <Dialog open onOpenChange={(aberto) => !aberto && fechar()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {ativa ? "Inativar" : "Reativar"} {nome}
+          </DialogTitle>
+          <DialogDescription>
+            {ativa
+              ? "A pessoa deixará de aparecer nas listas e seleções operacionais. Todo o histórico será preservado."
+              : "A pessoa voltará a aparecer nas listas e seleções operacionais."}
+          </DialogDescription>
+        </DialogHeader>
         <Formulario
           titulo={`${ativa ? "Inativar" : "Reativar"} pessoa`}
           texto={ativa ? "Confirmar inativação" : "Confirmar reativação"}
@@ -157,6 +248,13 @@ function DialogoSituacao({
             },
           ]}
           iniciais={{ data: hoje() }}
+          acoes={
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancelar
+              </Button>
+            </DialogClose>
+          }
           salvar={async (dados) => {
             await api(
               `/pessoas/${pessoa.id}/${ativa ? "inativacao" : "reativacao"}`,
@@ -165,170 +263,270 @@ function DialogoSituacao({
             concluido();
           }}
         />
-        <Button type="button" variant="outline" onClick={fechar}>
-          Cancelar
-        </Button>
-      </section>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 function ListaPessoas({ api, editar }: { api: Api; editar: boolean }) {
-  const [busca, setBusca] = useState("");
-  const [condicao, setCondicao] = useState("todos");
-  const [incluirInativos, setIncluirInativos] = useState(false);
-  const [pagina, setPagina] = useState(1);
+  const [parametros, setParametros] = useSearchParams();
   const [revisao, setRevisao] = useState(0);
   const [alterando, setAlterando] = useState<PessoaResumo>();
+  const [mensagem, setMensagem] = useState("");
+  const [busca, setBusca] = useState("");
+  const condicaoInformada = parametros.get("condicao") ?? "todos";
+  const condicao = condicoes.some(([valor]) => valor === condicaoInformada)
+    ? condicaoInformada
+    : "todos";
+  const paginaInformada = Number(parametros.get("pagina") ?? "1");
+  const pagina =
+    Number.isInteger(paginaInformada) && paginaInformada > 0
+      ? paginaInformada
+      : 1;
+  const incluirInativos = condicao === "inativos";
+  const condicaoApi = incluirInativos ? "todos" : condicao;
+
+  useEffect(() => {
+    if (!parametros.has("busca")) return;
+    const proximos = new URLSearchParams(parametros);
+    proximos.delete("busca");
+    setParametros(proximos, { replace: true });
+  }, [parametros, setParametros]);
+
+  function atualizarParametros(
+    mudancas: Partial<{ condicao: string; pagina: number }>,
+  ) {
+    const proximos = new URLSearchParams(parametros);
+    proximos.delete("busca");
+    const valores = { condicao, pagina, ...mudancas };
+    if (valores.condicao !== "todos")
+      proximos.set("condicao", valores.condicao);
+    else proximos.delete("condicao");
+    if (valores.pagina > 1) proximos.set("pagina", String(valores.pagina));
+    else proximos.delete("pagina");
+    setParametros(proximos, { replace: true });
+  }
+
   const consulta = useConsulta<PessoasResposta>(
     api,
-    `/pessoas?busca=${encodeURIComponent(busca)}&condicao=${condicao}&incluirInativos=${incluirInativos}&pagina=${pagina}`,
+    `/pessoas?busca=${encodeURIComponent(busca)}&condicao=${condicaoApi}&incluirInativos=${incluirInativos}&pagina=${pagina}`,
     revisao,
   );
+  const total = Number(consulta.dados?.total ?? 0);
+
   return (
-    <section aria-labelledby="titulo-pessoas">
-      <div className="cabecalho-listagem">
+    <section className="pagina-pessoas" aria-labelledby="titulo-pessoas">
+      <Toolbar className="cabecalho-modulo">
         <div>
           <h2 id="titulo-pessoas">Pessoas</h2>
-          <p>Embaixadores, Candidatos e Visitantes cadastrados na Igreja.</p>
+          <p>Localize cadastros e acompanhe a trajetória de cada pessoa.</p>
         </div>
         {editar && (
           <Button asChild>
-            <Link to="/pessoas/nova">Adicionar pessoa</Link>
+            <Link to="/pessoas/nova">
+              <Plus aria-hidden="true" /> Adicionar pessoa
+            </Link>
           </Button>
         )}
-      </div>
-      <div className="filtros-listagem">
-        <label>
-          Buscar pelo nome
-          <input
-            value={busca}
-            maxLength={100}
-            onChange={(e) => {
-              setBusca(e.target.value);
-              setPagina(1);
-            }}
-          />
-        </label>
-        <label>
-          Condição
-          <select
-            value={condicao}
-            onChange={(e) => {
-              setCondicao(e.target.value);
-              setPagina(1);
-            }}
-          >
-            <option value="todos">Todas</option>
-            <option value="embaixadores">Embaixadores</option>
-            <option value="candidatos">Candidatos</option>
-            <option value="visitantes">Visitantes</option>
-          </select>
-        </label>
-        <label className="controle-checkbox">
-          <input
-            type="checkbox"
-            checked={incluirInativos}
-            onChange={(e) => {
-              setIncluirInativos(e.target.checked);
-              setPagina(1);
-            }}
-          />{" "}
-          Exibir inativos
-        </label>
-      </div>
-      <Estado {...consulta} atualizar={() => setRevisao((x) => x + 1)} />
-      {consulta.dados && (
-        <>
-          <p className="resultado-listagem">
-            {consulta.dados.total} pessoa(s) encontrada(s).
-          </p>
-          {consulta.dados.total === 0 ? (
-            <div className="estado-vazio">
-              <p>Nenhuma pessoa encontrada com os filtros informados.</p>
+      </Toolbar>
+      {mensagem && (
+        <Alert variant="success">
+          <AlertDescription>{mensagem}</AlertDescription>
+        </Alert>
+      )}
+      <Card className="cartao-lista-pessoas">
+        <CardHeader>
+          <CardTitle>Cadastros</CardTitle>
+          <CardDescription>
+            Condição e página são mantidas no endereço. A busca pelo nome é
+            privada desta sessão.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="filtros-pessoas">
+            <Label htmlFor="busca-pessoas">
+              Buscar pelo nome
+              <span className="campo-com-icone">
+                <Search aria-hidden="true" />
+                <Input
+                  id="busca-pessoas"
+                  value={busca}
+                  maxLength={100}
+                  onChange={(evento) => {
+                    setBusca(evento.target.value);
+                    atualizarParametros({ pagina: 1 });
+                  }}
+                />
+              </span>
+            </Label>
+            <div
+              className="filtro-condicoes-pessoa"
+              role="group"
+              aria-label="Filtrar pessoas por condição"
+            >
+              {condicoes.map(([valor, rotulo]) => (
+                <Button
+                  key={valor}
+                  type="button"
+                  size="sm"
+                  variant={condicao === valor ? "secondary" : "ghost"}
+                  aria-pressed={condicao === valor}
+                  onClick={() =>
+                    atualizarParametros({ condicao: valor, pagina: 1 })
+                  }
+                >
+                  {rotulo}
+                </Button>
+              ))}
             </div>
-          ) : (
-            <div className="tabela-responsiva">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Condição</th>
-                    <th>Situação</th>
-                    <th>
+            {incluirInativos && (
+              <p className="ajuda-filtro">
+                Esta visão inclui pessoas ativas e inativas para permitir
+                consulta histórica e reativação.
+              </p>
+            )}
+          </div>
+          {consulta.loading && <PageSkeleton label="Carregando pessoas" />}
+          {consulta.erro && (
+            <Alert variant="danger">
+              <AlertDescription>{consulta.erro}</AlertDescription>
+              <Button
+                size="sm"
+                onClick={() => setRevisao((valor) => valor + 1)}
+              >
+                Tentar novamente
+              </Button>
+            </Alert>
+          )}
+          {consulta.dados && total === 0 && (
+            <EmptyState
+              title="Nenhuma pessoa encontrada"
+              description="Ajuste a busca ou selecione outra condição."
+              icon={<UsersRound aria-hidden="true" />}
+              action={
+                busca || condicao !== "todos" ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setBusca("");
+                      setParametros(new URLSearchParams(), { replace: true });
+                    }}
+                  >
+                    Limpar filtros
+                  </Button>
+                ) : undefined
+              }
+            />
+          )}
+          {consulta.dados && total > 0 && (
+            <>
+              <p className="resultado-listagem" role="status">
+                {total}{" "}
+                {total === 1 ? "pessoa encontrada" : "pessoas encontradas"}.
+              </p>
+              <Table className="tabela-pessoas">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Nascimento</TableHead>
+                    <TableHead>Condição</TableHead>
+                    <TableHead>Situação</TableHead>
+                    <TableHead>
                       <span className="somente-leitor">Ações</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {consulta.dados.pessoas.map((pessoa) => (
-                    <tr key={pessoa.id}>
-                      <td>
-                        <strong>{pessoa.nome}</strong>
-                      </td>
-                      <td>{pessoa.situacao ?? "Visitante"}</td>
-                      <td>
-                        <span
-                          className={`indicador-situacao ${pessoa.ativa ? "situacao-ativa" : "situacao-inativa"}`}
-                        >
-                          {pessoa.ativa ? "Ativa" : "Inativa"}
+                    <TableRow key={pessoa.id}>
+                      <TableCell data-label="Nome">
+                        <span className="identidade-lista">
+                          <Avatar>
+                            <AvatarFallback>
+                              {obterIniciais(pessoa.nome)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <strong>{pessoa.nome}</strong>
                         </span>
-                      </td>
-                      <td>
-                        <div className="acoes-tabela">
-                          <Button asChild variant="outline">
+                      </TableCell>
+                      <TableCell data-label="Nascimento">
+                        {dataBr(pessoa.dataNascimento)}
+                      </TableCell>
+                      <TableCell data-label="Condição">
+                        <Badge
+                          variant={pessoa.situacao ? "primary" : "neutral"}
+                        >
+                          {pessoa.situacao ?? "Visitante"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell data-label="Situação">
+                        <Badge variant={pessoa.ativa ? "success" : "neutral"}>
+                          {pessoa.ativa ? "Ativa" : "Inativa"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell data-label="Ações">
+                        <div className="acoes-pessoa-lista">
+                          <Button asChild variant="outline" size="sm">
                             <Link to={`/pessoas/${pessoa.id}`}>Visualizar</Link>
                           </Button>
                           {editar && (
-                            <Button asChild variant="outline">
-                              <Link to={`/pessoas/${pessoa.id}/editar`}>
-                                Editar
-                              </Link>
-                            </Button>
-                          )}
-                          {editar && (
-                            <Button
-                              variant="outline"
-                              onClick={() => setAlterando(pessoa)}
-                            >
-                              {pessoa.ativa ? "Inativar" : "Reativar"}
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label={`Ações para ${pessoa.nome}`}
+                                >
+                                  <EllipsisVertical aria-hidden="true" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/pessoas/${pessoa.id}/editar`}>
+                                    Editar cadastro
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  onSelect={() => setAlterando(pessoa)}
+                                >
+                                  {pessoa.ativa ? "Inativar" : "Reativar"}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+              <Pagination
+                page={pagina}
+                canPrevious={pagina > 1}
+                canNext={pagina * 20 < total}
+                onPrevious={() => atualizarParametros({ pagina: pagina - 1 })}
+                onNext={() => atualizarParametros({ pagina: pagina + 1 })}
+                label="Paginação de pessoas"
+              />
+            </>
           )}
-          <div className="paginacao">
-            <Button
-              variant="outline"
-              disabled={pagina === 1}
-              onClick={() => setPagina((x) => x - 1)}
-            >
-              Anterior
-            </Button>
-            <span>Página {pagina}</span>
-            <Button
-              variant="outline"
-              disabled={pagina * 20 >= consulta.dados.total}
-              onClick={() => setPagina((x) => x + 1)}
-            >
-              Próxima
-            </Button>
-          </div>
-        </>
-      )}
+        </CardContent>
+      </Card>
       {alterando && (
         <DialogoSituacao
           pessoa={alterando}
           api={api}
           fechar={() => setAlterando(undefined)}
           concluido={() => {
+            setMensagem(
+              alterando.ativa
+                ? "Pessoa inativada. O histórico foi preservado."
+                : "Pessoa reativada e disponível nas operações futuras.",
+            );
             setAlterando(undefined);
-            setRevisao((x) => x + 1);
+            setRevisao((valor) => valor + 1);
           }}
         />
       )}
@@ -336,338 +534,289 @@ function ListaPessoas({ api, editar }: { api: Api; editar: boolean }) {
   );
 }
 
-function NovaPessoa({ api }: { api: Api }) {
+function FormularioPessoa({ api, pessoa }: { api: Api; pessoa?: Pessoa }) {
   const navegar = useNavigate();
+  const editando = !!pessoa;
   return (
-    <section>
-      <div className="cabecalho-formulario">
-        <div>
-          <p className="caminho-interno">
-            <Link to="/pessoas">Pessoas</Link> / Novo cadastro
-          </p>
-          <h2>Adicionar pessoa</h2>
-          <p>
-            Cadastre os dados básicos. A trajetória ER pode ser iniciada
-            posteriormente.
-          </p>
-        </div>
+    <section
+      className="pagina-formulario-pessoa"
+      aria-labelledby="titulo-formulario-pessoa"
+    >
+      <div className="cabecalho-interno">
+        <p className="caminho-interno">
+          <Link to="/pessoas">Pessoas</Link> /{" "}
+          {editando ? "Editar" : "Novo cadastro"}
+        </p>
+        <h2 id="titulo-formulario-pessoa">
+          {editando ? "Editar pessoa" : "Adicionar pessoa"}
+        </h2>
+        <p>
+          {editando
+            ? "Atualize somente os dados cadastrais necessários."
+            : "Cadastre os dados básicos. A trajetória ER pode ser iniciada depois."}
+        </p>
       </div>
-      <Formulario
-        titulo="Nova pessoa"
-        campos={camposPessoa}
-        salvar={async (dados) => {
-          const criada = await api<components["schemas"]["IdResponse"]>(
-            "/pessoas",
-            converter(dados),
-          );
-          navegar(`/pessoas/${criada.id}`);
-        }}
-      />
-      <Button asChild variant="outline">
-        <Link to="/pessoas">Cancelar</Link>
-      </Button>
-    </section>
-  );
-}
-
-export function Pessoas({
-  api,
-  igrejaId,
-  permissoes,
-}: {
-  api: Api;
-  igrejaId: string;
-  permissoes: string[];
-}) {
-  const editar = permissoes.includes("pessoas.editar");
-  return (
-    <Routes>
-      <Route index element={<ListaPessoas api={api} editar={editar} />} />
-      {editar && <Route path="nova" element={<NovaPessoa api={api} />} />}
-      <Route
-        path=":pessoaId"
-        element={
-          <RotaPessoa api={api} igrejaId={igrejaId} permissoes={permissoes} />
-        }
-      />
-      <Route
-        path=":pessoaId/editar"
-        element={
-          editar ? (
-            <RotaPessoa
-              api={api}
-              igrejaId={igrejaId}
-              permissoes={permissoes}
-              modoEdicao
-            />
-          ) : (
-            <Navigate to=".." replace />
-          )
-        }
-      />
-      <Route path="*" element={<Navigate to="/pessoas" replace />} />
-    </Routes>
-  );
-}
-
-function RotaPessoa({
-  api,
-  igrejaId,
-  permissoes,
-  modoEdicao = false,
-}: {
-  api: Api;
-  igrejaId: string;
-  permissoes: string[];
-  modoEdicao?: boolean;
-}) {
-  const { pessoaId = "" } = useParams();
-  return (
-    <PessoaDetalhe
-      api={api}
-      igrejaId={igrejaId}
-      permissoes={permissoes}
-      pessoaIdInicial={pessoaId}
-      modoEdicao={modoEdicao}
-    />
-  );
-}
-
-function PessoaDetalhe({
-  api,
-  igrejaId,
-  permissoes,
-  pessoaIdInicial,
-  modoEdicao,
-}: {
-  api: Api;
-  igrejaId: string;
-  permissoes: string[];
-  pessoaIdInicial: string;
-  modoEdicao: boolean;
-}) {
-  const selecionada = pessoaIdInicial;
-  const [revisao, setRevisao] = useState(0);
-  const [alterando, setAlterando] = useState(false);
-  const ficha = useConsulta<Pessoa>(
-    api,
-    selecionada ? `/pessoas/${selecionada}` : null,
-    revisao,
-  );
-  const editar = permissoes.includes("pessoas.editar");
-  const atualizar = () => setRevisao((r) => r + 1);
-  const p = ficha.dados;
-  const frequencia = useConsulta<
-    components["schemas"]["FrequenciaPessoaResponse"][]
-  >(
-    api,
-    selecionada && permissoes.includes("frequencia.consultar")
-      ? `/pessoas/${selecionada}/frequencia`
-      : null,
-    revisao,
-  );
-  if (modoEdicao)
-    return (
-      <section>
-        <Estado {...ficha} atualizar={atualizar} />
-        {p && (
-          <>
-            <p className="caminho-interno">
-              <Link to={`/pessoas/${p.id}`}>{p.dados.nome}</Link> / Editar
-            </p>
-            <h2>Editar pessoa</h2>
-            <Formulario
-              key={p.versao}
-              titulo="Dados pessoais"
-              campos={camposPessoa}
-              iniciais={p.dados}
-              salvar={async (dados) => {
+      <Card>
+        <CardContent>
+          <Formulario
+            key={pessoa?.versao ?? "nova"}
+            titulo={editando ? "Dados da pessoa" : "Nova pessoa"}
+            campos={camposPessoa}
+            iniciais={pessoa?.dados}
+            acoes={
+              <Button asChild type="button" variant="outline">
+                <Link to={pessoa ? `/pessoas/${pessoa.id}` : "/pessoas"}>
+                  Cancelar
+                </Link>
+              </Button>
+            }
+            salvar={async (dados) => {
+              if (pessoa) {
                 await api(
-                  `/pessoas/${p.id}`,
-                  { versao: p.versao, dados: converter(dados) },
+                  `/pessoas/${pessoa.id}`,
+                  { versao: pessoa.versao, dados: converter(dados) },
                   "PUT",
                 );
-                atualizar();
-              }}
-            />
+                navegar(`/pessoas/${pessoa.id}`, {
+                  state: { mensagem: "Dados da pessoa atualizados." },
+                });
+                return;
+              }
+              const criada = await api<components["schemas"]["IdResponse"]>(
+                "/pessoas",
+                converter(dados),
+              );
+              navegar(`/pessoas/${criada.id}`, {
+                state: { mensagem: "Pessoa cadastrada com sucesso." },
+              });
+            }}
+          />
+        </CardContent>
+      </Card>
+      {pessoa && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Foto</CardTitle>
+            <CardDescription>PNG ou JPEG com até 2 MB.</CardDescription>
+          </CardHeader>
+          <CardContent>
             <Formulario
               titulo="Atualizar foto"
               campos={[]}
               salvar={async () => {
                 const elemento = document.getElementById(
-                  `foto-${p.id}`,
+                  `foto-${pessoa.id}`,
                 ) as HTMLInputElement;
                 if (!elemento.files?.[0])
                   throw new Error("Selecione uma foto PNG ou JPEG.");
                 const form = new FormData();
                 form.set("foto", elemento.files[0]);
-                form.set("versao", p.versao);
-                await api(`/pessoas/${p.id}/foto`, form);
-                atualizar();
+                form.set("versao", pessoa.versao);
+                await api(`/pessoas/${pessoa.id}/foto`, form);
               }}
             >
-              <label htmlFor={`foto-${p.id}`}>
-                Foto PNG ou JPEG, até 2 MB
-                <input
-                  id={`foto-${p.id}`}
+              <Label htmlFor={`foto-${pessoa.id}`}>
+                Arquivo da foto
+                <Input
+                  id={`foto-${pessoa.id}`}
                   type="file"
                   accept="image/png,image/jpeg"
                   required
                 />
-              </label>
+              </Label>
             </Formulario>
-            <Button asChild variant="outline">
-              <Link to={`/pessoas/${p.id}`}>Voltar aos detalhes</Link>
-            </Button>
-          </>
-        )}
-      </section>
-    );
+          </CardContent>
+        </Card>
+      )}
+    </section>
+  );
+}
+
+function RotaEditarPessoa({ api }: { api: Api }) {
+  const { pessoaId = "" } = useParams();
+  const [revisao, setRevisao] = useState(0);
+  const ficha = useConsulta<Pessoa>(api, `/pessoas/${pessoaId}`, revisao);
   return (
-    <section>
-      <p className="caminho-interno">
-        <Link to="/pessoas">Pessoas</Link> / Detalhes
-      </p>
-      <Estado {...ficha} atualizar={atualizar} />
-      {p && (
-        <article className="ficha-dominio" key={p.id}>
-          <div className="cabecalho-detalhes">
-            <div>
-              <h2>{p.dados.nome}</h2>
-              <span
-                className={`indicador-situacao ${p.ativa ? "situacao-ativa" : "situacao-inativa"}`}
-              >
-                {p.ativa ? "Ativa" : "Inativa"}
-              </span>
-            </div>
-            <div className="acoes-dominio">
-              <Button asChild variant="outline">
-                <Link to="/pessoas">Voltar</Link>
-              </Button>
-              {editar && (
-                <Button asChild>
-                  <Link to={`/pessoas/${p.id}/editar`}>Editar</Link>
-                </Button>
-              )}
-              {editar && (
-                <Button variant="outline" onClick={() => setAlterando(true)}>
-                  {p.ativa ? "Inativar" : "Reativar"}
-                </Button>
-              )}
-            </div>
-          </div>
-          <Foto igrejaId={igrejaId} pessoa={p} />
-          <dl>
+    <>
+      <Estado {...ficha} atualizar={() => setRevisao((valor) => valor + 1)} />
+      {ficha.dados && <FormularioPessoa api={api} pessoa={ficha.dados} />}
+    </>
+  );
+}
+
+function ResumoPessoa({ pessoa }: { pessoa: Pessoa }) {
+  return (
+    <div className="grade-resumo-pessoa">
+      <Card>
+        <CardHeader>
+          <CardTitle>Dados pessoais</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <dl className="lista-dados-pessoa">
             <dt>Nascimento</dt>
-            <dd>{dataBr(p.dados.dataNascimento)}</dd>
-            <dt>Primeira reunião</dt>
-            <dd>
-              {p.primeiraReuniao
-                ? dataBr(p.primeiraReuniao)
-                : "Nenhuma presença registrada"}
-            </dd>
+            <dd>{dataBr(pessoa.dados.dataNascimento)}</dd>
             <dt>Faixa etária atual</dt>
             <dd>
-              {p.faixaEtaria ?? "Fora da faixa etária ER ou data não informada"}
+              {pessoa.faixaEtaria ?? "Fora da faixa etária ER ou não informada"}
             </dd>
-            <dt>Contato</dt>
-            <dd>{p.dados.whatsApp ?? "Não informado"}</dd>
-            <dt>Endereço</dt>
-            <dd>{p.dados.endereco ?? "Não informado"}</dd>
             <dt>Naturalidade</dt>
-            <dd>{p.dados.naturalidade ?? "Não informada"}</dd>
+            <dd>{pessoa.dados.naturalidade ?? "Não informada"}</dd>
+            <dt>WhatsApp</dt>
+            <dd>{pessoa.dados.whatsApp ?? "Não informado"}</dd>
+            <dt>Endereço</dt>
+            <dd>{pessoa.dados.endereco ?? "Não informado"}</dd>
+          </dl>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Vida eclesiástica e Embaixada</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <dl className="lista-dados-pessoa">
             <dt>Batismo</dt>
             <dd>
-              {dataBr(p.dados.dataBatismo)} ·{" "}
-              {p.dados.localBatismo ?? "Local não informado"}
+              {dataBr(pessoa.dados.dataBatismo)} ·{" "}
+              {pessoa.dados.localBatismo ?? "Local não informado"}
+            </dd>
+            <dt>Primeira reunião</dt>
+            <dd>
+              {pessoa.primeiraReuniao
+                ? dataBr(pessoa.primeiraReuniao)
+                : "Nenhuma presença registrada"}
             </dd>
             <dt>Carteira</dt>
             <dd>
-              {p.dados.numeroCarteira ?? "Número não informado"} ·{" "}
-              {p.dados.situacaoCarteira ?? "Situação não informada"}
+              {pessoa.dados.numeroCarteira ?? "Número não informado"} ·{" "}
+              {pessoa.dados.situacaoCarteira ?? "Situação não informada"}
             </dd>
             <dt>Possui Bíblia</dt>
             <dd>
-              {p.dados.possuiBiblia == null
+              {pessoa.dados.possuiBiblia == null
                 ? "Não informado"
-                : p.dados.possuiBiblia
+                : pessoa.dados.possuiBiblia
                   ? "Sim"
                   : "Não"}
             </dd>
-            <dt>Observações</dt>
-            <dd>{p.dados.observacoes ?? "Nenhuma"}</dd>
           </dl>
-          {p.alteracoesSituacao.length > 0 && (
-            <details>
-              <summary>Histórico da situação</summary>
-              <ul className="lista-dominio">
-                {p.alteracoesSituacao.map((alteracao) => (
-                  <li key={`${alteracao.registradoEm}-${alteracao.tipo}`}>
-                    <strong>
-                      {alteracao.tipo === 0 ? "Inativação" : "Reativação"} em{" "}
-                      {dataBr(alteracao.data)}
-                    </strong>
-                    <span>{alteracao.motivo}</span>
-                  </li>
-                ))}
-              </ul>
-            </details>
+        </CardContent>
+      </Card>
+      <Card className="cartao-observacoes-pessoa">
+        <CardHeader>
+          <CardTitle>Observações</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>{pessoa.dados.observacoes ?? "Nenhuma observação cadastrada."}</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function FrequenciaPessoa({
+  consulta,
+  atualizar,
+}: {
+  consulta: { dados?: Frequencia[]; loading: boolean; erro: string };
+  atualizar: () => void;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Histórico de frequência</CardTitle>
+        <CardDescription>
+          A primeira reunião é derivada da primeira presença registrada.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Estado {...consulta} atualizar={atualizar} />
+        {consulta.dados?.length === 0 && (
+          <EmptyState
+            title="Nenhuma frequência registrada"
+            description="Os registros aparecerão aqui depois da chamada."
+          />
+        )}
+        {consulta.dados && consulta.dados.length > 0 && (
+          <Timeline
+            label="Frequências da pessoa"
+            items={consulta.dados.map((frequencia) => ({
+              id: frequencia.reuniaoId,
+              title: frequencia.titulo,
+              description: estadosFrequencia[Number(frequencia.situacao) - 1],
+              meta: dataBr(frequencia.data),
+            }))}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function VinculosPessoa({
+  pessoa,
+  api,
+  editar,
+  atualizar,
+}: {
+  pessoa: Pessoa;
+  api: Api;
+  editar: boolean;
+  atualizar: () => void;
+}) {
+  return (
+    <div className="grade-vinculos-pessoa">
+      <Card>
+        <CardHeader>
+          <CardTitle>Responsáveis</CardTitle>
+          <CardDescription>Vínculos atuais e encerrados.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {pessoa.responsaveis.length === 0 && (
+            <EmptyState title="Nenhum responsável vinculado" />
           )}
-          {permissoes.includes("frequencia.consultar") && (
-            <details>
-              <summary>Histórico de frequência</summary>
-              <Estado {...frequencia} atualizar={atualizar} />
-              {frequencia.dados?.length === 0 && (
-                <p>Nenhuma frequência registrada.</p>
-              )}
-              <ul>
-                {frequencia.dados?.map((f) => (
-                  <li key={f.reuniaoId}>
-                    {dataBr(f.data)} · {f.titulo} ·{" "}
-                    {estadosFrequencia[Number(f.situacao) - 1]}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          )}
-          <h4>Responsáveis</h4>
-          {p.responsaveis.length === 0 && <p>Nenhum responsável vinculado.</p>}
-          <ul className="lista-dominio">
-            {p.responsaveis.map((r) => (
-              <li key={r.id}>
-                <strong>
-                  {r.parentesco}: {r.nome}
-                </strong>
-                <span>
-                  {r.whatsApp ?? "Contato não informado"} ·{" "}
-                  {dataBr(r.dataInicio)} até{" "}
-                  {r.dataFim ? dataBr(r.dataFim) : "o momento"}
-                </span>
-                {editar && !r.dataFim && (
-                  <Formulario
-                    titulo={`Encerrar vínculo de ${r.nome}`}
-                    campos={[
-                      {
-                        nome: "dataFim",
-                        rotulo: "Data de encerramento",
-                        tipo: "date",
-                        obrigatorio: true,
-                      },
-                    ]}
-                    iniciais={{ dataFim: hoje() }}
-                    salvar={async (d) => {
-                      await api(
-                        `/pessoas/${p.id}/responsaveis/${r.id}/encerramento`,
-                        { ...d, versao: r.versao },
-                      );
-                      atualizar();
-                    }}
-                  />
+          <ul className="lista-registros-pessoa">
+            {pessoa.responsaveis.map((responsavel) => (
+              <li key={responsavel.id}>
+                <div>
+                  <strong>
+                    {responsavel.parentesco}: {responsavel.nome}
+                  </strong>
+                  <span>{responsavel.whatsApp ?? "Contato não informado"}</span>
+                  <span>
+                    {dataBr(responsavel.dataInicio)} até{" "}
+                    {responsavel.dataFim
+                      ? dataBr(responsavel.dataFim)
+                      : "o momento"}
+                  </span>
+                </div>
+                {editar && !responsavel.dataFim && (
+                  <details>
+                    <summary>Encerrar vínculo</summary>
+                    <Formulario
+                      titulo={`Encerrar vínculo de ${responsavel.nome}`}
+                      campos={[
+                        {
+                          nome: "dataFim",
+                          rotulo: "Data de encerramento",
+                          tipo: "date",
+                          obrigatorio: true,
+                        },
+                      ]}
+                      iniciais={{ dataFim: hoje() }}
+                      salvar={async (dados) => {
+                        await api(
+                          `/pessoas/${pessoa.id}/responsaveis/${responsavel.id}/encerramento`,
+                          { ...dados, versao: responsavel.versao },
+                        );
+                        atualizar();
+                      }}
+                    />
+                  </details>
                 )}
               </li>
             ))}
           </ul>
-          {editar && p.ativa && (
+          {editar && pessoa.ativa && (
             <details>
               <summary>Vincular responsável</summary>
               <Formulario
@@ -687,10 +836,10 @@ function PessoaDetalhe({
                   },
                 ]}
                 iniciais={{ dataInicio: hoje() }}
-                salvar={async (d) => {
-                  await api(`/pessoas/${p.id}/responsaveis`, {
-                    ...d,
-                    versao: p.versao,
+                salvar={async (dados) => {
+                  await api(`/pessoas/${pessoa.id}/responsaveis`, {
+                    ...dados,
+                    versao: pessoa.versao,
                   });
                   atualizar();
                 }}
@@ -703,51 +852,67 @@ function PessoaDetalhe({
               </Formulario>
             </details>
           )}
-          <h4>Vínculos eclesiásticos</h4>
-          {p.vinculos.length === 0 && (
-            <p>Nenhum vínculo eclesiástico registrado.</p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Vínculos eclesiásticos</CardTitle>
+          <CardDescription>Histórico de membro ou congregado.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {pessoa.vinculos.length === 0 && (
+            <EmptyState title="Nenhum vínculo eclesiástico registrado" />
           )}
-          <ul className="lista-dominio">
-            {p.vinculos.map((v) => (
-              <li key={v.id}>
-                <strong>
-                  {v.tipo} · {v.nomeIgreja}
-                </strong>
-                <span>
-                  {dataBr(v.dataInicio)} até{" "}
-                  {v.dataFim ? dataBr(v.dataFim) : "o momento"}
-                </span>
-                {editar && !v.dataFim && (
-                  <Formulario
-                    titulo={`Encerrar vínculo com ${v.nomeIgreja}`}
-                    campos={[
-                      {
-                        nome: "dataFim",
-                        rotulo: "Data de encerramento",
-                        tipo: "date",
-                        obrigatorio: true,
-                      },
-                    ]}
-                    iniciais={{ dataFim: hoje() }}
-                    salvar={async (d) => {
-                      await api(
-                        `/pessoas/${p.id}/vinculos-eclesiasticos/${v.id}/encerramento`,
-                        { ...d, versao: v.versao },
-                      );
-                      atualizar();
-                    }}
-                  />
+          <ul className="lista-registros-pessoa">
+            {pessoa.vinculos.map((vinculo) => (
+              <li key={vinculo.id}>
+                <div>
+                  <strong>
+                    {vinculo.tipo} · {vinculo.nomeIgreja}
+                  </strong>
+                  <span>
+                    {dataBr(vinculo.dataInicio)} até{" "}
+                    {vinculo.dataFim ? dataBr(vinculo.dataFim) : "o momento"}
+                  </span>
+                </div>
+                {editar && !vinculo.dataFim && (
+                  <details>
+                    <summary>Encerrar vínculo</summary>
+                    <Formulario
+                      titulo={`Encerrar vínculo com ${vinculo.nomeIgreja}`}
+                      campos={[
+                        {
+                          nome: "dataFim",
+                          rotulo: "Data de encerramento",
+                          tipo: "date",
+                          obrigatorio: true,
+                        },
+                      ]}
+                      iniciais={{ dataFim: hoje() }}
+                      salvar={async (dados) => {
+                        await api(
+                          `/pessoas/${pessoa.id}/vinculos-eclesiasticos/${vinculo.id}/encerramento`,
+                          { ...dados, versao: vinculo.versao },
+                        );
+                        atualizar();
+                      }}
+                    />
+                  </details>
                 )}
               </li>
             ))}
           </ul>
-          {editar && p.ativa && (
+          {editar && pessoa.ativa && (
             <details>
               <summary>Registrar vínculo eclesiástico</summary>
               <Formulario
                 titulo="Novo vínculo eclesiástico"
                 campos={[
-                  { nome: "nomeIgreja", rotulo: "Igreja", obrigatorio: true },
+                  {
+                    nome: "nomeIgreja",
+                    rotulo: "Igreja",
+                    obrigatorio: true,
+                  },
                   {
                     nome: "tipo",
                     rotulo: "Vínculo",
@@ -766,40 +931,314 @@ function PessoaDetalhe({
                   },
                 ]}
                 iniciais={{ dataInicio: hoje() }}
-                salvar={async (d) => {
-                  await api(`/pessoas/${p.id}/vinculos-eclesiasticos`, {
-                    ...d,
-                    versao: p.versao,
+                salvar={async (dados) => {
+                  await api(`/pessoas/${pessoa.id}/vinculos-eclesiasticos`, {
+                    ...dados,
+                    versao: pessoa.versao,
                   });
                   atualizar();
                 }}
               />
             </details>
           )}
-          {permissoes.includes("progressao.consultar") && (
-            <Jornada
-              api={api}
-              pessoaId={p.id}
-              versaoPessoa={p.versao}
-              podeRegistrar={
-                p.ativa && permissoes.includes("progressao.registrar")
-              }
-              atualizarPessoa={atualizar}
-            />
-          )}
-        </article>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function HistoricoPessoa({
+  pessoa,
+  frequencias,
+}: {
+  pessoa: Pessoa;
+  frequencias?: Frequencia[];
+}) {
+  const itens = useMemo(() => {
+    const eventos: {
+      id: string;
+      data: string;
+      title: string;
+      description?: string;
+    }[] = [];
+    pessoa.alteracoesSituacao.forEach((alteracao) =>
+      eventos.push({
+        id: `situacao-${alteracao.registradoEm}`,
+        data: alteracao.data,
+        title: alteracao.tipo === 0 ? "Pessoa inativada" : "Pessoa reativada",
+        description: alteracao.motivo,
+      }),
+    );
+    pessoa.responsaveis.forEach((responsavel) => {
+      eventos.push({
+        id: `responsavel-inicio-${responsavel.id}`,
+        data: responsavel.dataInicio,
+        title: `${responsavel.nome} vinculado como responsável`,
+        description: responsavel.parentesco,
+      });
+      if (responsavel.dataFim)
+        eventos.push({
+          id: `responsavel-fim-${responsavel.id}`,
+          data: responsavel.dataFim,
+          title: "Vínculo de responsável encerrado",
+          description: responsavel.nome,
+        });
+    });
+    pessoa.vinculos.forEach((vinculo) => {
+      eventos.push({
+        id: `igreja-inicio-${vinculo.id}`,
+        data: vinculo.dataInicio,
+        title: "Vínculo eclesiástico iniciado",
+        description: `${vinculo.tipo} · ${vinculo.nomeIgreja}`,
+      });
+      if (vinculo.dataFim)
+        eventos.push({
+          id: `igreja-fim-${vinculo.id}`,
+          data: vinculo.dataFim,
+          title: "Vínculo eclesiástico encerrado",
+          description: vinculo.nomeIgreja,
+        });
+    });
+    frequencias?.forEach((frequencia) =>
+      eventos.push({
+        id: `frequencia-${frequencia.reuniaoId}`,
+        data: frequencia.data,
+        title: frequencia.titulo,
+        description: estadosFrequencia[Number(frequencia.situacao) - 1],
+      }),
+    );
+    return eventos
+      .sort((a, b) => b.data.localeCompare(a.data))
+      .map((evento) => ({ ...evento, meta: dataBr(evento.data) }));
+  }, [frequencias, pessoa]);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Histórico cadastral e operacional</CardTitle>
+        <CardDescription>
+          Postos, tarefas e cerimônias permanecem detalhados em Jornada.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {itens.length === 0 ? (
+          <EmptyState title="Nenhum acontecimento registrado" />
+        ) : (
+          <Timeline items={itens} label="Histórico da pessoa" />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function PessoaDetalhe({
+  api,
+  igrejaId,
+  permissoes,
+  pessoaId,
+}: {
+  api: Api;
+  igrejaId: string;
+  permissoes: string[];
+  pessoaId: string;
+}) {
+  const [parametros, setParametros] = useSearchParams();
+  const [revisao, setRevisao] = useState(0);
+  const [alterando, setAlterando] = useState(false);
+  const [mensagemSituacao, setMensagemSituacao] = useState("");
+  const location = useLocation();
+  const mensagem =
+    (location.state as { mensagem?: string } | null)?.mensagem ??
+    mensagemSituacao;
+  const abaInformada = parametros.get("aba") as AbaPessoa | null;
+  const aba =
+    abaInformada && abas.includes(abaInformada) ? abaInformada : "resumo";
+  const ficha = useConsulta<Pessoa>(api, `/pessoas/${pessoaId}`, revisao);
+  const podeConsultarFrequencia = permissoes.includes("frequencia.consultar");
+  const frequencia = useConsulta<Frequencia[]>(
+    api,
+    podeConsultarFrequencia ? `/pessoas/${pessoaId}/frequencia` : null,
+    revisao,
+  );
+  const editar = permissoes.includes("pessoas.editar");
+  const atualizar = () => setRevisao((valor) => valor + 1);
+  const pessoa = ficha.dados;
+  function selecionarAba(valor: string) {
+    const proximos = new URLSearchParams(parametros);
+    if (valor === "resumo") proximos.delete("aba");
+    else proximos.set("aba", valor);
+    setParametros(proximos, { replace: true });
+  }
+  return (
+    <section className="pagina-detalhe-pessoa">
+      <Estado {...ficha} atualizar={atualizar} />
+      {mensagem && (
+        <Alert variant="success">
+          <AlertDescription>{mensagem}</AlertDescription>
+        </Alert>
       )}
-      {alterando && p && (
+      {pessoa && (
+        <>
+          <div className="resumo-superior-pessoa">
+            <Foto igrejaId={igrejaId} pessoa={pessoa} />
+            <div className="identificacao-pessoa">
+              <p className="caminho-interno">
+                <Link to="/pessoas">Pessoas</Link> / Detalhes
+              </p>
+              <h2>{pessoa.dados.nome}</h2>
+              <div>
+                <Badge variant={pessoa.ativa ? "success" : "neutral"}>
+                  {pessoa.ativa ? "Ativa" : "Inativa"}
+                </Badge>
+                {pessoa.faixaEtaria && <Badge>{pessoa.faixaEtaria}</Badge>}
+              </div>
+            </div>
+            <div className="acoes-detalhe-pessoa">
+              {editar && (
+                <Button asChild>
+                  <Link to={`/pessoas/${pessoa.id}/editar`}>Editar pessoa</Link>
+                </Button>
+              )}
+              {editar && (
+                <Button
+                  variant={pessoa.ativa ? "outline" : "secondary"}
+                  onClick={() => setAlterando(true)}
+                >
+                  {pessoa.ativa ? "Inativar" : "Reativar"}
+                </Button>
+              )}
+            </div>
+          </div>
+          {!pessoa.ativa && (
+            <Alert variant="warning">
+              <AlertDescription>
+                Esta pessoa está inativa e não aparece nas operações futuras. O
+                histórico permanece disponível.
+              </AlertDescription>
+            </Alert>
+          )}
+          <Tabs value={aba} onValueChange={selecionarAba}>
+            <TabsList aria-label="Áreas da ficha da pessoa">
+              <TabsTrigger value="resumo">Resumo</TabsTrigger>
+              <TabsTrigger value="jornada">Jornada</TabsTrigger>
+              <TabsTrigger value="frequencia">Frequência</TabsTrigger>
+              <TabsTrigger value="vinculos">Vínculos</TabsTrigger>
+              <TabsTrigger value="historico">Histórico</TabsTrigger>
+            </TabsList>
+            <TabsContent value="resumo">
+              <ResumoPessoa pessoa={pessoa} />
+            </TabsContent>
+            <TabsContent value="jornada">
+              {permissoes.includes("progressao.consultar") ? (
+                <Jornada
+                  api={api}
+                  pessoaId={pessoa.id}
+                  versaoPessoa={pessoa.versao}
+                  podeRegistrar={
+                    pessoa.ativa && permissoes.includes("progressao.registrar")
+                  }
+                  atualizarPessoa={atualizar}
+                />
+              ) : (
+                <AccessDeniedState description="Você não possui permissão para consultar a Jornada." />
+              )}
+            </TabsContent>
+            <TabsContent value="frequencia">
+              {podeConsultarFrequencia ? (
+                <FrequenciaPessoa consulta={frequencia} atualizar={atualizar} />
+              ) : (
+                <AccessDeniedState description="Você não possui permissão para consultar a frequência." />
+              )}
+            </TabsContent>
+            <TabsContent value="vinculos">
+              <VinculosPessoa
+                pessoa={pessoa}
+                api={api}
+                editar={editar}
+                atualizar={atualizar}
+              />
+            </TabsContent>
+            <TabsContent value="historico">
+              <HistoricoPessoa pessoa={pessoa} frequencias={frequencia.dados} />
+            </TabsContent>
+          </Tabs>
+        </>
+      )}
+      {alterando && pessoa && (
         <DialogoSituacao
-          pessoa={p}
+          pessoa={pessoa}
           api={api}
           fechar={() => setAlterando(false)}
           concluido={() => {
+            setMensagemSituacao(
+              pessoa.ativa
+                ? "Pessoa inativada. O histórico foi preservado."
+                : "Pessoa reativada e disponível nas operações futuras.",
+            );
             setAlterando(false);
             atualizar();
           }}
         />
       )}
     </section>
+  );
+}
+
+function RotaPessoa({
+  api,
+  igrejaId,
+  permissoes,
+}: {
+  api: Api;
+  igrejaId: string;
+  permissoes: string[];
+}) {
+  const { pessoaId = "" } = useParams();
+  return (
+    <PessoaDetalhe
+      api={api}
+      igrejaId={igrejaId}
+      permissoes={permissoes}
+      pessoaId={pessoaId}
+    />
+  );
+}
+
+export function Pessoas({
+  api,
+  igrejaId,
+  permissoes,
+}: {
+  api: Api;
+  igrejaId: string;
+  permissoes: string[];
+}) {
+  const editar = permissoes.includes("pessoas.editar");
+  return (
+    <Routes>
+      <Route index element={<ListaPessoas api={api} editar={editar} />} />
+      <Route
+        path="nova"
+        element={
+          editar ? (
+            <FormularioPessoa api={api} />
+          ) : (
+            <Navigate to="/pessoas" replace />
+          )
+        }
+      />
+      <Route
+        path=":pessoaId/editar"
+        element={
+          editar ? <RotaEditarPessoa api={api} /> : <Navigate to=".." replace />
+        }
+      />
+      <Route
+        path=":pessoaId"
+        element={
+          <RotaPessoa api={api} igrejaId={igrejaId} permissoes={permissoes} />
+        }
+      />
+      <Route path="*" element={<Navigate to="/pessoas" replace />} />
+    </Routes>
   );
 }

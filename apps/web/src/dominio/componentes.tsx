@@ -10,6 +10,7 @@ export type Campo = {
   obrigatorio?: boolean;
   limite?: number;
   opcoes?: { valor: string; rotulo: string }[];
+  grupo?: string;
 };
 export function Formulario({
   titulo,
@@ -18,6 +19,7 @@ export function Formulario({
   salvar,
   children,
   texto = "Salvar",
+  acoes,
 }: {
   titulo: string;
   campos: Campo[];
@@ -25,12 +27,58 @@ export function Formulario({
   salvar: (dados: Record<string, string>) => Promise<unknown>;
   children?: ReactNode;
   texto?: string;
+  acoes?: ReactNode;
 }) {
   const id = useId();
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const mensagem = useRef<HTMLParagraphElement>(null);
+  const grupos = campos.reduce<Record<string, Campo[]>>((resultado, campo) => {
+    const grupo = campo.grupo ?? "";
+    (resultado[grupo] ??= []).push(campo);
+    return resultado;
+  }, {});
+  const renderizarCampo = (c: Campo) => (
+    <label key={c.nome} htmlFor={`${id}-${c.nome}`}>
+      {c.rotulo}
+      {c.obrigatorio && " *"}
+      {c.tipo === "textarea" ? (
+        <textarea
+          id={`${id}-${c.nome}`}
+          name={c.nome}
+          required={c.obrigatorio}
+          maxLength={c.limite ?? 10000}
+          rows={4}
+          defaultValue={String(iniciais[c.nome] ?? "")}
+        />
+      ) : c.tipo === "select" ? (
+        <select
+          id={`${id}-${c.nome}`}
+          name={c.nome}
+          required={c.obrigatorio}
+          defaultValue={String(iniciais[c.nome] ?? "")}
+        >
+          <option value="">Selecione</option>
+          {c.opcoes?.map((o) => (
+            <option key={o.valor} value={o.valor}>
+              {o.rotulo}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          id={`${id}-${c.nome}`}
+          name={c.nome}
+          type={c.tipo ?? "text"}
+          step={c.tipo === "number" ? "any" : undefined}
+          required={c.obrigatorio}
+          maxLength={c.limite ?? 200}
+          defaultValue={String(iniciais[c.nome] ?? "")}
+        />
+      )}
+    </label>
+  );
   return (
     <form
       aria-label={titulo}
@@ -61,49 +109,22 @@ export function Formulario({
       <fieldset disabled={salvando}>
         <legend>{titulo}</legend>
         <div className="campos-dominio">
-          {campos.map((c) => (
-            <label key={c.nome} htmlFor={`${id}-${c.nome}`}>
-              {c.rotulo}
-              {c.obrigatorio && " *"}
-              {c.tipo === "textarea" ? (
-                <textarea
-                  id={`${id}-${c.nome}`}
-                  name={c.nome}
-                  required={c.obrigatorio}
-                  maxLength={c.limite ?? 10000}
-                  rows={4}
-                  defaultValue={String(iniciais[c.nome] ?? "")}
-                />
-              ) : c.tipo === "select" ? (
-                <select
-                  id={`${id}-${c.nome}`}
-                  name={c.nome}
-                  required={c.obrigatorio}
-                  defaultValue={String(iniciais[c.nome] ?? "")}
-                >
-                  <option value="">Selecione</option>
-                  {c.opcoes?.map((o) => (
-                    <option key={o.valor} value={o.valor}>
-                      {o.rotulo}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  id={`${id}-${c.nome}`}
-                  name={c.nome}
-                  type={c.tipo ?? "text"}
-                  step={c.tipo === "number" ? "any" : undefined}
-                  required={c.obrigatorio}
-                  maxLength={c.limite ?? 200}
-                  defaultValue={String(iniciais[c.nome] ?? "")}
-                />
-              )}
-            </label>
-          ))}
+          {Object.entries(grupos).map(([grupo, itens]) =>
+            grupo ? (
+              <section className="grupo-campos" key={grupo}>
+                <h3>{grupo}</h3>
+                <div>{itens.map(renderizarCampo)}</div>
+              </section>
+            ) : (
+              itens.map(renderizarCampo)
+            ),
+          )}
           {children}
         </div>
-        <Button type="submit">{salvando ? "Salvando…" : texto}</Button>
+        <div className="acoes-formulario">
+          <Button type="submit">{salvando ? "Salvando…" : texto}</Button>
+          {acoes}
+        </div>
       </fieldset>
       {erro && (
         <p ref={mensagem} role="alert" tabIndex={-1}>

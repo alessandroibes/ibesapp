@@ -27,7 +27,21 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
   await page
     .getByRole("link", { name: "Pessoas e jornada", exact: true })
     .click();
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
   await page.getByRole("link", { name: "Adicionar pessoa" }).click();
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
   const nova = page.getByRole("form", { name: "Nova pessoa" });
   const nome = `Pessoa fictícia E2E ${Date.now()}`;
   await nova.getByLabel("Nome completo").fill(nome);
@@ -36,6 +50,14 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
   await expect(
     page.getByRole("heading", { name: nome, exact: true }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "Editar pessoa" }).click();
+  await page.getByLabel("Naturalidade").fill("Cidade fictícia");
+  await page
+    .getByRole("form", { name: "Dados da pessoa" })
+    .getByRole("button", { name: "Salvar" })
+    .click();
+  await expect(page.getByText("Dados da pessoa atualizados.")).toBeVisible();
+  await page.getByRole("tab", { name: "Jornada" }).click();
   await page.getByRole("button", { name: "Iniciar trajetória" }).click();
   const requisitos = [
     "Significado do nome Embaixador do Rei",
@@ -83,7 +105,7 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
         .analyze()
     ).violations,
   ).toEqual([]);
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 320, height: 844 });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -103,5 +125,6 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     .getByRole("row", { name: new RegExp(nome) })
     .getByRole("link", { name: "Visualizar" })
     .click();
+  await page.getByRole("tab", { name: "Jornada" }).click();
   await expect(page.getByText("Concluída em 03/01/2024")).toBeVisible();
 });

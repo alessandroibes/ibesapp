@@ -1,34 +1,112 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { Pessoas } from "./Pessoas";
 import type { Api } from "./api";
 
+const resumo = {
+  id: "p1",
+  versao: "v1",
+  nome: "Daniel",
+  dataNascimento: "2012-04-03",
+  situacao: "Candidato",
+  ativa: true,
+};
+const ficha = {
+  id: "p1",
+  versao: "v1",
+  ativa: true,
+  possuiFoto: false,
+  faixaEtaria: "Adolescente",
+  primeiraReuniao: "2025-02-01",
+  dados: {
+    nome: "Daniel",
+    dataNascimento: "2012-04-03",
+    naturalidade: null,
+    whatsApp: null,
+    endereco: null,
+    dataBatismo: null,
+    localBatismo: null,
+    numeroCarteira: null,
+    situacaoCarteira: null,
+    possuiBiblia: null,
+    observacoes: null,
+  },
+  responsaveis: [],
+  vinculos: [],
+  alteracoesSituacao: [],
+};
+
+function EnderecoAtual() {
+  return <output data-testid="endereco-atual">{useLocation().search}</output>;
+}
+
+function renderizar(api: Api, rota: string, permissoes: string[] = []) {
+  return render(
+    <MemoryRouter initialEntries={[rota]}>
+      <Routes>
+        <Route
+          path="/pessoas/*"
+          element={
+            <>
+              <Pessoas api={api} igrejaId="igreja" permissoes={permissoes} />
+              <EnderecoAtual />
+            </>
+          }
+        />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
 describe("Páginas de Pessoas", () => {
-  it("lista ações e inativa preservando a confirmação explícita", async () => {
+  it("restaura filtros pela URL sem expor a busca pelo nome", async () => {
+    const api = vi.fn().mockResolvedValue({ total: 1, pessoas: [resumo] });
+    renderizar(api as Api, "/pessoas?condicao=candidatos&pagina=2");
+
+    expect(await screen.findByLabelText("Buscar pelo nome")).toHaveValue("");
+    expect(screen.getByRole("button", { name: "Candidatos" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "busca=&condicao=candidatos&incluirInativos=false&pagina=2",
+        ),
+        undefined,
+        undefined,
+        expect.any(AbortSignal),
+      ),
+    );
+    fireEvent.change(screen.getByLabelText("Buscar pelo nome"), {
+      target: { value: "Daniel" },
+    });
+    await waitFor(() =>
+      expect(api).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "busca=Daniel&condicao=candidatos&incluirInativos=false&pagina=1",
+        ),
+        undefined,
+        undefined,
+        expect.any(AbortSignal),
+      ),
+    );
+    expect(screen.getByTestId("endereco-atual")).not.toHaveTextContent(
+      "Daniel",
+    );
+  });
+
+  it("mantém Visualizar evidente e inativa por diálogo explícito", async () => {
     const api = vi.fn().mockImplementation((caminho: string) => {
       if (caminho.startsWith("/pessoas?"))
-        return Promise.resolve({
-          total: 1,
-          pessoas: [
-            {
-              id: "p1",
-              versao: "v1",
-              nome: "Daniel",
-              dataNascimento: "2012-04-03",
-              situacao: "Candidato",
-              ativa: true,
-            },
-          ],
-        });
+        return Promise.resolve({ total: 1, pessoas: [resumo] });
+      if (caminho === "/pessoas/p1") return Promise.resolve(ficha);
       return Promise.resolve({ id: "p1", versao: "v2" });
     }) as unknown as Api;
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <Pessoas api={api} igrejaId="igreja" permissoes={["pessoas.editar"]} />
-      </MemoryRouter>,
-    );
+    renderizar(api, "/pessoas", ["pessoas.editar"]);
+
     expect(
       await screen.findByRole("link", { name: "Adicionar pessoa" }),
     ).toHaveAttribute("href", "/pessoas/nova");
@@ -36,12 +114,18 @@ describe("Páginas de Pessoas", () => {
       "href",
       "/pessoas/p1",
     );
-    await userEvent.click(screen.getByRole("button", { name: "Inativar" }));
-    await userEvent.type(
-      screen.getByLabelText("Motivo *"),
-      "Mudança de cidade",
-    );
-    await userEvent.click(
+    expect(
+      screen.getByRole("button", { name: "Ações para Daniel" }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("link", { name: "Visualizar" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Inativar" }));
+    expect(
+      screen.getByRole("dialog", { name: "Inativar Daniel" }),
+    ).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Motivo *"), {
+      target: { value: "Mudança de cidade" },
+    });
+    fireEvent.click(
       screen.getByRole("button", { name: "Confirmar inativação" }),
     );
     await waitFor(() =>
@@ -49,6 +133,52 @@ describe("Páginas de Pessoas", () => {
         "/pessoas/p1/inativacao",
         expect.objectContaining({ versao: "v1", motivo: "Mudança de cidade" }),
       ),
+    );
+    expect(
+      await screen.findByText("Pessoa inativada. O histórico foi preservado."),
+    ).toBeInTheDocument();
+  });
+
+  it("mantém ficha, abas e edição em rotas próprias", async () => {
+    const usuario = userEvent.setup();
+    const api = vi.fn().mockImplementation((caminho: string) => {
+      if (caminho === "/pessoas/p1") return Promise.resolve(ficha);
+      if (caminho === "/pessoas/p1/frequencia")
+        return Promise.resolve([
+          {
+            reuniaoId: "r1",
+            titulo: "Reunião semanal",
+            data: "2025-02-01",
+            situacao: 1,
+          },
+        ]);
+      return Promise.resolve([]);
+    }) as unknown as Api;
+    renderizar(api, "/pessoas/p1", [
+      "pessoas.editar",
+      "frequencia.consultar",
+      "progressao.consultar",
+    ]);
+
+    expect(
+      await screen.findByRole("heading", { name: "Daniel" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Resumo" })).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    await usuario.click(screen.getByRole("tab", { name: "Frequência" }));
+    expect(await screen.findByText("Reunião semanal")).toBeInTheDocument();
+    await usuario.click(screen.getByRole("link", { name: "Editar pessoa" }));
+    expect(
+      await screen.findByRole("heading", { name: "Editar pessoa" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Identificação" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Cancelar" })).toHaveAttribute(
+      "href",
+      "/pessoas/p1",
     );
   });
 });
