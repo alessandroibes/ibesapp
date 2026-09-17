@@ -486,13 +486,13 @@ function DetalheMarco({
                   {gerenciar && (
                     <>
                       <Button
-                        variant="destructive"
+                        variant="outline"
                         onClick={() => anexar({ marco, anexo: a })}
                       >
                         Substituir
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="destructive"
                         onClick={() => confirmar({ marco, anexo: a })}
                       >
                         Remover

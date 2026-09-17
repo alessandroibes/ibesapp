@@ -182,7 +182,11 @@ export default function Inicio() {
   const modulos = modulosDisponiveis(permissoes);
   return (
     <SafeAreaView style={styles.page}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.marca}>EMBAIXADORES DO REI</Text>
         <Text
           accessibilityRole="header"
@@ -259,9 +263,17 @@ export default function Inicio() {
                   }}
                   disabled={loading}
                   onPress={() => escolher(i.igrejaId)}
-                  style={styles.option}
+                  style={[
+                    styles.option,
+                    selecionada === i.igrejaId && styles.optionSelected,
+                  ]}
                 >
-                  <Text style={styles.body}>
+                  <Text
+                    style={[
+                      styles.body,
+                      selecionada === i.igrejaId && styles.optionSelectedText,
+                    ]}
+                  >
                     {selecionada === i.igrejaId ? "✓ " : ""}
                     {i.nome}
                   </Text>
@@ -401,6 +413,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
   },
+  optionSelected: { backgroundColor: "#e8f1ef", borderColor: "#183a38" },
+  optionSelectedText: { color: "#183a38", fontWeight: "700" },
   error: { color: "#972b25", fontSize: 16 },
   rotuloModulos: {
     color: "#526258",
