@@ -43,10 +43,11 @@ public sealed partial class AppDbContext
         alteracaoPessoa.HasOne<Pessoa>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.PessoaId }).OnDelete(DeleteBehavior.Restrict);
         alteracaoPessoa.HasIndex(x => new { x.IgrejaId, x.PessoaId, x.Data });
         var responsavel = Base<ResponsavelPessoa>(b, "responsaveis_pessoa", "pessoas");
-        responsavel.Property(x => x.Parentesco).HasMaxLength(80);
+        responsavel.Property(x => x.Relacao).HasMaxLength(80);
+        responsavel.Property(x => x.Nome).HasMaxLength(200);
+        responsavel.Property(x => x.TelefoneWhatsApp).HasMaxLength(40);
         responsavel.HasOne<Pessoa>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.PessoaId }).OnDelete(DeleteBehavior.Restrict);
-        responsavel.HasOne<Pessoa>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.ResponsavelId }).OnDelete(DeleteBehavior.Restrict);
-        responsavel.HasIndex(x => new { x.IgrejaId, x.PessoaId, x.ResponsavelId, x.DataInicio }).IsUnique();
+        responsavel.HasIndex(x => new { x.IgrejaId, x.PessoaId });
         var vinculo = Base<VinculoEclesiastico>(b, "vinculos_eclesiasticos", "pessoas");
         vinculo.Property(x => x.NomeIgreja).HasMaxLength(200);
         vinculo.Property(x => x.Tipo).HasMaxLength(30);
@@ -56,12 +57,8 @@ public sealed partial class AppDbContext
         foto.HasIndex(x => new { x.IgrejaId, x.PessoaId }).IsUnique();
         foto.Property(x => x.TipoConteudo).HasMaxLength(40);
         var conselheiro = Base<Conselheiro>(b, "conselheiros", "embaixadas");
-        conselheiro.Property(x => x.Funcao).HasMaxLength(100);
         conselheiro.HasOne<Pessoa>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.PessoaId }).OnDelete(DeleteBehavior.Restrict);
         conselheiro.HasOne<Usuario>().WithMany().HasForeignKey(x => x.UsuarioId).OnDelete(DeleteBehavior.Restrict);
-        var lideranca = Base<LiderancaEmbaixada>(b, "liderancas_embaixada", "embaixadas");
-        lideranca.Property(x => x.Funcao).HasMaxLength(100);
-        lideranca.HasOne<Conselheiro>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.ConselheiroId }).OnDelete(DeleteBehavior.Restrict);
         var manual = Base<Manual>(b, "manuais", "progressao");
         manual.HasIndex(x => new { x.IgrejaId, x.Posto }).IsUnique();
         manual.Property(x => x.Posto).HasConversion<string>().HasMaxLength(30);

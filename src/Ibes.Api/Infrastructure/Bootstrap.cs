@@ -82,7 +82,7 @@ public static class Bootstrap
         {
             var pessoa = new Pessoa { IgrejaId = IgrejaDevelopment, Nome = "Conselheiro de demonstração", DataNascimento = new DateOnly(1980, 1, 1) };
             db.Add(pessoa);
-            db.Add(new Conselheiro { IgrejaId = IgrejaDevelopment, PessoaId = pessoa.Id, UsuarioId = usuario.Id, DataInicio = new DateOnly(2020, 1, 1), Funcao = "Conselheiro" });
+            db.Add(new Conselheiro { IgrejaId = IgrejaDevelopment, PessoaId = pessoa.Id, UsuarioId = usuario.Id, DataInicio = new DateOnly(2020, 1, 1) });
         }
         await db.SaveChangesAsync();
     }

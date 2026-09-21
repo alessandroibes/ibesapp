@@ -7,7 +7,7 @@ O shell apresenta somente áreas permitidas no vínculo da Igreja selecionada. I
 | Área | Rotas finais | Finalidade |
 | --- | --- | --- |
 | Pessoas e Jornada | `/pessoas`, `/pessoas/nova`, `/pessoas/{id}`, `/pessoas/{id}/editar` | Candidatos, Embaixadores, Visitantes e Inativos; ficha, Jornada aplicável, Frequência, vínculos, histórico, inativação e reativação |
-| Conselheiros | rota própria a definir na Etapa 14 | listagem, cadastro simples, detalhe e vínculo adulto com a Embaixada |
+| Conselheiros | `/conselheiros`, `/conselheiros/{id}` | listagem, cadastro simples, detalhe, edição dos dados pessoais aplicáveis, encerramento do vínculo adulto e consulta de eventual trajetória ER histórica |
 | Igreja e Embaixada | `/instituicao`, `/instituicao/editar` | resumo institucional e edição; o formulário separado de liderança será removido na Etapa 14 |
 | Manuais | `/manuais`, `/manuais/nova`, `/manuais/{id}`, rota de edição a definir na Etapa 16 | versões, tarefas e correções aprovadas |
 | Agenda | `/agenda`, `/agenda/nova`, `/agenda/configuracoes` | Hoje, Próximos, Lista, Mês, Ano, cadastro e configurações |

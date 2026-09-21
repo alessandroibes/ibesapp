@@ -31,7 +31,6 @@ test("aptidão, elegibilidade, escalação, finalização e reabertura", async (
     .getByRole("form", { name: "Nova pessoa" })
     .getByRole("button", { name: "Salvar" })
     .click();
-  await page.getByRole("tab", { name: "Jornada" }).click();
   await page.getByRole("button", { name: "Iniciar trajetória" }).click();
 
   await page

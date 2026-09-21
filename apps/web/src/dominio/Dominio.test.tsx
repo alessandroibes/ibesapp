@@ -5,6 +5,9 @@ import { MemoryRouter } from "react-router-dom";
 import { Dominio } from "./Dominio";
 
 vi.mock("./Pessoas", () => ({ Pessoas: () => <h2>Pessoas abertas</h2> }));
+vi.mock("./Conselheiros", () => ({
+  Conselheiros: () => <h2>Conselheiros abertos</h2>,
+}));
 vi.mock("./Instituicao", () => ({
   Instituicao: () => <h2>Instituição aberta</h2>,
 }));
@@ -39,11 +42,11 @@ describe("Navegação do domínio", () => {
       screen.getByRole("navigation", { name: "Gestão da Embaixada" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /Pessoas e jornada/ }),
+      screen.getByRole("link", { name: /Meninos e jornada/ }),
     ).toHaveAttribute("aria-current", "page");
     expect(screen.getByText("Pessoas abertas")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Pessoas e jornada", level: 1 }),
+      screen.getByRole("heading", { name: "Meninos e jornada", level: 1 }),
     ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("link", { name: /Agenda e reuniões/ }),
@@ -55,6 +58,27 @@ describe("Navegação do domínio", () => {
     expect(screen.queryByText("Pessoas abertas")).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: /Competições/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("abre Conselheiros em área própria quando a permissão da Embaixada está disponível", () => {
+    render(
+      <MemoryRouter initialEntries={["/conselheiros"]}>
+        <Dominio
+          igrejaId="igreja-a"
+          nomeIgreja="Igreja A"
+          nomeEmbaixada="Embaixada A"
+          permissoes={["embaixada.consultar"]}
+        />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("link", { name: "Conselheiros" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByText("Conselheiros abertos")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Meninos e jornada" }),
     ).not.toBeInTheDocument();
   });
 

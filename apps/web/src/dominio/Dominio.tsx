@@ -35,6 +35,7 @@ import {
 import { AcervoHistorico } from "./AcervoHistorico";
 import { criarApi } from "./api";
 import { CompeticoesNova } from "./CompeticoesNova";
+import { Conselheiros } from "./Conselheiros";
 import { Financeiro } from "./Financeiro";
 import { Instituicao } from "./Instituicao";
 import { Manuais } from "./Manuais";
@@ -59,10 +60,18 @@ type Secao = {
 const todasSecoes: Secao[] = [
   {
     id: "pessoas",
-    nome: "Pessoas e jornada",
-    resumo: "Cadastros e progressão",
+    nome: "Meninos e jornada",
+    resumo: "Embaixadores, Candidatos e Visitantes",
     grupo: "Gestão",
     permissao: "pessoas.consultar",
+    icone: UsersRound,
+  },
+  {
+    id: "conselheiros",
+    nome: "Conselheiros",
+    resumo: "Responsáveis pela Embaixada",
+    grupo: "Gestão",
+    permissao: "embaixada.consultar",
     icone: UsersRound,
   },
   {
@@ -254,7 +263,7 @@ export function Dominio({
             />
           </SheetContent>
         </Sheet>
-        {atual && ["pessoas", "agenda"].includes(atual.id) && (
+        {atual && ["pessoas", "conselheiros", "agenda"].includes(atual.id) && (
           <PageHeader
             title={atual.nome}
             description={atual.resumo}
@@ -295,6 +304,17 @@ export function Dominio({
                 path="/instituicao/*"
                 element={
                   <Instituicao
+                    api={api}
+                    editar={permissoes.includes("embaixada.editar")}
+                  />
+                }
+              />
+            )}
+            {secoes.some((x) => x.id === "conselheiros") && (
+              <Route
+                path="/conselheiros/*"
+                element={
+                  <Conselheiros
                     api={api}
                     editar={permissoes.includes("embaixada.editar")}
                     podeConsultarPessoas={permissoes.includes(

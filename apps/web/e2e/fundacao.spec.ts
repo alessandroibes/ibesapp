@@ -19,9 +19,9 @@ test("acesso web, contexto, logout e acessibilidade", async ({ page }) => {
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Pessoas e jornada", level: 1 }),
+    page.getByRole("heading", { name: "Meninos e jornada", level: 1 }),
   ).toBeVisible();
-  const primeiraAba = page.getByRole("link", { name: "Pessoas e jornada" });
+  const primeiraAba = page.getByRole("link", { name: "Meninos e jornada" });
   await expect(
     page.getByRole("navigation", { name: "Gestão da Embaixada" }),
   ).toBeVisible();

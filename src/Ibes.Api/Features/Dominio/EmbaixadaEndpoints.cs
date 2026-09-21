@@ -34,9 +34,19 @@ public static class EmbaixadaEndpoints
         grupo.MapGet("/conselheiros", async (AppDbContext db, CancellationToken ct) => TypedResults.Ok(await (
             from c in db.Set<Conselheiro>()
             join p in db.Set<Pessoa>() on c.PessoaId equals p.Id
+            let possuiJornada = db.Set<Ibes.Progressao.JornadaEmbaixador>().Any(j => j.PessoaId == p.Id)
             orderby p.Nome, c.DataInicio descending
-            select new ConselheiroResponse(c.Id, c.Versao, c.PessoaId, p.Nome, c.UsuarioId, c.Funcao, c.DataInicio, c.DataFim)).ToListAsync(ct)))
+            select new ConselheiroResponse(c.Id, c.Versao, c.PessoaId, p.Nome, c.UsuarioId, c.DataInicio, c.DataFim, p.Ativa, possuiJornada)).ToListAsync(ct)))
             .RequireAuthorization(Permissoes.ConsultarEmbaixada).WithName("ListarConselheiros");
+        grupo.MapGet("/conselheiros/{id:guid}", async (Guid id, AppDbContext db, CancellationToken ct) =>
+        {
+            var resultado = await (from c in db.Set<Conselheiro>()
+                                   join p in db.Set<Pessoa>() on c.PessoaId equals p.Id
+                                   where c.Id == id
+                                   let possuiJornada = db.Set<Ibes.Progressao.JornadaEmbaixador>().Any(j => j.PessoaId == p.Id)
+                                   select new ConselheiroResponse(c.Id, c.Versao, c.PessoaId, p.Nome, c.UsuarioId, c.DataInicio, c.DataFim, p.Ativa, possuiJornada)).SingleOrDefaultAsync(ct);
+            return resultado is null ? Results.NotFound() : Results.Ok(resultado);
+        }).RequireAuthorization(Permissoes.ConsultarEmbaixada).Produces<ConselheiroResponse>().WithName("ConsultarConselheiro");
         grupo.MapGet("/contas", async (AppDbContext db, CancellationToken ct) => TypedResults.Ok(await (
             from v in db.VinculosIgreja
             join u in db.Users on v.UsuarioId equals u.Id
@@ -47,11 +57,12 @@ public static class EmbaixadaEndpoints
             var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(p => p.Id == request.PessoaId, ct);
             if (pessoa is null) return Results.NotFound();
             if (request.UsuarioId is { } usuario && !await db.VinculosIgreja.AnyAsync(v => v.UsuarioId == usuario, ct)) return Results.NotFound();
+            Exigir(pessoa.Ativa, "Não é possível criar vínculo de Conselheiro para uma pessoa inativa.");
             Operacao.ValidarPeriodo(request.DataInicio, null, relogio.Hoje);
             Exigir(pessoa.DataNascimento is { } nascimento && Idade(nascimento, request.DataInicio) >= 18, "Conselheiro deve ser adulto na data de início. Informe a data de nascimento.");
             Operacao.ConferirVersao(pessoa, request.VersaoPessoa);
             Exigir(!await db.Set<Conselheiro>().AnyAsync(c => (c.PessoaId == pessoa.Id || request.UsuarioId != null && c.UsuarioId == request.UsuarioId) && (c.DataFim == null || c.DataFim >= request.DataInicio), ct), "Já existe vínculo de Conselheiro nesse período.");
-            var conselheiro = new Conselheiro { IgrejaId = tenant.IgrejaId, PessoaId = pessoa.Id, UsuarioId = request.UsuarioId, Funcao = request.Funcao.Trim(), DataInicio = request.DataInicio };
+            var conselheiro = new Conselheiro { IgrejaId = tenant.IgrejaId, PessoaId = pessoa.Id, UsuarioId = request.UsuarioId, DataInicio = request.DataInicio };
             db.Add(conselheiro); await db.SaveChangesAsync(ct); return Results.Ok(new IdResponse(conselheiro.Id, conselheiro.Versao));
         }).RequireAuthorization(Permissoes.EditarEmbaixada).Produces<IdResponse>().WithName("CadastrarConselheiro");
         grupo.MapPost("/conselheiros/{id:guid}/encerramento", async (Guid id, EncerrarVinculoRequest request, AppDbContext db, Relogio relogio, CancellationToken ct) =>
@@ -59,32 +70,7 @@ public static class EmbaixadaEndpoints
             var c = await db.Set<Conselheiro>().SingleOrDefaultAsync(c => c.Id == id, ct);
             if (c is null) return Results.NotFound();
             Exigir(c.DataFim is null, "Vínculo de Conselheiro já encerrado."); Operacao.ValidarPeriodo(c.DataInicio, request.DataFim, relogio.Hoje);
-            Exigir(!await db.Set<LiderancaEmbaixada>().AnyAsync(l => l.ConselheiroId == id && (l.DataFim == null || l.DataFim > request.DataFim), ct), "Encerre as lideranças vinculadas antes de encerrar o Conselheiro.");
             Operacao.ConferirVersao(c, request.Versao); c.DataFim = request.DataFim; await db.SaveChangesAsync(ct); return Results.NoContent();
-        }).RequireAuthorization(Permissoes.EditarEmbaixada);
-        grupo.MapGet("/liderancas", async (AppDbContext db, CancellationToken ct) => TypedResults.Ok(await (
-            from l in db.Set<LiderancaEmbaixada>()
-            join c in db.Set<Conselheiro>() on l.ConselheiroId equals c.Id
-            join p in db.Set<Pessoa>() on c.PessoaId equals p.Id
-            orderby l.DataInicio descending
-            select new LiderancaResponse(l.Id, l.Versao, c.Id, p.Nome, l.Funcao, l.DataInicio, l.DataFim)).ToListAsync(ct)))
-            .RequireAuthorization(Permissoes.ConsultarEmbaixada).WithName("ListarLiderancas");
-        grupo.MapPost("/liderancas", async (LiderancaRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
-        {
-            var c = await db.Set<Conselheiro>().SingleOrDefaultAsync(c => c.Id == request.ConselheiroId, ct);
-            if (c is null) return Results.NotFound();
-            Operacao.ValidarPeriodo(request.DataInicio, null, relogio.Hoje);
-            Exigir(request.DataInicio >= c.DataInicio && c.DataFim is null, "A liderança deve começar durante um vínculo de Conselheiro aberto.");
-            Operacao.ConferirVersao(c, request.VersaoConselheiro);
-            var l = new LiderancaEmbaixada { IgrejaId = tenant.IgrejaId, ConselheiroId = c.Id, Funcao = request.Funcao.Trim(), DataInicio = request.DataInicio };
-            db.Add(l); await db.SaveChangesAsync(ct); return Results.Ok(new IdResponse(l.Id, l.Versao));
-        }).RequireAuthorization(Permissoes.EditarEmbaixada).Produces<IdResponse>();
-        grupo.MapPost("/liderancas/{id:guid}/encerramento", async (Guid id, EncerrarVinculoRequest request, AppDbContext db, Relogio relogio, CancellationToken ct) =>
-        {
-            var l = await db.Set<LiderancaEmbaixada>().SingleOrDefaultAsync(l => l.Id == id, ct);
-            if (l is null) return Results.NotFound();
-            Exigir(l.DataFim is null, "Liderança já encerrada."); Operacao.ValidarPeriodo(l.DataInicio, request.DataFim, relogio.Hoje);
-            Operacao.ConferirVersao(l, request.Versao); l.DataFim = request.DataFim; await db.SaveChangesAsync(ct); return Results.NoContent();
         }).RequireAuthorization(Permissoes.EditarEmbaixada);
     }
 }
@@ -92,8 +78,6 @@ public sealed record EmbaixadaResponse(string NomeIgreja, string? EnderecoIgreja
 public sealed record EmbaixadaRequest([property: Required, StringLength(200)] string NomeIgreja, [property: StringLength(500)] string? EnderecoIgreja,
     [property: StringLength(200)] string? Pastor, Guid VersaoIgreja, [property: Required, StringLength(200)] string NomeOficial, [property: StringLength(200)] string? NomeUsual,
     DateOnly? DataFundacao, [property: StringLength(500)] string? EnderecoEmbaixada, [property: StringLength(10000)] string? Historia, Guid VersaoEmbaixada);
-public sealed record ConselheiroRequest(Guid PessoaId, Guid VersaoPessoa, Guid? UsuarioId, [property: Required, StringLength(100)] string Funcao, DateOnly DataInicio);
-public sealed record ConselheiroResponse(Guid Id, Guid Versao, Guid PessoaId, string Nome, Guid? UsuarioId, string Funcao, DateOnly DataInicio, DateOnly? DataFim);
-public sealed record LiderancaRequest(Guid ConselheiroId, Guid VersaoConselheiro, [property: Required, StringLength(100)] string Funcao, DateOnly DataInicio);
-public sealed record LiderancaResponse(Guid Id, Guid Versao, Guid ConselheiroId, string Nome, string Funcao, DateOnly DataInicio, DateOnly? DataFim);
+public sealed record ConselheiroRequest(Guid PessoaId, Guid VersaoPessoa, Guid? UsuarioId, DateOnly DataInicio);
+public sealed record ConselheiroResponse(Guid Id, Guid Versao, Guid PessoaId, string Nome, Guid? UsuarioId, DateOnly DataInicio, DateOnly? DataFim, bool PessoaAtiva, bool PossuiJornada);
 public sealed record ContaResponse(Guid Id, string Email);

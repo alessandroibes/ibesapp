@@ -36,6 +36,8 @@ const ficha = {
   responsaveis: [],
   vinculos: [],
   alteracoesSituacao: [],
+  possuiJornada: false,
+  conselheiroVigente: false,
 };
 
 function EnderecoAtual() {
@@ -180,5 +182,42 @@ describe("Páginas de Pessoas", () => {
       "href",
       "/pessoas/p1",
     );
+  });
+
+  it("não apresenta Jornada ao Visitante e usa responsáveis sem cadastro de outra Pessoa", async () => {
+    const api = vi.fn().mockImplementation((caminho: string) => {
+      if (caminho === "/pessoas/p1")
+        return Promise.resolve({
+          ...ficha,
+          responsaveis: [
+            {
+              id: "r1",
+              versao: "rv1",
+              relacao: "Mãe",
+              nome: "Maria",
+              telefoneWhatsApp: "11999999999",
+              moraComOEmbaixador: true,
+            },
+          ],
+        });
+      return Promise.resolve([]);
+    }) as unknown as Api;
+    renderizar(api, "/pessoas/p1?aba=jornada", ["pessoas.editar"]);
+    expect(
+      await screen.findByRole("heading", { name: "Daniel" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("tab", { name: "Jornada" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Resumo" })).toHaveAttribute(
+      "data-state",
+      "active",
+    );
+    await userEvent.click(screen.getByRole("tab", { name: "Vínculos" }));
+    expect(screen.getByText("Mãe: Maria")).toBeInTheDocument();
+    expect(screen.getAllByText(/Mora com o Embaixador/).length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getByText("Adicionar responsável")).toBeInTheDocument();
   });
 });

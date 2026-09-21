@@ -60,9 +60,10 @@ export function Pessoas({
     (async () => {
       if (id) {
         const p = (await obter(`/pessoas/${id}`)) as Pessoa;
-        const j = consultarJornada
-          ? ((await obter(`/pessoas/${id}/jornada`)) as Jornada | null)
-          : null;
+        const j =
+          consultarJornada && p.possuiJornada
+            ? ((await obter(`/pessoas/${id}/jornada`)) as Jornada | null)
+            : null;
         if (!controller.signal.aborted) {
           setPessoa(p);
           setJornada(j);
@@ -219,13 +220,14 @@ export function Pessoas({
           )}
           {pessoa.responsaveis.map((r) => (
             <Text key={r.id}>
-              {r.nome} · {r.parentesco} · {r.whatsApp ?? "Sem telefone"} ·{" "}
-              {r.dataInicio} a {r.dataFim ?? "atual"}
+              {r.nome} · {r.relacao} · {r.telefoneWhatsApp ?? "Sem telefone"} ·{" "}
+              {r.moraComOEmbaixador == null
+                ? "Moradia não informada"
+                : r.moraComOEmbaixador
+                  ? "Mora com o Embaixador"
+                  : "Não mora com o Embaixador"}
             </Text>
           ))}
-          {consultarJornada && !jornada && (
-            <Text>Trajetória ainda não registrada.</Text>
-          )}
         </>
       )}
       {jornada && (
@@ -242,19 +244,20 @@ export function Pessoas({
               Permanência mínima: {jornada.mesesPermanencia} meses por Posto.
             </Text>
           )}
-          {permissoes.includes("progressao.registrar") && (
-            <>
-              <Text>Data do fato (AAAA-MM-DD)</Text>
-              <TextInput
-                accessibilityLabel="Data do fato (AAAA-MM-DD)"
-                placeholder="AAAA-MM-DD"
-                value={data}
-                maxLength={10}
-                onChangeText={setData}
-                style={styles.campo}
-              />
-            </>
-          )}
+          {permissoes.includes("progressao.registrar") &&
+            !pessoa?.conselheiroVigente && (
+              <>
+                <Text>Data do fato (AAAA-MM-DD)</Text>
+                <TextInput
+                  accessibilityLabel="Data do fato (AAAA-MM-DD)"
+                  placeholder="AAAA-MM-DD"
+                  value={data}
+                  maxLength={10}
+                  onChangeText={setData}
+                  style={styles.campo}
+                />
+              </>
+            )}
           <Text accessibilityRole="header">Requisitos Mínimos</Text>
           {jornada.requisitos.map((r) => (
             <View key={r.requisito} style={styles.area}>
@@ -263,6 +266,7 @@ export function Pessoas({
               </Text>
               {!r.dataConclusao &&
                 permissoes.includes("progressao.registrar") &&
+                !pessoa?.conselheiroVigente &&
                 botao(
                   `Concluir ${r.nome}`,
                   () => void concluir("requisitos", { requisito: r.requisito }),
@@ -290,6 +294,7 @@ export function Pessoas({
                   {!t.dataConclusao &&
                     !p.dataConclusao &&
                     permissoes.includes("progressao.registrar") &&
+                    !pessoa?.conselheiroVigente &&
                     botao(
                       `Concluir ${t.nome}`,
                       () => void concluir("tarefas", { tarefaManualId: t.id }),

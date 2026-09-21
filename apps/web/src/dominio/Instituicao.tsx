@@ -5,55 +5,25 @@ import {
   Button,
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
-  EmptyState,
   PageHeader,
-  Timeline,
 } from "../components/ui";
-import { type Api, dataBr, hoje, useConsulta } from "./api";
-import {
-  Estado,
-  Formulario,
-  FormularioDialogo,
-  SeletorPessoa,
-} from "./componentes";
+import { type Api, dataBr, useConsulta } from "./api";
+import { Estado, Formulario } from "./componentes";
+
 type E = components["schemas"];
 
-export function Instituicao({
-  api,
-  editar,
-  podeConsultarPessoas,
-}: {
-  api: Api;
-  editar: boolean;
-  podeConsultarPessoas: boolean;
-}) {
+export function Instituicao({ api, editar }: { api: Api; editar: boolean }) {
   const [revisao, setRevisao] = useState(0);
-  const atualizar = () => setRevisao((r) => r + 1);
+  const atualizar = () => setRevisao((valor) => valor + 1);
   const instituicao = useConsulta<E["EmbaixadaResponse"]>(
     api,
     "/embaixada",
     revisao,
   );
-  const conselheiros = useConsulta<E["ConselheiroResponse"][]>(
-    api,
-    "/embaixada/conselheiros",
-    revisao,
-  );
-  const liderancas = useConsulta<E["LiderancaResponse"][]>(
-    api,
-    "/embaixada/liderancas",
-    revisao,
-  );
-  const contas = useConsulta<E["ContaResponse"][]>(
-    api,
-    editar ? "/embaixada/contas" : null,
-    revisao,
-  );
-  const salvar = async (c: string, d: object, m = "POST") => {
-    await api(c, d, m);
+  const salvar = async (caminho: string, dados: object, metodo = "POST") => {
+    await api(caminho, dados, metodo);
     atualizar();
   };
   return (
@@ -63,18 +33,7 @@ export function Instituicao({
         <Routes>
           <Route
             index
-            element={
-              <Resumo
-                i={instituicao.dados}
-                conselheiros={conselheiros.dados ?? []}
-                liderancas={liderancas.dados ?? []}
-                editar={editar}
-                podeConsultarPessoas={podeConsultarPessoas}
-                api={api}
-                contas={contas.dados ?? []}
-                salvar={salvar}
-              />
-            }
+            element={<Resumo i={instituicao.dados} editar={editar} />}
           />
           <Route
             path="editar"
@@ -93,32 +52,12 @@ export function Instituicao({
   );
 }
 
-function Resumo({
-  i,
-  conselheiros,
-  liderancas,
-  editar,
-  podeConsultarPessoas,
-  api,
-  contas,
-  salvar,
-}: {
-  i: E["EmbaixadaResponse"];
-  conselheiros: E["ConselheiroResponse"][];
-  liderancas: E["LiderancaResponse"][];
-  editar: boolean;
-  podeConsultarPessoas: boolean;
-  api: Api;
-  contas: E["ContaResponse"][];
-  salvar: (c: string, d: object, m?: string) => Promise<void>;
-}) {
-  const atuais = conselheiros.filter((c) => !c.dataFim);
-  const liderancasAtuais = liderancas.filter((l) => !l.dataFim);
+function Resumo({ i, editar }: { i: E["EmbaixadaResponse"]; editar: boolean }) {
   return (
     <>
       <PageHeader
         title="Igreja e Embaixada"
-        description="Dados institucionais, Conselheiros e lideranças adultas."
+        description="Dados institucionais da Igreja e de sua Embaixada."
         breadcrumbs={[{ label: "Igreja e Embaixada" }]}
         actions={
           editar && (
@@ -184,236 +123,6 @@ function Resumo({
         </CardHeader>
         <CardContent>
           <p>{i.historia || "História ainda não registrada."}</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <div className="linha-titulo">
-            <div>
-              <CardTitle>Conselheiros vigentes</CardTitle>
-              <CardDescription>
-                O vínculo não concede permissões automaticamente.
-              </CardDescription>
-            </div>
-            {editar && podeConsultarPessoas && (
-              <FormularioDialogo
-                titulo="Cadastrar Conselheiro"
-                descricao="Vincule uma pessoa adulta e, opcionalmente, uma conta de acesso."
-                gatilho="Cadastrar Conselheiro"
-              >
-                <Formulario
-                  titulo="Novo Conselheiro"
-                  campos={[
-                    { nome: "funcao", rotulo: "Função", obrigatorio: true },
-                    {
-                      nome: "dataInicio",
-                      rotulo: "Data de início",
-                      tipo: "date",
-                      obrigatorio: true,
-                    },
-                    {
-                      nome: "usuarioId",
-                      rotulo: "Conta de acesso (opcional)",
-                      tipo: "select",
-                      opcoes: contas.map((c) => ({
-                        valor: c.id,
-                        rotulo: c.email,
-                      })),
-                    },
-                  ]}
-                  iniciais={{ dataInicio: hoje() }}
-                  salvar={async (d) => {
-                    const p = await api<E["PessoaResponse"]>(
-                      `/pessoas/${d.pessoaId}`,
-                    );
-                    await salvar("/embaixada/conselheiros", {
-                      ...d,
-                      usuarioId: d.usuarioId || null,
-                      versaoPessoa: p.versao,
-                    });
-                  }}
-                >
-                  <SeletorPessoa api={api} />
-                </Formulario>
-              </FormularioDialogo>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {atuais.length === 0 ? (
-            <EmptyState title="Nenhum Conselheiro vigente" />
-          ) : (
-            <ul className="lista-registros">
-              {atuais.map((c) => (
-                <li key={c.id}>
-                  <div>
-                    <strong>{c.nome}</strong>
-                    <span>
-                      {c.funcao} · desde {dataBr(c.dataInicio)}
-                    </span>
-                  </div>
-                  {editar && (
-                    <FormularioDialogo
-                      titulo="Encerrar Conselheiro"
-                      descricao="O vínculo continuará disponível no histórico."
-                      gatilho="Encerrar"
-                    >
-                      <Formulario
-                        titulo={`Encerrar Conselheiro ${c.nome}`}
-                        texto="Encerrar vínculo"
-                        campos={[
-                          {
-                            nome: "dataFim",
-                            rotulo: "Data de encerramento",
-                            tipo: "date",
-                            obrigatorio: true,
-                          },
-                        ]}
-                        iniciais={{ dataFim: hoje() }}
-                        salvar={(d) =>
-                          salvar(
-                            `/embaixada/conselheiros/${c.id}/encerramento`,
-                            { ...d, versao: c.versao },
-                          )
-                        }
-                      />
-                    </FormularioDialogo>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <div className="linha-titulo">
-            <div>
-              <CardTitle>Lideranças vigentes</CardTitle>
-              <CardDescription>
-                Funções adultas da Embaixada, independentes da Diretoria dos
-                meninos.
-              </CardDescription>
-            </div>
-            {editar && (
-              <FormularioDialogo
-                titulo="Registrar liderança"
-                descricao="Escolha um Conselheiro vigente e informe a função."
-                gatilho="Registrar liderança"
-              >
-                <Formulario
-                  titulo="Nova liderança"
-                  campos={[
-                    {
-                      nome: "conselheiroId",
-                      rotulo: "Conselheiro",
-                      tipo: "select",
-                      obrigatorio: true,
-                      opcoes: atuais.map((c) => ({
-                        valor: c.id,
-                        rotulo: c.nome,
-                      })),
-                    },
-                    {
-                      nome: "funcao",
-                      rotulo: "Função de liderança",
-                      obrigatorio: true,
-                    },
-                    {
-                      nome: "dataInicio",
-                      rotulo: "Data de início",
-                      tipo: "date",
-                      obrigatorio: true,
-                    },
-                  ]}
-                  iniciais={{ dataInicio: hoje() }}
-                  salvar={(d) => {
-                    const c = atuais.find((x) => x.id === d.conselheiroId)!;
-                    return salvar("/embaixada/liderancas", {
-                      ...d,
-                      versaoConselheiro: c.versao,
-                    });
-                  }}
-                />
-              </FormularioDialogo>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {liderancasAtuais.length === 0 ? (
-            <EmptyState title="Nenhuma liderança vigente" />
-          ) : (
-            <ul className="lista-registros">
-              {liderancasAtuais.map((l) => (
-                <li key={l.id}>
-                  <div>
-                    <strong>{l.funcao}</strong>
-                    <span>
-                      {l.nome} · desde {dataBr(l.dataInicio)}
-                    </span>
-                  </div>
-                  {editar && (
-                    <FormularioDialogo
-                      titulo="Encerrar liderança"
-                      descricao="O período permanecerá no histórico."
-                      gatilho="Encerrar"
-                    >
-                      <Formulario
-                        titulo={`Encerrar liderança ${l.funcao}`}
-                        texto="Encerrar liderança"
-                        campos={[
-                          {
-                            nome: "dataFim",
-                            rotulo: "Data de encerramento",
-                            tipo: "date",
-                            obrigatorio: true,
-                          },
-                        ]}
-                        iniciais={{ dataFim: hoje() }}
-                        salvar={(d) =>
-                          salvar(`/embaixada/liderancas/${l.id}/encerramento`, {
-                            ...d,
-                            versao: l.versao,
-                          })
-                        }
-                      />
-                    </FormularioDialogo>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Histórico institucional</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {conselheiros.filter((c) => c.dataFim).length +
-            liderancas.filter((l) => l.dataFim).length ===
-          0 ? (
-            <EmptyState title="Nenhum vínculo encerrado" />
-          ) : (
-            <Timeline
-              items={[
-                ...conselheiros
-                  .filter((c) => c.dataFim)
-                  .map((c) => ({
-                    id: `c-${c.id}`,
-                    title: `${c.nome} · Conselheiro`,
-                    description: `${dataBr(c.dataInicio)} a ${dataBr(c.dataFim!)}`,
-                  })),
-                ...liderancas
-                  .filter((l) => l.dataFim)
-                  .map((l) => ({
-                    id: `l-${l.id}`,
-                    title: `${l.funcao} · ${l.nome}`,
-                    description: `${dataBr(l.dataInicio)} a ${dataBr(l.dataFim!)}`,
-                  })),
-              ]}
-            />
-          )}
         </CardContent>
       </Card>
     </>
@@ -488,12 +197,12 @@ function Editar({
                 grupo: "Memória",
               },
             ]}
-            salvar={(d) =>
+            salvar={(dados) =>
               salvar(
                 "/embaixada",
                 {
-                  ...d,
-                  dataFundacao: d.dataFundacao || null,
+                  ...dados,
+                  dataFundacao: dados.dataFundacao || null,
                   versaoIgreja: i.versaoIgreja,
                   versaoEmbaixada: i.versaoEmbaixada,
                 },

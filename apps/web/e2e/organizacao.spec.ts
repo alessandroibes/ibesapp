@@ -18,7 +18,6 @@ test("Consulado, Cônsul, transferência e mandato", async ({ page }) => {
   await pessoa.getByLabel("Nome completo").fill(pessoaNome);
   await pessoa.getByLabel("Data de nascimento").fill("2011-01-01");
   await pessoa.getByRole("button", { name: "Salvar" }).click();
-  await page.getByRole("tab", { name: "Jornada" }).click();
   await page.getByRole("button", { name: "Iniciar trajetória" }).click();
   await page.getByRole("link", { name: "Consulados e Diretoria" }).click();
   for (const nome of [`Origem ${sufixo}`, `Destino ${sufixo}`]) {

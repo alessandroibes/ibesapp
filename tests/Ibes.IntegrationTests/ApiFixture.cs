@@ -53,7 +53,7 @@ public sealed class ApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
             db.VinculosIgreja.Add(new VinculoIgreja { IgrejaId = IgrejaA, UsuarioId = UsuarioId, Permissoes = Permissoes.Todas });
             var pessoa = new Pessoa { IgrejaId = IgrejaA, Nome = "Conselheiro de teste", DataNascimento = new DateOnly(1980, 1, 1) };
             db.Add(pessoa);
-            db.Add(new Conselheiro { IgrejaId = IgrejaA, PessoaId = pessoa.Id, UsuarioId = UsuarioId, DataInicio = new DateOnly(2020, 1, 1), Funcao = "Conselheiro" });
+            db.Add(new Conselheiro { IgrejaId = IgrejaA, PessoaId = pessoa.Id, UsuarioId = UsuarioId, DataInicio = new DateOnly(2020, 1, 1) });
             await db.SaveChangesAsync();
         });
         await NaIgreja(IgrejaB, async db =>

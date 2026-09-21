@@ -32,10 +32,10 @@ public sealed class AlteracaoSituacaoPessoa : Entidade
 public sealed class ResponsavelPessoa : Entidade
 {
     public Guid PessoaId { get; set; }
-    public Guid ResponsavelId { get; set; }
-    public string Parentesco { get; set; } = "";
-    public DateOnly DataInicio { get; set; }
-    public DateOnly? DataFim { get; set; }
+    public string Relacao { get; set; } = "";
+    public string Nome { get; set; } = "";
+    public string? TelefoneWhatsApp { get; set; }
+    public bool? MoraComOEmbaixador { get; set; }
 }
 
 public sealed class VinculoEclesiastico : Entidade

@@ -106,7 +106,7 @@ public sealed class DominioTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
-    public async Task IsolamentoComVinculoNasDuasIgrejasEFkComposta()
+    public async Task IsolamentoEntrePessoasDasDuasIgrejas()
     {
         var pessoa = await CriarPessoa(); var outra = Guid.NewGuid();
         await api.NaIgreja(api.IgrejaB, async db =>
@@ -118,25 +118,31 @@ public sealed class DominioTests(ApiFixture api) : IClassFixture<ApiFixture>
         {
             Assert.Equal(HttpStatusCode.NotFound, (await api.GetTenant($"/api/v1/pessoas/{pessoa.Id}", api.IgrejaB)).StatusCode);
             Assert.Equal(HttpStatusCode.NotFound, (await api.GetTenant($"/api/v1/pessoas/{outra}", api.IgrejaA)).StatusCode);
-            Assert.Equal(HttpStatusCode.NotFound, (await Enviar($"/api/v1/pessoas/{pessoa.Id}/responsaveis", new ResponsavelRequest(pessoa.Versao, outra, "Responsável", new DateOnly(2024, 1, 1)))).StatusCode);
-            await api.NaIgreja(api.IgrejaA, async db =>
-            {
-                db.Add(new ResponsavelPessoa { IgrejaId = api.IgrejaA, PessoaId = pessoa.Id, ResponsavelId = outra, Parentesco = "Responsável", DataInicio = new DateOnly(2024, 1, 1) });
-                await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
-            });
+            Assert.Equal(HttpStatusCode.NotFound, (await Enviar($"/api/v1/pessoas/{outra}/responsaveis", new ResponsavelRequest(pessoa.Versao, "Mãe", "Responsável", null, null))).StatusCode);
             await api.NaIgreja(null, async db => { Assert.Empty(await db.Set<Pessoa>().ToListAsync()); Assert.Empty(await db.Set<VersaoManual>().ToListAsync()); });
         }
         finally { await api.NaIgreja(api.IgrejaB, async db => { db.VinculosIgreja.Remove(await db.VinculosIgreja.SingleAsync()); await db.SaveChangesAsync(); }); }
     }
 
     [Fact]
-    public async Task CadastrosResponsaveisEVinculosPreservamHistorico()
+    public async Task ResponsaveisLivresPodemSerIncluidosEditadosERemovidos()
     {
-        var pessoa = await CriarPessoa(); var responsavel = await CriarPessoa();
-        var id = await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa.Id}/responsaveis", new ResponsavelRequest(pessoa.Versao, responsavel.Id, "Mãe", new DateOnly(2024, 1, 1))));
-        var resposta = await Enviar($"/api/v1/pessoas/{pessoa.Id}/responsaveis/{id.Id}/encerramento", new EncerrarVinculoRequest(id.Versao, new DateOnly(2025, 1, 1)));
-        Assert.Equal(HttpStatusCode.NoContent, resposta.StatusCode);
-        var ficha = await Pessoa(pessoa.Id); Assert.Single(ficha.Responsaveis); Assert.NotNull(ficha.Responsaveis[0].DataFim);
+        var pessoa = await CriarPessoa();
+        var id = await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa.Id}/responsaveis", new ResponsavelRequest(pessoa.Versao, "Mãe", "Maria", "11999999999", true)));
+        var ficha = await Pessoa(pessoa.Id);
+        var cadastrado = Assert.Single(ficha.Responsaveis);
+        Assert.Equal("Maria", cadastrado.Nome); Assert.True(cadastrado.MoraComOEmbaixador);
+        var atualizado = await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa.Id}/responsaveis/{id.Id}", new AlterarResponsavelRequest(id.Versao, "Avó", "Maria Silva", null, false), HttpMethod.Put));
+        cadastrado = Assert.Single((await Pessoa(pessoa.Id)).Responsaveis);
+        Assert.Equal("Avó", cadastrado.Relacao); Assert.False(cadastrado.MoraComOEmbaixador);
+        Assert.Equal(HttpStatusCode.NoContent, (await Enviar($"/api/v1/pessoas/{pessoa.Id}/responsaveis/{id.Id}?versao={atualizado.Versao}", new { }, HttpMethod.Delete)).StatusCode);
+        Assert.Empty((await Pessoa(pessoa.Id)).Responsaveis);
+    }
+
+    [Fact]
+    public async Task VinculosEclesiasticosPreservamHistorico()
+    {
+        var pessoa = await CriarPessoa(); var ficha = await Pessoa(pessoa.Id);
         var vinculo = await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa.Id}/vinculos-eclesiasticos", new VinculoRequest(ficha.Versao, "Igreja informada", "Membro", new DateOnly(2024, 1, 1))));
         Assert.Equal(HttpStatusCode.NoContent, (await Enviar($"/api/v1/pessoas/{pessoa.Id}/vinculos-eclesiasticos/{vinculo.Id}/encerramento", new EncerrarVinculoRequest(vinculo.Versao, new DateOnly(2025, 1, 1)))).StatusCode);
         Assert.Single((await Pessoa(pessoa.Id)).Vinculos);
@@ -188,12 +194,16 @@ public sealed class DominioTests(ApiFixture api) : IClassFixture<ApiFixture>
         semCsrf.Headers.Add("X-Igreja-Id", api.IgrejaA.ToString());
         Assert.Equal(HttpStatusCode.BadRequest, (await api.Adulto.SendAsync(semCsrf)).StatusCode);
         await api.NaIgreja(api.IgrejaA, async db => { (await db.VinculosIgreja.SingleAsync()).Permissoes = [Permissoes.ConsultarFundacao]; await db.SaveChangesAsync(); });
-        try { Assert.Equal(HttpStatusCode.Forbidden, (await Enviar("/api/v1/pessoas", Dados())).StatusCode); }
+        try
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, (await Enviar("/api/v1/pessoas", Dados())).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await api.GetTenant("/api/v1/embaixada/conselheiros", api.IgrejaA)).StatusCode);
+        }
         finally { await api.NaIgreja(api.IgrejaA, async db => { (await db.VinculosIgreja.SingleAsync()).Permissoes = Permissoes.Todas; await db.SaveChangesAsync(); }); }
     }
 
     [Fact]
-    public async Task CadastroInstitucionalEHistoricoDeConselheiroELideranca()
+    public async Task CadastroInstitucionalEFluxoProprioDeConselheiro()
     {
         var antes = await Ler<EmbaixadaResponse>(await api.GetTenant("/api/v1/embaixada", api.IgrejaA));
         var alterar = new EmbaixadaRequest(antes.NomeIgreja, "Endereço de teste", "Pastor de teste", antes.VersaoIgreja,
@@ -202,15 +212,24 @@ public sealed class DominioTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal(HttpStatusCode.Conflict, (await Enviar("/api/v1/embaixada", alterar, HttpMethod.Put)).StatusCode);
         Assert.Equal("História registrada", (await Ler<EmbaixadaResponse>(await api.GetTenant("/api/v1/embaixada", api.IgrejaA))).Historia);
         var menor = await CriarPessoa();
-        Assert.Equal(HttpStatusCode.BadRequest, (await Enviar("/api/v1/embaixada/conselheiros", new ConselheiroRequest(menor.Id, menor.Versao, null, "Auxiliar", new DateOnly(2024, 1, 1)))).StatusCode);
-        var adulto = await Ler<IdResponse>(await Enviar("/api/v1/pessoas", Dados("Adulto para liderança", new DateOnly(1980, 1, 1))));
-        var c = await Ler<IdResponse>(await Enviar("/api/v1/embaixada/conselheiros", new ConselheiroRequest(adulto.Id, adulto.Versao, null, "Auxiliar", new DateOnly(2023, 1, 1))));
-        var l = await Ler<IdResponse>(await Enviar("/api/v1/embaixada/liderancas", new LiderancaRequest(c.Id, c.Versao, "Presidente", new DateOnly(2024, 1, 1))));
+        Assert.Equal(HttpStatusCode.BadRequest, (await Enviar("/api/v1/embaixada/conselheiros", new ConselheiroRequest(menor.Id, menor.Versao, null, new DateOnly(2024, 1, 1)))).StatusCode);
+        var adulto = await Ler<IdResponse>(await Enviar("/api/v1/pessoas", Dados("Adulto Conselheiro", new DateOnly(1980, 1, 1))));
+        await api.NaIgreja(api.IgrejaA, async db =>
+        {
+            db.Add(new JornadaEmbaixador { IgrejaId = api.IgrejaA, PessoaId = adulto.Id });
+            await db.SaveChangesAsync();
+        });
+        var c = await Ler<IdResponse>(await Enviar("/api/v1/embaixada/conselheiros", new ConselheiroRequest(adulto.Id, adulto.Versao, null, new DateOnly(2023, 1, 1))));
         var atualizado = (await Ler<List<ConselheiroResponse>>(await api.GetTenant("/api/v1/embaixada/conselheiros", api.IgrejaA))).Single(x => x.Id == c.Id);
-        Assert.Equal(HttpStatusCode.BadRequest, (await Enviar($"/api/v1/embaixada/conselheiros/{c.Id}/encerramento", new EncerrarVinculoRequest(atualizado.Versao, new DateOnly(2025, 1, 1)))).StatusCode);
-        Assert.Equal(HttpStatusCode.NoContent, (await Enviar($"/api/v1/embaixada/liderancas/{l.Id}/encerramento", new EncerrarVinculoRequest(l.Versao, new DateOnly(2025, 1, 1)))).StatusCode);
+        Assert.True(atualizado.PossuiJornada);
+        var fichaConselheiro = await Pessoa(adulto.Id);
+        Assert.True(fichaConselheiro.PossuiJornada); Assert.True(fichaConselheiro.ConselheiroVigente);
+        var pessoas = await Ler<PessoasResponse>(await api.GetTenant("/api/v1/pessoas?condicao=visitantes", api.IgrejaA));
+        Assert.DoesNotContain(pessoas.Pessoas, p => p.Id == adulto.Id);
+        Assert.Equal(c.Id, (await Ler<ConselheiroResponse>(await api.GetTenant($"/api/v1/embaixada/conselheiros/{c.Id}", api.IgrejaA))).Id);
+        Assert.Equal(HttpStatusCode.NotFound, (await api.GetTenant("/api/v1/embaixada/liderancas", api.IgrejaA)).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await Enviar($"/api/v1/embaixada/conselheiros/{c.Id}/encerramento", new EncerrarVinculoRequest(atualizado.Versao, new DateOnly(2025, 1, 1)))).StatusCode);
-        Assert.NotNull((await Ler<List<LiderancaResponse>>(await api.GetTenant("/api/v1/embaixada/liderancas", api.IgrejaA))).Single(x => x.Id == l.Id).DataFim);
+        Assert.NotNull((await Ler<List<ConselheiroResponse>>(await api.GetTenant("/api/v1/embaixada/conselheiros", api.IgrejaA))).Single(x => x.Id == c.Id).DataFim);
     }
 
     [Fact]

@@ -4,6 +4,7 @@ using Ibes.Foundation.Organizacoes;
 using Ibes.Foundation.Persistence;
 using Ibes.Pessoas;
 using Ibes.Progressao;
+using Ibes.Embaixadas;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static Ibes.Foundation.Domain.Datas;
@@ -20,18 +21,28 @@ public static class PessoasEndpoints
             Exigir((pagina ?? 1) is >= 1 and <= 10000 && (busca?.Length ?? 0) <= 100, "Busca ou página inválida.");
             var query = db.Set<Pessoa>().AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(busca)) query = query.Where(p => p.Nome.Contains(busca));
-            if (incluirInativos != true) query = query.Where(p => p.Ativa);
+            var filtro = condicao?.ToLowerInvariant();
+            if (filtro == "inativos") query = query.Where(p => !p.Ativa);
+            else if (incluirInativos != true) query = query.Where(p => p.Ativa);
+            if (filtro != "inativos")
+            {
+                var hoje = relogio.Hoje;
+                var conselheirosVigentes = db.Set<Conselheiro>()
+                    .Where(c => c.DataInicio <= hoje && (c.DataFim == null || c.DataFim >= hoje))
+                    .Select(c => c.PessoaId);
+                query = query.Where(p => !conselheirosVigentes.Contains(p.Id));
+            }
             var pessoas = await query.OrderBy(p => p.Nome).ThenBy(p => p.Id).ToListAsync(ct);
             var ids = pessoas.Select(p => p.Id).ToArray();
             var jornadas = await db.Set<JornadaEmbaixador>().AsNoTracking().Include(j => j.Postos).Where(j => ids.Contains(j.PessoaId)).ToListAsync(ct);
             var resultados = pessoas.Select(p => new PessoaResumo(p.Id, p.Versao, p.Nome, p.DataNascimento,
                 p.DataNascimento is { } nascimento ? jornadas.SingleOrDefault(j => j.PessoaId == p.Id)?.Situacao(nascimento, relogio.Hoje) : null, p.Ativa)).ToList();
-            resultados = (condicao?.ToLowerInvariant()) switch
+            resultados = filtro switch
             {
                 "embaixadores" => resultados.Where(x => x.Situacao?.StartsWith("Embaixador") == true).ToList(),
                 "candidatos" => resultados.Where(x => x.Situacao == "Candidato").ToList(),
                 "visitantes" => resultados.Where(x => x.Situacao is null).ToList(),
-                null or "" or "todos" => resultados,
+                null or "" or "todos" or "inativos" => resultados,
                 _ => throw new RegraNegocioException("Filtro de condição inválido.")
             };
             var total = resultados.Count;
@@ -41,20 +52,21 @@ public static class PessoasEndpoints
         {
             var pessoa = await db.Set<Pessoa>().AsNoTracking().SingleOrDefaultAsync(p => p.Id == id, ct);
             if (pessoa is null) return Results.NotFound();
-            var responsaveis = await (from r in db.Set<ResponsavelPessoa>()
-                                      join p in db.Set<Pessoa>() on r.ResponsavelId equals p.Id
-                                      where r.PessoaId == id
-                                      orderby r.DataInicio descending
-                                      select new ResponsavelResponse(r.Id, r.Versao, p.Id, p.Nome, p.WhatsApp, r.Parentesco, r.DataInicio, r.DataFim)).ToListAsync(ct);
+            var responsaveis = await db.Set<ResponsavelPessoa>().AsNoTracking().Where(r => r.PessoaId == id)
+                .OrderBy(r => r.Nome)
+                .Select(r => new ResponsavelResponse(r.Id, r.Versao, r.Relacao, r.Nome, r.TelefoneWhatsApp, r.MoraComOEmbaixador)).ToListAsync(ct);
             var vinculos = await db.Set<VinculoEclesiastico>().Where(v => v.PessoaId == id).OrderByDescending(v => v.DataInicio)
                 .Select(v => new VinculoResponse(v.Id, v.Versao, v.NomeIgreja, v.Tipo, v.DataInicio, v.DataFim)).ToListAsync(ct);
             var alteracoes = await db.Set<AlteracaoSituacaoPessoa>().AsNoTracking().Where(x => x.PessoaId == id)
                 .OrderByDescending(x => x.Data).ThenByDescending(x => x.CreatedAt)
                 .Select(x => new AlteracaoSituacaoPessoaResponse(x.Tipo, x.Data, x.Motivo, x.CreatedAt)).ToListAsync(ct);
+            var possuiJornada = await db.Set<JornadaEmbaixador>().AnyAsync(j => j.PessoaId == id, ct);
+            var hoje = relogio.Hoje;
+            var conselheiroVigente = await db.Set<Conselheiro>().AnyAsync(c => c.PessoaId == id && c.DataInicio <= hoje && (c.DataFim == null || c.DataFim >= hoje), ct);
             return Results.Ok(new PessoaResponse(pessoa.Id, pessoa.Versao, DadosPessoa.De(pessoa),
                 pessoa.DataNascimento is { } nascimento ? FaixaEtaria(nascimento, relogio.Hoje) : null,
                 await db.Set<FotoPessoa>().AnyAsync(f => f.PessoaId == id, ct), responsaveis, vinculos,
-                await FrequenciaEndpoints.PrimeiraReuniao(db, id, ct), pessoa.Ativa, alteracoes));
+                await FrequenciaEndpoints.PrimeiraReuniao(db, id, ct), pessoa.Ativa, possuiJornada, conselheiroVigente, alteracoes));
         }).RequireAuthorization(Permissoes.ConsultarPessoas).Produces<PessoaResponse>().WithName("ConsultarPessoa");
         grupo.MapPost("/", async (DadosPessoa dados, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
         {
@@ -101,17 +113,33 @@ public static class PessoasEndpoints
             db.Add(new AlteracaoSituacaoPessoa { IgrejaId = tenant.IgrejaId, PessoaId = id, Tipo = TipoAlteracaoSituacaoPessoa.Reativacao, Data = request.Data, Motivo = request.Motivo.Trim(), RegistradoPor = tenant.UsuarioId!.Value });
             await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(pessoa.Id, pessoa.Versao));
         }).RequireAuthorization(Permissoes.EditarPessoas).Produces<IdResponse>();
-        grupo.MapPost("/{id:guid}/responsaveis", async (Guid id, ResponsavelRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
+        grupo.MapPost("/{id:guid}/responsaveis", async (Guid id, ResponsavelRequest request, AppDbContext db, TenantContext tenant, CancellationToken ct) =>
         {
             var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(p => p.Id == id, ct);
-            if (pessoa is null || !await db.Set<Pessoa>().AnyAsync(p => p.Id == request.ResponsavelId, ct)) return Results.NotFound();
+            if (pessoa is null) return Results.NotFound();
             Exigir(pessoa.Ativa, "Não é possível criar vínculos para uma pessoa inativa.");
-            Exigir(id != request.ResponsavelId, "A pessoa não pode ser responsável por si mesma.");
-            Operacao.ValidarPeriodo(request.DataInicio, null, relogio.Hoje); Operacao.ConferirVersao(pessoa, request.Versao);
-            Exigir(!await db.Set<ResponsavelPessoa>().AnyAsync(r => r.PessoaId == id && r.ResponsavelId == request.ResponsavelId && (r.DataFim == null || r.DataFim >= request.DataInicio), ct), "Já existe vínculo de responsável nesse período.");
-            var vinculo = new ResponsavelPessoa { IgrejaId = tenant.IgrejaId, PessoaId = id, ResponsavelId = request.ResponsavelId, Parentesco = request.Parentesco.Trim(), DataInicio = request.DataInicio };
-            db.Add(vinculo); await db.SaveChangesAsync(ct); return Results.Ok(new IdResponse(vinculo.Id, vinculo.Versao));
+            ValidarResponsavel(request.Relacao, request.Nome, request.TelefoneWhatsApp);
+            Operacao.ConferirVersao(pessoa, request.VersaoPessoa);
+            var responsavel = new ResponsavelPessoa { IgrejaId = tenant.IgrejaId, PessoaId = id };
+            AplicarResponsavel(responsavel, request.Relacao, request.Nome, request.TelefoneWhatsApp, request.MoraComOEmbaixador);
+            db.Add(responsavel); await db.SaveChangesAsync(ct); return Results.Ok(new IdResponse(responsavel.Id, responsavel.Versao));
         }).RequireAuthorization(Permissoes.EditarPessoas).Produces<IdResponse>();
+        grupo.MapPut("/{id:guid}/responsaveis/{responsavelId:guid}", async (Guid id, Guid responsavelId, AlterarResponsavelRequest request, AppDbContext db, CancellationToken ct) =>
+        {
+            var responsavel = await db.Set<ResponsavelPessoa>().SingleOrDefaultAsync(r => r.Id == responsavelId && r.PessoaId == id, ct);
+            if (responsavel is null) return Results.NotFound();
+            ValidarResponsavel(request.Relacao, request.Nome, request.TelefoneWhatsApp);
+            Operacao.ConferirVersao(responsavel, request.Versao);
+            AplicarResponsavel(responsavel, request.Relacao, request.Nome, request.TelefoneWhatsApp, request.MoraComOEmbaixador);
+            await db.SaveChangesAsync(ct); return Results.Ok(new IdResponse(responsavel.Id, responsavel.Versao));
+        }).RequireAuthorization(Permissoes.EditarPessoas).Produces<IdResponse>();
+        grupo.MapDelete("/{id:guid}/responsaveis/{responsavelId:guid}", async (Guid id, Guid responsavelId, Guid versao, AppDbContext db, CancellationToken ct) =>
+        {
+            var responsavel = await db.Set<ResponsavelPessoa>().SingleOrDefaultAsync(r => r.Id == responsavelId && r.PessoaId == id, ct);
+            if (responsavel is null) return Results.NotFound();
+            Operacao.ConferirVersao(responsavel, versao);
+            db.Remove(responsavel); await db.SaveChangesAsync(ct); return Results.NoContent();
+        }).RequireAuthorization(Permissoes.EditarPessoas);
         grupo.MapPost("/{id:guid}/vinculos-eclesiasticos", async (Guid id, VinculoRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
         {
             var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(p => p.Id == id, ct);
@@ -122,13 +150,6 @@ public static class PessoasEndpoints
             var vinculo = new VinculoEclesiastico { IgrejaId = tenant.IgrejaId, PessoaId = id, NomeIgreja = request.NomeIgreja.Trim(), Tipo = request.Tipo, DataInicio = request.DataInicio };
             db.Add(vinculo); await db.SaveChangesAsync(ct); return Results.Ok(new IdResponse(vinculo.Id, vinculo.Versao));
         }).RequireAuthorization(Permissoes.EditarPessoas).Produces<IdResponse>();
-        grupo.MapPost("/{id:guid}/responsaveis/{vinculoId:guid}/encerramento", async (Guid id, Guid vinculoId, EncerrarVinculoRequest request, AppDbContext db, Relogio relogio, CancellationToken ct) =>
-        {
-            var vinculo = await db.Set<ResponsavelPessoa>().SingleOrDefaultAsync(v => v.Id == vinculoId && v.PessoaId == id, ct);
-            if (vinculo is null) return Results.NotFound();
-            Exigir(vinculo.DataFim is null, "Vínculo já encerrado."); Operacao.ValidarPeriodo(vinculo.DataInicio, request.DataFim, relogio.Hoje);
-            Operacao.ConferirVersao(vinculo, request.Versao); vinculo.DataFim = request.DataFim; await db.SaveChangesAsync(ct); return Results.NoContent();
-        }).RequireAuthorization(Permissoes.EditarPessoas);
         grupo.MapPost("/{id:guid}/vinculos-eclesiasticos/{vinculoId:guid}/encerramento", async (Guid id, Guid vinculoId, EncerrarVinculoRequest request, AppDbContext db, Relogio relogio, CancellationToken ct) =>
         {
             var vinculo = await db.Set<VinculoEclesiastico>().SingleOrDefaultAsync(v => v.Id == vinculoId && v.PessoaId == id, ct);
@@ -170,6 +191,17 @@ public static class PessoasEndpoints
             !string.IsNullOrWhiteSpace(request.Motivo) && request.Motivo.Length <= 500,
             "Informe data e motivo válidos para a alteração da situação.");
     }
+
+    private static void ValidarResponsavel(string relacao, string nome, string? telefoneWhatsApp) =>
+        Exigir(!string.IsNullOrWhiteSpace(relacao) && relacao.Length <= 80 && !string.IsNullOrWhiteSpace(nome) && nome.Length <= 200 && (telefoneWhatsApp?.Length ?? 0) <= 40,
+            "Informe relação, nome e telefone/WhatsApp válidos para o responsável.");
+
+    private static void AplicarResponsavel(ResponsavelPessoa responsavel, string relacao, string nome, string? telefoneWhatsApp, bool? moraComOEmbaixador)
+    {
+        responsavel.Relacao = relacao.Trim(); responsavel.Nome = nome.Trim();
+        responsavel.TelefoneWhatsApp = string.IsNullOrWhiteSpace(telefoneWhatsApp) ? null : telefoneWhatsApp.Trim();
+        responsavel.MoraComOEmbaixador = moraComOEmbaixador;
+    }
 }
 
 public sealed record DadosPessoa(
@@ -193,11 +225,12 @@ public sealed record DadosPessoa(
 }
 public sealed record AlterarPessoaRequest(Guid Versao, [property: Required] DadosPessoa Dados);
 public sealed record AlterarSituacaoPessoaRequest(Guid Versao, DateOnly Data, [property: Required, StringLength(500)] string Motivo);
-public sealed record ResponsavelRequest(Guid Versao, Guid ResponsavelId, [property: Required, StringLength(80)] string Parentesco, DateOnly DataInicio);
+public sealed record ResponsavelRequest(Guid VersaoPessoa, [property: Required, StringLength(80)] string Relacao, [property: Required, StringLength(200)] string Nome, [property: StringLength(40)] string? TelefoneWhatsApp, bool? MoraComOEmbaixador);
+public sealed record AlterarResponsavelRequest(Guid Versao, [property: Required, StringLength(80)] string Relacao, [property: Required, StringLength(200)] string Nome, [property: StringLength(40)] string? TelefoneWhatsApp, bool? MoraComOEmbaixador);
 public sealed record VinculoRequest(Guid Versao, [property: Required, StringLength(200)] string NomeIgreja, [property: Required] string Tipo, DateOnly DataInicio);
 public sealed record PessoasResponse(int Total, List<PessoaResumo> Pessoas);
 public sealed record PessoaResumo(Guid Id, Guid Versao, string Nome, DateOnly? DataNascimento, string? Situacao, bool Ativa);
-public sealed record PessoaResponse(Guid Id, Guid Versao, DadosPessoa Dados, string? FaixaEtaria, bool PossuiFoto, List<ResponsavelResponse> Responsaveis, List<VinculoResponse> Vinculos, DateOnly? PrimeiraReuniao, bool Ativa, List<AlteracaoSituacaoPessoaResponse> AlteracoesSituacao);
+public sealed record PessoaResponse(Guid Id, Guid Versao, DadosPessoa Dados, string? FaixaEtaria, bool PossuiFoto, List<ResponsavelResponse> Responsaveis, List<VinculoResponse> Vinculos, DateOnly? PrimeiraReuniao, bool Ativa, bool PossuiJornada, bool ConselheiroVigente, List<AlteracaoSituacaoPessoaResponse> AlteracoesSituacao);
 public sealed record AlteracaoSituacaoPessoaResponse(TipoAlteracaoSituacaoPessoa Tipo, DateOnly Data, string Motivo, DateTimeOffset RegistradoEm);
-public sealed record ResponsavelResponse(Guid Id, Guid Versao, Guid PessoaId, string Nome, string? WhatsApp, string Parentesco, DateOnly DataInicio, DateOnly? DataFim);
+public sealed record ResponsavelResponse(Guid Id, Guid Versao, string Relacao, string Nome, string? TelefoneWhatsApp, bool? MoraComOEmbaixador);
 public sealed record VinculoResponse(Guid Id, Guid Versao, string NomeIgreja, string Tipo, DateOnly DataInicio, DateOnly? DataFim);

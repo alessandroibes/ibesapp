@@ -39,7 +39,7 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
   await page.getByRole("link", { name: "Cancelar" }).click();
   await expect(page.getByText(edicao)).toBeVisible();
   await page
-    .getByRole("link", { name: "Pessoas e jornada", exact: true })
+    .getByRole("link", { name: "Meninos e jornada", exact: true })
     .click();
   expect(
     (
@@ -71,8 +71,8 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     .getByRole("button", { name: "Salvar" })
     .click();
   await expect(page.getByText("Dados da pessoa atualizados.")).toBeVisible();
-  await page.getByRole("tab", { name: "Jornada" }).click();
   await page.getByRole("button", { name: "Iniciar trajetória" }).click();
+  await page.getByRole("tab", { name: "Jornada" }).click();
   const requisitos = [
     "Significado do nome Embaixador do Rei",
     "Compromisso dos ER",
@@ -132,7 +132,7 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
   await page.reload();
   await page.getByRole("button", { name: "Áreas de trabalho" }).click();
   await page
-    .getByRole("link", { name: "Pessoas e jornada", exact: true })
+    .getByRole("link", { name: "Meninos e jornada", exact: true })
     .click();
   await page.getByLabel("Buscar pelo nome").fill(nome);
   await page

@@ -57,7 +57,7 @@ import {
 } from "../components/ui";
 import { estadosFrequencia } from "./Chamada";
 import { type Api, dataBr, hoje, useConsulta } from "./api";
-import { Estado, Formulario, SeletorPessoa, type Campo } from "./componentes";
+import { Estado, Formulario, type Campo } from "./componentes";
 import { Jornada } from "./Jornada";
 
 type AlteracaoSituacao = {
@@ -284,7 +284,6 @@ function ListaPessoas({ api, editar }: { api: Api; editar: boolean }) {
       ? paginaInformada
       : 1;
   const incluirInativos = condicao === "inativos";
-  const condicaoApi = incluirInativos ? "todos" : condicao;
 
   useEffect(() => {
     if (!parametros.has("busca")) return;
@@ -309,7 +308,7 @@ function ListaPessoas({ api, editar }: { api: Api; editar: boolean }) {
 
   const consulta = useConsulta<PessoasResposta>(
     api,
-    `/pessoas?busca=${encodeURIComponent(busca)}&condicao=${condicaoApi}&incluirInativos=${incluirInativos}&pagina=${pagina}`,
+    `/pessoas?busca=${encodeURIComponent(busca)}&condicao=${condicao}&incluirInativos=${incluirInativos}&pagina=${pagina}`,
     revisao,
   );
   const total = Number(consulta.dados?.total ?? 0);
@@ -768,7 +767,9 @@ function VinculosPessoa({
       <Card>
         <CardHeader>
           <CardTitle>Responsáveis</CardTitle>
-          <CardDescription>Vínculos atuais e encerrados.</CardDescription>
+          <CardDescription>
+            Contatos informados diretamente no cadastro do menino.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {pessoa.responsaveis.length === 0 && (
@@ -779,38 +780,93 @@ function VinculosPessoa({
               <li key={responsavel.id}>
                 <div>
                   <strong>
-                    {responsavel.parentesco}: {responsavel.nome}
+                    {responsavel.relacao}: {responsavel.nome}
                   </strong>
-                  <span>{responsavel.whatsApp ?? "Contato não informado"}</span>
                   <span>
-                    {dataBr(responsavel.dataInicio)} até{" "}
-                    {responsavel.dataFim
-                      ? dataBr(responsavel.dataFim)
-                      : "o momento"}
+                    {responsavel.telefoneWhatsApp ?? "Contato não informado"} ·{" "}
+                    {responsavel.moraComOEmbaixador == null
+                      ? "Moradia não informada"
+                      : responsavel.moraComOEmbaixador
+                        ? "Mora com o Embaixador"
+                        : "Não mora com o Embaixador"}
                   </span>
                 </div>
-                {editar && !responsavel.dataFim && (
+                {editar && (
                   <details>
-                    <summary>Encerrar vínculo</summary>
+                    <summary>Editar</summary>
                     <Formulario
-                      titulo={`Encerrar vínculo de ${responsavel.nome}`}
+                      titulo={`Editar responsável ${responsavel.nome}`}
                       campos={[
                         {
-                          nome: "dataFim",
-                          rotulo: "Data de encerramento",
-                          tipo: "date",
+                          nome: "relacao",
+                          rotulo: "Relação",
                           obrigatorio: true,
+                          limite: 80,
+                        },
+                        {
+                          nome: "nome",
+                          rotulo: "Nome",
+                          obrigatorio: true,
+                          limite: 200,
+                        },
+                        {
+                          nome: "telefoneWhatsApp",
+                          rotulo: "Telefone/WhatsApp",
+                          limite: 40,
+                        },
+                        {
+                          nome: "moraComOEmbaixador",
+                          rotulo: "Mora com o Embaixador?",
+                          tipo: "select",
+                          opcoes: [
+                            { valor: "true", rotulo: "Sim" },
+                            { valor: "false", rotulo: "Não" },
+                          ],
                         },
                       ]}
-                      iniciais={{ dataFim: hoje() }}
+                      iniciais={{
+                        ...responsavel,
+                        moraComOEmbaixador:
+                          responsavel.moraComOEmbaixador == null
+                            ? ""
+                            : String(responsavel.moraComOEmbaixador),
+                      }}
                       salvar={async (dados) => {
                         await api(
-                          `/pessoas/${pessoa.id}/responsaveis/${responsavel.id}/encerramento`,
-                          { ...dados, versao: responsavel.versao },
+                          `/pessoas/${pessoa.id}/responsaveis/${responsavel.id}`,
+                          {
+                            ...dados,
+                            versao: responsavel.versao,
+                            moraComOEmbaixador:
+                              dados.moraComOEmbaixador === ""
+                                ? null
+                                : dados.moraComOEmbaixador === "true",
+                          },
+                          "PUT",
                         );
                         atualizar();
                       }}
                     />
+                    <Button
+                      variant="destructive"
+                      type="button"
+                      onClick={async () => {
+                        if (
+                          !window.confirm(
+                            `Remover ${responsavel.nome} dos responsáveis?`,
+                          )
+                        )
+                          return;
+                        await api(
+                          `/pessoas/${pessoa.id}/responsaveis/${responsavel.id}?versao=${responsavel.versao}`,
+                          {},
+                          "DELETE",
+                        );
+                        atualizar();
+                      }}
+                    >
+                      Remover responsável
+                    </Button>
                   </details>
                 )}
               </li>
@@ -818,38 +874,49 @@ function VinculosPessoa({
           </ul>
           {editar && pessoa.ativa && (
             <details>
-              <summary>Vincular responsável</summary>
+              <summary>Adicionar responsável</summary>
               <Formulario
-                titulo="Novo vínculo de responsável"
+                titulo="Novo responsável"
                 campos={[
                   {
-                    nome: "parentesco",
-                    rotulo: "Parentesco ou relação",
+                    nome: "relacao",
+                    rotulo: "Relação",
                     obrigatorio: true,
                     limite: 80,
                   },
                   {
-                    nome: "dataInicio",
-                    rotulo: "Data de início",
-                    tipo: "date",
+                    nome: "nome",
+                    rotulo: "Nome",
                     obrigatorio: true,
+                    limite: 200,
+                  },
+                  {
+                    nome: "telefoneWhatsApp",
+                    rotulo: "Telefone/WhatsApp",
+                    limite: 40,
+                  },
+                  {
+                    nome: "moraComOEmbaixador",
+                    rotulo: "Mora com o Embaixador?",
+                    tipo: "select",
+                    opcoes: [
+                      { valor: "true", rotulo: "Sim" },
+                      { valor: "false", rotulo: "Não" },
+                    ],
                   },
                 ]}
-                iniciais={{ dataInicio: hoje() }}
                 salvar={async (dados) => {
                   await api(`/pessoas/${pessoa.id}/responsaveis`, {
                     ...dados,
-                    versao: pessoa.versao,
+                    versaoPessoa: pessoa.versao,
+                    moraComOEmbaixador:
+                      dados.moraComOEmbaixador === ""
+                        ? null
+                        : dados.moraComOEmbaixador === "true",
                   });
                   atualizar();
                 }}
-              >
-                <SeletorPessoa
-                  api={api}
-                  nome="responsavelId"
-                  rotulo="Responsável"
-                />
-              </Formulario>
+              />
             </details>
           )}
         </CardContent>
@@ -969,21 +1036,6 @@ function HistoricoPessoa({
         description: alteracao.motivo,
       }),
     );
-    pessoa.responsaveis.forEach((responsavel) => {
-      eventos.push({
-        id: `responsavel-inicio-${responsavel.id}`,
-        data: responsavel.dataInicio,
-        title: `${responsavel.nome} vinculado como responsável`,
-        description: responsavel.parentesco,
-      });
-      if (responsavel.dataFim)
-        eventos.push({
-          id: `responsavel-fim-${responsavel.id}`,
-          data: responsavel.dataFim,
-          title: "Vínculo de responsável encerrado",
-          description: responsavel.nome,
-        });
-    });
     pessoa.vinculos.forEach((vinculo) => {
       eventos.push({
         id: `igreja-inicio-${vinculo.id}`,
@@ -1050,8 +1102,6 @@ function PessoaDetalhe({
     (location.state as { mensagem?: string } | null)?.mensagem ??
     mensagemSituacao;
   const abaInformada = parametros.get("aba") as AbaPessoa | null;
-  const aba =
-    abaInformada && abas.includes(abaInformada) ? abaInformada : "resumo";
   const ficha = useConsulta<Pessoa>(api, `/pessoas/${pessoaId}`, revisao);
   const podeConsultarFrequencia = permissoes.includes("frequencia.consultar");
   const frequencia = useConsulta<Frequencia[]>(
@@ -1062,6 +1112,18 @@ function PessoaDetalhe({
   const editar = permissoes.includes("pessoas.editar");
   const atualizar = () => setRevisao((valor) => valor + 1);
   const pessoa = ficha.dados;
+  const abasDisponiveis = pessoa
+    ? abas.filter(
+        (item) =>
+          (item !== "jornada" || pessoa.possuiJornada) &&
+          (!pessoa.conselheiroVigente ||
+            !["frequencia", "vinculos"].includes(item)),
+      )
+    : abas;
+  const aba =
+    abaInformada && abasDisponiveis.includes(abaInformada)
+      ? abaInformada
+      : "resumo";
   function selecionarAba(valor: string) {
     const proximos = new URLSearchParams(parametros);
     if (valor === "resumo") proximos.delete("aba");
@@ -1116,12 +1178,49 @@ function PessoaDetalhe({
               </AlertDescription>
             </Alert>
           )}
+          {!pessoa.possuiJornada &&
+            !pessoa.conselheiroVigente &&
+            pessoa.ativa &&
+            permissoes.includes("progressao.registrar") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Visitante</CardTitle>
+                  <CardDescription>
+                    A Jornada ainda não se aplica. Registre a candidatura quando
+                    o menino se tornar Candidato.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Formulario
+                    titulo="Registrar como Candidato"
+                    campos={[]}
+                    texto="Iniciar trajetória"
+                    salvar={async () => {
+                      await api(`/pessoas/${pessoa.id}/candidatura`, {
+                        versao: pessoa.versao,
+                      });
+                      atualizar();
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            )}
           <Tabs value={aba} onValueChange={selecionarAba}>
             <TabsList aria-label="Áreas da ficha da pessoa">
               <TabsTrigger value="resumo">Resumo</TabsTrigger>
-              <TabsTrigger value="jornada">Jornada</TabsTrigger>
-              <TabsTrigger value="frequencia">Frequência</TabsTrigger>
-              <TabsTrigger value="vinculos">Vínculos</TabsTrigger>
+              {pessoa.possuiJornada && (
+                <TabsTrigger value="jornada">
+                  {pessoa.conselheiroVigente
+                    ? "Trajetória ER histórica"
+                    : "Jornada"}
+                </TabsTrigger>
+              )}
+              {!pessoa.conselheiroVigente && (
+                <TabsTrigger value="frequencia">Frequência</TabsTrigger>
+              )}
+              {!pessoa.conselheiroVigente && (
+                <TabsTrigger value="vinculos">Vínculos</TabsTrigger>
+              )}
               <TabsTrigger value="historico">Histórico</TabsTrigger>
             </TabsList>
             <TabsContent value="resumo">
@@ -1134,7 +1233,9 @@ function PessoaDetalhe({
                   pessoaId={pessoa.id}
                   versaoPessoa={pessoa.versao}
                   podeRegistrar={
-                    pessoa.ativa && permissoes.includes("progressao.registrar")
+                    pessoa.ativa &&
+                    !pessoa.conselheiroVigente &&
+                    permissoes.includes("progressao.registrar")
                   }
                   atualizarPessoa={atualizar}
                 />

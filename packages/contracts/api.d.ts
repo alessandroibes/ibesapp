@@ -325,6 +325,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pessoas/{id}/responsaveis/{responsavelId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    responsavelId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AlterarResponsavelRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["IdResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete: {
+            parameters: {
+                query: {
+                    versao: string;
+                };
+                header: {
+                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                    "X-Igreja-Id": string;
+                };
+                path: {
+                    id: string;
+                    responsavelId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pessoas/{id}/vinculos-eclesiasticos": {
         parameters: {
             query?: never;
@@ -360,49 +430,6 @@ export interface paths {
                     content: {
                         "application/json": components["schemas"]["IdResponse"];
                     };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/pessoas/{id}/responsaveis/{vinculoId}/encerramento": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
-                    "X-Igreja-Id": string;
-                };
-                path: {
-                    id: string;
-                    vinculoId: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["EncerrarVinculoRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
                 };
             };
         };
@@ -547,6 +574,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/embaixada/conselheiros/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ConsultarConselheiro"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/embaixada/contas": {
         parameters: {
             query?: never;
@@ -564,90 +607,6 @@ export interface paths {
         trace?: never;
     };
     "/api/v1/embaixada/conselheiros/{id}/encerramento": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
-                    "X-Igreja-Id": string;
-                };
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["EncerrarVinculoRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/embaixada/liderancas": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["ListarLiderancas"];
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header: {
-                    /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
-                    "X-Igreja-Id": string;
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["LiderancaRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["IdResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/embaixada/liderancas/{id}/encerramento": {
         parameters: {
             query?: never;
             header?: never;
@@ -3776,6 +3735,14 @@ export interface components {
             tipoReferencia: components["schemas"]["TipoReferenciaProva"];
             ativa: boolean;
         };
+        AlterarResponsavelRequest: {
+            /** Format: uuid */
+            versao: string;
+            relacao: string;
+            nome: string;
+            telefoneWhatsApp: null | string;
+            moraComOEmbaixador: null | boolean;
+        };
         AlterarSituacaoPessoaRequest: {
             /** Format: uuid */
             versao: string;
@@ -4003,7 +3970,6 @@ export interface components {
             versaoPessoa: string;
             /** Format: uuid */
             usuarioId: null | string;
-            funcao: string;
             /** Format: date */
             dataInicio: string;
         };
@@ -4017,11 +3983,12 @@ export interface components {
             nome: string;
             /** Format: uuid */
             usuarioId: null | string;
-            funcao: string;
             /** Format: date */
             dataInicio: string;
             /** Format: date */
             dataFim: null | string;
+            pessoaAtiva: boolean;
+            possuiJornada: boolean;
         };
         ConsuladoRequest: {
             nome: string;
@@ -4302,29 +4269,6 @@ export interface components {
             iniciativaFinanceiraId: null | string;
             iniciativa: null | string;
         };
-        LiderancaRequest: {
-            /** Format: uuid */
-            conselheiroId: string;
-            /** Format: uuid */
-            versaoConselheiro: string;
-            funcao: string;
-            /** Format: date */
-            dataInicio: string;
-        };
-        LiderancaResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            versao: string;
-            /** Format: uuid */
-            conselheiroId: string;
-            nome: string;
-            funcao: string;
-            /** Format: date */
-            dataInicio: string;
-            /** Format: date */
-            dataFim: null | string;
-        };
         MandatoRequest: {
             nome: string;
             /** Format: date */
@@ -4565,6 +4509,8 @@ export interface components {
             /** Format: date */
             primeiraReuniao: null | string;
             ativa: boolean;
+            possuiJornada: boolean;
+            conselheiroVigente: boolean;
             alteracoesSituacao: components["schemas"]["AlteracaoSituacaoPessoaResponse"][];
         };
         PessoaResumo: {
@@ -4712,27 +4658,21 @@ export interface components {
         };
         ResponsavelRequest: {
             /** Format: uuid */
-            versao: string;
-            /** Format: uuid */
-            responsavelId: string;
-            parentesco: string;
-            /** Format: date */
-            dataInicio: string;
+            versaoPessoa: string;
+            relacao: string;
+            nome: string;
+            telefoneWhatsApp: null | string;
+            moraComOEmbaixador: null | boolean;
         };
         ResponsavelResponse: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
             versao: string;
-            /** Format: uuid */
-            pessoaId: string;
+            relacao: string;
             nome: string;
-            whatsApp: null | string;
-            parentesco: string;
-            /** Format: date */
-            dataInicio: string;
-            /** Format: date */
-            dataFim: null | string;
+            telefoneWhatsApp: null | string;
+            moraComOEmbaixador: null | boolean;
         };
         ResumoFinanceiroResponse: {
             /** Format: double */
@@ -5163,6 +5103,31 @@ export interface operations {
             };
         };
     };
+    ConsultarConselheiro: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConselheiroResponse"];
+                };
+            };
+        };
+    };
     ListarContasDaIgreja: {
         parameters: {
             query?: never;
@@ -5182,29 +5147,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ContaResponse"][];
-                };
-            };
-        };
-    };
-    ListarLiderancas: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
-                "X-Igreja-Id": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LiderancaResponse"][];
                 };
             };
         };

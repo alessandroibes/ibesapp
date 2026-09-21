@@ -69,7 +69,7 @@ test("login acessível por teclado, erro neutro e encerramento da sessão", asyn
     .fill(process.env.BOOTSTRAP_PASSWORD ?? "");
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(
-    page.getByRole("heading", { name: "Pessoas e jornada", level: 1 }),
+    page.getByRole("heading", { name: "Meninos e jornada", level: 1 }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Sair", exact: true }).click();
   await expect(

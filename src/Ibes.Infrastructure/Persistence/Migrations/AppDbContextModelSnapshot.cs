@@ -1126,11 +1126,6 @@ namespace Ibes.Foundation.Persistence.Migrations
                     b.Property<DateOnly>("DataInicio")
                         .HasColumnType("date");
 
-                    b.Property<string>("Funcao")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<Guid>("PessoaId")
                         .HasColumnType("uuid");
 
@@ -1151,45 +1146,6 @@ namespace Ibes.Foundation.Persistence.Migrations
                     b.HasIndex("IgrejaId", "PessoaId");
 
                     b.ToTable("conselheiros", "embaixadas");
-                });
-
-            modelBuilder.Entity("Ibes.Embaixadas.LiderancaEmbaixada", b =>
-                {
-                    b.Property<Guid>("IgrejaId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ConselheiroId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateOnly?>("DataFim")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly>("DataInicio")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Funcao")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("Versao")
-                        .IsConcurrencyToken()
-                        .HasColumnType("uuid");
-
-                    b.HasKey("IgrejaId", "Id");
-
-                    b.HasIndex("IgrejaId", "ConselheiroId");
-
-                    b.ToTable("liderancas_embaixada", "embaixadas");
                 });
 
             modelBuilder.Entity("Ibes.Financeiro.IniciativaFinanceira", b =>
@@ -1780,22 +1736,25 @@ namespace Ibes.Foundation.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly?>("DataFim")
-                        .HasColumnType("date");
+                    b.Property<bool?>("MoraComOEmbaixador")
+                        .HasColumnType("boolean");
 
-                    b.Property<DateOnly>("DataInicio")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Parentesco")
+                    b.Property<string>("Nome")
                         .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("character varying(80)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<Guid>("PessoaId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ResponsavelId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Relacao")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<string>("TelefoneWhatsApp")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1806,10 +1765,7 @@ namespace Ibes.Foundation.Persistence.Migrations
 
                     b.HasKey("IgrejaId", "Id");
 
-                    b.HasIndex("IgrejaId", "ResponsavelId");
-
-                    b.HasIndex("IgrejaId", "PessoaId", "ResponsavelId", "DataInicio")
-                        .IsUnique();
+                    b.HasIndex("IgrejaId", "PessoaId");
 
                     b.ToTable("responsaveis_pessoa", "pessoas");
                 });
@@ -2930,21 +2886,6 @@ namespace Ibes.Foundation.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Ibes.Embaixadas.LiderancaEmbaixada", b =>
-                {
-                    b.HasOne("Ibes.Foundation.Organizacoes.Igreja", null)
-                        .WithMany()
-                        .HasForeignKey("IgrejaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ibes.Embaixadas.Conselheiro", null)
-                        .WithMany()
-                        .HasForeignKey("IgrejaId", "ConselheiroId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Ibes.Financeiro.IniciativaFinanceira", b =>
                 {
                     b.HasOne("Ibes.Foundation.Organizacoes.Igreja", null)
@@ -3117,12 +3058,6 @@ namespace Ibes.Foundation.Persistence.Migrations
                     b.HasOne("Ibes.Pessoas.Pessoa", null)
                         .WithMany()
                         .HasForeignKey("IgrejaId", "PessoaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Ibes.Pessoas.Pessoa", null)
-                        .WithMany()
-                        .HasForeignKey("IgrejaId", "ResponsavelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

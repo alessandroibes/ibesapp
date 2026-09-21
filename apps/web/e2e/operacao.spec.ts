@@ -129,7 +129,7 @@ test("agenda, recorrência, exceção, visitante, chamada e cancelamento", async
   });
   await page.getByRole("button", { name: "Áreas de trabalho" }).click();
   await page
-    .getByRole("link", { name: "Pessoas e jornada", exact: true })
+    .getByRole("link", { name: "Meninos e jornada", exact: true })
     .click();
   await page.getByLabel("Buscar pelo nome").fill(visitante);
   await page
