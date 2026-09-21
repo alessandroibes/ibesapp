@@ -43,9 +43,10 @@ Termos técnicos consolidados podem permanecer em inglês: Id, CreatedAt, Update
 - Tarefas podem ser concluídas em qualquer ordem.
 - Cerimônia não bloqueia progressão.
 - Aptidão para prova é definida por Conselheiro; elegibilidade etária é calculada pelo sistema.
+- Correções cadastrais autorizadas não devem ser bloqueadas pela exigência de histórico detalhado. Auditoria funcional somente é obrigatória quando uma regra específica documentada exigir preservar o acontecimento.
 
 ## Qualidade
-Toda feature deve incluir validação, autorização, isolamento de tenant, testes adequados, estados de loading/empty/error, acessibilidade e auditoria quando aplicável.
+Toda feature deve incluir validação, autorização, isolamento de tenant, testes adequados, estados de loading/empty/error e acessibilidade. Auditoria funcional deve ser adicionada somente quando exigida pela regra de negócio; a auditoria técnica existente não deve impedir correções autorizadas.
 
 ## Dúvidas
 Quando uma decisão de negócio/tecnologia relevante não estiver documentada, pergunte apresentando opções, recomendação e justificativa antes de implementar.

@@ -27,3 +27,7 @@ Performance, acessibilidade, segurança, observabilidade, backup/restauração e
 ## Ciclo de evolução visual web
 
 Após as Fases funcionais 0 a 6, executar sequencialmente as Etapas UX 06 a 11 descritas em `plans/UX-REDESIGN-ROADMAP.md`. Esse ciclo reorganiza a experiência das funcionalidades existentes e não amplia as regras de negócio.
+
+## Ciclo de evolução após avaliação de uso
+
+Depois da consolidação visual, executar as Etapas 12 a 18 descritas em `plans/USABILITY-FEEDBACK-ROADMAP.md`. O ciclo começa por uma barreira de decisões e então trata login, separação dos fluxos de Pessoas/Conselheiros, responsáveis, correções da Jornada, gestão de Manuais e operações administrativas da Agenda.

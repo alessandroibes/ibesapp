@@ -38,3 +38,16 @@ Essa sequência está detalhada em `plans/UX-REDESIGN-ROADMAP.md`. Ela reorganiz
 - `91-security-review.md`: revisão de segurança.
 - `99-release.md`: validação e preparação de release.
 
+## Ciclo após avaliação de uso
+
+Executar somente depois das sequências funcional e visual existentes:
+
+1. `12-feedback-decisoes.md`
+2. `13-login-design-system.md`
+3. `14-pessoas-conselheiros-responsaveis.md`
+4. `15-jornada-correcoes.md`
+5. `16-manuais-gestao.md`
+6. `17-agenda-gestao.md`
+7. `18-feedback-consolidacao.md`
+
+O ciclo está detalhado em `plans/USABILITY-FEEDBACK-ROADMAP.md`. O prompt 12 é uma barreira obrigatória: decisões ainda abertas devem ser confirmadas e registradas antes de qualquer implementação.

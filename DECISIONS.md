@@ -49,6 +49,14 @@
 - Ao registrar oficialmente a conclusão de um posto, o ingresso no posto seguinte ocorre na mesma data, independentemente da cerimônia.
 - Cerimônias de reconhecimento e entrega de certificado possuem histórico próprio.
 
+## Simplicidade e correções cadastrais — confirmação de 18/09/2026
+
+- Um Conselheiro autorizado pode corrigir diretamente informações cadastradas incorretamente sem informar motivo e sem criar histórico funcional detalhado de quem alterou ou quando alterou, salvo quando uma regra específica deste documento exigir preservar o acontecimento.
+- A auditoria técnica existente pode permanecer automática, mas não deve tornar cadastros imutáveis nem acrescentar etapas ao fluxo comum de correção.
+- Datas de conclusão de Requisitos Mínimos e tarefas podem ser editadas diretamente. A data corrigida ainda deve respeitar as regras cronológicas da Jornada; o sistema não altera outros fatos em cascata silenciosamente.
+- Uma versão de Manual pode ser editada mesmo depois de vinculada a uma Jornada, pois a edição corrige sua representação no sistema. A Jornada continua vinculada à mesma versão; isso não é migração entre versões.
+- Permanece pendente definir o efeito de adicionar ou remover tarefas em uma versão já usada. Alterar identificação, texto e ordem das tarefas não exige criar outra versão.
+
 ## Faixas etárias
 - Junior: menor de 12.
 - Adolescente: 12 a 14.
