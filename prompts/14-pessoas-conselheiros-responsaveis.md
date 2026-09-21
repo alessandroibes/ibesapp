@@ -16,15 +16,15 @@ Executar somente a Etapa 14: separar a experiência de Conselheiros da experiên
 
 ## Escopo obrigatório
 
-- Implementar as categorias confirmadas para Conselheiros, Embaixadores, Candidatos, Visitantes e Inativos.
-- Manter `Pessoa` como base compartilhada e aplicar precedência/classificação exatamente como decidida.
-- Criar listagem/rota própria de Conselheiros se essa for a decisão, com visualizar, cadastrar vínculo, editar dados aplicáveis e encerrar vínculo.
-- Garantir que `/pessoas` represente o público confirmado e que filtros, contagens, estados vazios e URLs não misturem fluxos incompatíveis.
+- Implementar área própria para Conselheiros e manter Embaixadores, Candidatos, Visitantes e Inativos no fluxo de `/pessoas`.
+- Manter `Pessoa` como base compartilhada. Vínculo vigente de Conselheiro tem precedência na apresentação, sem ocultar uma trajetória ER histórica no detalhe.
+- Criar listagem/rota própria de Conselheiros, com visualizar, cadastrar vínculo simples, editar dados aplicáveis e encerrar vínculo.
+- Garantir que `/pessoas` não classifique Conselheiro como Visitante por ausência de Jornada e que filtros, contagens, estados vazios e URLs não misturem fluxos incompatíveis.
 - Exibir Jornada somente para quem possui trajetória ER; não mostrar Jornada, vínculos próprios do menino ou ações de progressão a Conselheiro/Visitante sem trajetória aplicável.
 - Manter inativos fora de listas operacionais por padrão e permitir consulta histórica.
-- Substituir responsáveis pelo modelo confirmado de campos livres: relação, nome, telefone/WhatsApp e informação de moradia, com edição/remoção direta conforme a decisão confirmada.
-- Migrar dados existentes sem perder nome, contato ou parentesco e sem cruzar tenant.
-- Reorganizar Igreja e Embaixada para explicar, em linguagem direta, a diferença entre cadastro/vínculo de Conselheiro e liderança adicional, ou remover essa distinção se assim decidido.
+- Substituir responsáveis por campos livres de relação, nome, telefone/WhatsApp e `MoraComOEmbaixador` opcional, com inclusão, edição e remoção direta.
+- Migrar, dentro de cada Igreja, nome e WhatsApp da Pessoa relacionada e parentesco do vínculo; iniciar `MoraComOEmbaixador` como não informado e só então remover Pessoa e datas obrigatórias.
+- Remover o conceito, endpoints, contratos e formulário separados de liderança da Embaixada. Manter apenas o cadastro simples e o vínculo de Conselheiro nesta etapa.
 - Usar páginas para cadastros extensos e diálogos para ações curtas.
 - Atualizar mobile apenas no necessário para o novo contrato e para não apresentar Jornada indevida.
 
@@ -33,6 +33,7 @@ Executar somente a Etapa 14: separar a experiência de Conselheiros da experiên
 - Não criar entidades separadas que dupliquem Pessoa.
 - Não criar login para meninos ou responsáveis.
 - Não inventar funções de liderança.
+- Não implementar Conselheiro-chefe, segundo Conselheiro-chefe, auxiliares ou frequência de Conselheiros; esses pontos permanecem abertos.
 - Não transformar categoria de tela em permissão, Cargo ou Posto.
 - Não implementar relatórios ou aniversariantes.
 - Não avançar para correções da Jornada, Manuais ou Agenda.
@@ -40,9 +41,11 @@ Executar somente a Etapa 14: separar a experiência de Conselheiros da experiên
 ## Critérios de aceite
 
 - Um Conselheiro vigente é localizado em seu fluxo próprio e não aparece como Visitante por ausência de Jornada.
+- Uma trajetória ER antiga permanece consultável no detalhe do Conselheiro sem habilitar ações atuais de Jornada adulta.
 - Candidatos e Embaixadores continuam derivados da Jornada e idade/data-base.
 - Inativos ficam fora das operações futuras por padrão.
 - Responsável pode ser informado sem cadastrar outra Pessoa e sem data de início.
+- Não restam operações públicas para liderança separada depois da migração segura dos dados existentes.
 - Migração é segura para base vazia e base com responsáveis existentes.
 - Toda listagem e mutação respeita tenant, permissão, concorrência e dados de menores.
 

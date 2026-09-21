@@ -6,9 +6,10 @@ O shell apresenta somente áreas permitidas no vínculo da Igreja selecionada. I
 
 | Área | Rotas finais | Finalidade |
 | --- | --- | --- |
-| Pessoas e Jornada | `/pessoas`, `/pessoas/nova`, `/pessoas/{id}`, `/pessoas/{id}/editar` | lista, cadastro, ficha, Jornada, Frequência, vínculos, histórico, inativação e reativação |
-| Igreja e Embaixada | `/instituicao`, `/instituicao/editar` | resumo institucional, Conselheiros, lideranças e edição |
-| Manuais | `/manuais`, `/manuais/nova`, `/manuais/{id}` | versões e tarefas versionadas |
+| Pessoas e Jornada | `/pessoas`, `/pessoas/nova`, `/pessoas/{id}`, `/pessoas/{id}/editar` | Candidatos, Embaixadores, Visitantes e Inativos; ficha, Jornada aplicável, Frequência, vínculos, histórico, inativação e reativação |
+| Conselheiros | rota própria a definir na Etapa 14 | listagem, cadastro simples, detalhe e vínculo adulto com a Embaixada |
+| Igreja e Embaixada | `/instituicao`, `/instituicao/editar` | resumo institucional e edição; o formulário separado de liderança será removido na Etapa 14 |
+| Manuais | `/manuais`, `/manuais/nova`, `/manuais/{id}`, rota de edição a definir na Etapa 16 | versões, tarefas e correções aprovadas |
 | Agenda | `/agenda`, `/agenda/nova`, `/agenda/configuracoes` | Hoje, Próximos, Lista, Mês, Ano, cadastro e configurações |
 | Atividade e reunião | `/agenda/atividades/{id}/ocorrencias/{data}`, `/agenda/reunioes/{id}/chamada` | detalhe, recorrência, roteiro e chamada |
 | Organização | `/organizacao/consulados`, `/organizacao/consulados/{id}`, `/organizacao/diretoria`, `/organizacao/mandatos/{id}` | Consulados, Cônsul, membros, Diretoria, cargos e mandatos |
@@ -17,6 +18,8 @@ O shell apresenta somente áreas permitidas no vínculo da Igreja selecionada. I
 | Acervo Histórico | `/acervo`, `/acervo/novo`, `/acervo/{id}`, `/acervo/{id}/editar` | linha do tempo, detalhe, pessoas, atividade e anexos privados |
 
 Busca por nome permanece fora da URL. Parâmetros restauráveis usam somente contexto operacional sem dados pessoais, como visualização, datas, situação, categoria, iniciativa, página e aba.
+
+As rotas ainda não definidas representam decisões para as próximas etapas e não estão implementadas na data deste documento.
 
 ## Mobile
 

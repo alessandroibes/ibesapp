@@ -16,7 +16,7 @@ Executar somente a Etapa 18: consolidar e revisar as melhorias entregues neste c
 
 - Revisar login, Pessoas, Conselheiros, responsáveis, Igreja/Embaixada, Jornada, Manuais e Agenda como fluxo contínuo.
 - Confirmar que não restaram botões, formulários, contratos, DTOs, estilos ou rotas obsoletos do comportamento substituído.
-- Confirmar linguagem clara para Conselheiro, liderança, Jornada, Manual, versão, modelo, reunião, cancelamento e exclusão.
+- Confirmar linguagem clara para Conselheiro, Jornada, Manual, versão, modelo, reunião, cancelamento e exclusão, sem referências residuais à liderança separada removida.
 - Verificar que ações semelhantes usam os mesmos componentes e padrões de confirmação.
 - Revisar navegação direta, voltar/avançar, recarga, foco, loading, vazio, erro, conflito e sucesso.
 - Revisar responsividade de 320 a 1440 px e acessibilidade WCAG 2.2 AA.
@@ -33,6 +33,7 @@ Executar somente a Etapa 18: consolidar e revisar as melhorias entregues neste c
 
 - Todos os pedidos originais do ciclo têm evidência de entrega ou limitação explicitamente aceita.
 - Não existe mistura operacional entre Conselheiros e meninos.
+- Não restam entidade, endpoint, contrato, rota ou formulário público do conceito separado de liderança da Embaixada.
 - Jornada aparece somente onde se aplica.
 - Históricos e referências continuam íntegros após correções e remoções permitidas.
 - Contratos web/mobile e documentação representam o comportamento final.

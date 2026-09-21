@@ -1,15 +1,17 @@
 # Domínio — Fases 1 e 2
 
-Implementação exclusiva de `prompts/01-domain-foundation.md`. Regras consolidadas em `DECISIONS.md`, incluindo as confirmações sobre os 18 anos, Emérito e versão fixa por Posto.
+Implementação original de `prompts/01-domain-foundation.md`. Regras consolidadas em `DECISIONS.md`, incluindo as confirmações sobre os 18 anos, Emérito e versão vinculada por Posto.
+
+As decisões de 21/09/2026 alteram comportamentos que esta entrega original ainda não implementa. Até a execução dos prompts 14 a 17, continuam existindo no código o vínculo datado de responsável, a liderança separada, a imutabilidade de versões/tarefas e as restrições atuais da Agenda. O comportamento alvo está documentado em `docs/product/USABILITY-FEEDBACK-DECISIONS.md` e não deve ser tratado como já entregue.
 
 ## Funcionalidades
 
 - Cadastro institucional de Igreja e sua única Embaixada, nomes, endereços, Pastor, fundação e história.
 - Pessoas com contatos, nascimento, naturalidade, batismo, carteira, Bíblia, observações e foto privada; consulta paginada por nome.
-- Responsáveis extensíveis com parentesco e histórico; vínculos eclesiásticos de membro/congregado com períodos.
-- Conselheiros adultos vinculados a uma pessoa e, opcionalmente, à conta adulta da Igreja; funções e lideranças com histórico. Cargo não concede permissão.
+- Responsáveis extensíveis com parentesco e histórico no modelo original; sua substituição por registros livres foi aprovada para a Etapa 14.
+- Conselheiros adultos vinculados a uma pessoa e, opcionalmente, à conta adulta da Igreja; o modelo original de liderança separada será removido na Etapa 14. Cargo não concede permissão.
 - Candidatura, cinco Requisitos Mínimos com datas, admissão explícita, Postos, conclusões de tarefas em qualquer ordem e progressão oficial.
-- Manuais com edição explicitamente informada e tarefas em dados. O catálogo auxiliar contém somente os nomes documentados; nenhum seed presume edição. Versões e suas tarefas são imutáveis.
+- Manuais com edição explicitamente informada e tarefas em dados. O catálogo auxiliar contém somente os nomes documentados; nenhum seed presume edição. Versões e tarefas são imutáveis na implementação original; a edição direta aprovada será implementada nas Etapas 15 e 16.
 - Cerimônias/certificados têm registros independentes e não bloqueiam ingresso no próximo Posto.
 
 Web oferece os cadastros e operações acima. Mobile oferece busca paginada, consulta da ficha/responsáveis/jornada e conclusões datadas de requisitos e tarefas; a gestão institucional, dos manuais e a admissão/conclusão oficial ficam disponíveis no web e na API.
@@ -22,7 +24,7 @@ Cada fato de progressão deve ocorrer entre o aniversário de 9 anos e a vésper
 
 Admissão antes dos 14 fixa 12 meses por Posto; a partir dos 14 fixa 6. A permanência é contada em meses de calendário desde o ingresso em cada Posto e não muda com aniversários posteriores. A conclusão exige todas as tarefas daquela versão concluídas até a data e permanência cumprida. Conclusão oficial e ingresso seguinte são atômicos e têm a mesma data. Sênior leva ao Emérito sem manual; suas tarefas/conclusão aguardam definição.
 
-A data de nascimento de pessoa com jornada não é editável neste fluxo para não invalidar fatos históricos. Correções de trajetória e migração de edições não foram definidas. Para Conselheiros, uma alteração no nascimento deve preservar a idade adulta nos vínculos existentes.
+A data de nascimento de pessoa com jornada não é editável neste fluxo para não invalidar fatos históricos. A correção direta das datas de conclusão e das versões foi decidida depois desta entrega e pertence às Etapas 15 e 16; migração de uma Jornada entre versões continua fora do escopo. Para Conselheiros, uma alteração no nascimento deve preservar a idade adulta nos vínculos existentes.
 
 ## Persistência, segurança e contrato
 
@@ -30,7 +32,7 @@ Entidades e regras ficam nos módulos Pessoas, Embaixadas e Progressão. `Ibes.I
 
 Entidades de domínio usam chave composta IgrejaId/Id e FKs compostas, filtro obrigatório do tenant e proteção de escrita. Sessão autenticada, vínculo e permissão são verificados em cada requisição; `X-Igreja-Id` não concede acesso. Permissões novas: `pessoas.consultar`, `pessoas.editar`, `embaixada.consultar`, `embaixada.editar`, `progressao.consultar`, `progressao.registrar` e `manuais.gerenciar`. Registros de progressão exigem também conta vinculada a Conselheiro atualmente ativo.
 
-Tokens de versão GUID implementam concorrência otimista. Alterações de filhos atualizam a versão do agregado; conflitos/duplicações retornam 409, impedindo conclusões repetidas. Auditoria guarda Igreja, conta, chave, ação e instante, sem copiar dados pessoais. Registros históricos de conclusão e versões de manual não aceitam edição/exclusão pelo DbContext.
+Tokens de versão GUID implementam concorrência otimista. Alterações de filhos atualizam a versão do agregado; conflitos/duplicações retornam 409, impedindo conclusões repetidas. Auditoria guarda Igreja, conta, chave, ação e instante, sem copiar dados pessoais. Na implementação original, registros de conclusão e versões de Manual não aceitam edição/exclusão pelo DbContext. As proteções deverão ser ajustadas nas Etapas 15 e 16 para permitir somente as correções aprovadas, preservando Postos concluídos.
 
 Fotos são armazenadas privadamente no PostgreSQL, limitadas a 2 MB, com assinatura PNG/JPEG e MIME correspondente; não há URL pública. Leitura exige sessão/permissão/tenant e `no-store`. Conteúdo não é registrado em logs. Upload e demais mutações web exigem antiforgery; mobile usa bearer validado.
 

@@ -86,6 +86,21 @@
 - A inativação acontece no cadastro de Pessoa, com data e motivo, preserva todo o histórico e permite reativação explícita.
 - Pessoas inativas ficam fora das listas operacionais por padrão, inclusive relatórios de ativos, aniversariantes, aptidões, escalas e novos vínculos. A consulta histórica e a edição cadastral permanecem disponíveis.
 
+## Evolução após avaliação de uso — confirmação de 21/09/2026
+
+- `Pessoa` continua sendo o cadastro geral da Igreja. A Embaixada possui fluxos próprios para Conselheiros e para os meninos, sem duplicar a pessoa.
+- `/pessoas` é dedicado a Candidatos, Embaixadores, Visitantes e Inativos. Conselheiros possuem área própria e não são classificados como Visitantes apenas por não terem Jornada.
+- Uma Pessoa com trajetória ER histórica e vínculo vigente de Conselheiro aparece na área de Conselheiros; a trajetória permanece consultável como histórico e não se torna uma Jornada adulta atual.
+- Conselheiro possui, neste ciclo, cadastro simples e vínculo adulto com a Embaixada. O conceito separado de liderança da Embaixada será removido. Conselheiro-chefe, segundo Conselheiro-chefe, auxiliares e frequência de Conselheiros são possibilidades futuras, sem regra ou controle próprio nesta etapa.
+- Responsável é um registro livre ligado ao menino, com relação, nome, telefone/WhatsApp e `MoraComOEmbaixador`. Pode ser incluído, editado e removido diretamente, sem cadastro separado de Pessoa e sem período de vigência.
+- A migração de responsáveis copia nome e WhatsApp da Pessoa atualmente relacionada e preserva o parentesco. `MoraComOEmbaixador` começa como não informado. As referências a Pessoa e as datas de início/fim só deixam de ser obrigatórias depois da migração segura dos dados de cada Igreja.
+- Em uma versão de Manual já usada, identificação, texto e ordem podem ser corrigidos diretamente. O Posto do Manual permanece fixo e a edição não migra Jornadas para outra versão.
+- Tarefas podem ser adicionadas ou retiradas do conjunto aplicável aos Postos em andamento. Ao retirar uma tarefa, sua conclusão em Posto ainda em andamento também é removida. Postos já concluídos e suas conclusões permanecem fatos oficiais e não são reabertos nem recalculados.
+- Modelo de roteiro nunca usado pode ser excluído fisicamente. Depois de usado, pode ser editado para usos futuros ou arquivado, mas reuniões já preparadas preservam a cópia do roteiro utilizada.
+- Uma atividade sem reunião ou outra dependência pode ser excluída com confirmação. Excluir uma atividade recorrente alcança a série inteira; uma ocorrência individual não é excluída fisicamente e deve ser cancelada.
+- Atividade ou reunião com frequência, exceção, lançamento financeiro, marco histórico ou relação com outra atividade não pode ser excluída. A interface deve explicar a dependência e orientar o cancelamento, preservando o histórico.
+- Uma reunião preparada que ainda não possui frequência pode ser desfeita; a atividade correspondente permanece na Agenda.
+
 ## Competições
 - Catálogo de provas reutilizável.
 - Competição possui data-base de categoria definida pelo regulamento.

@@ -13,7 +13,7 @@ A fonte de verdade continua sendo, nesta ordem, `AGENTS.md`, `DECISIONS.md`, `do
 - Jornada pertence somente a Candidatos e Embaixadores e não deve aparecer como fluxo de Conselheiro ou Visitante.
 - Menores continuam sem login e seus dados recebem proteção reforçada.
 - Correções cadastrais autorizadas são diretas e não exigem motivo ou histórico funcional detalhado, salvo regra específica documentada.
-- Versões de Manual vinculadas a uma Jornada podem receber correções de identificação, texto e ordem; adicionar/remover tarefas usadas depende da decisão da Etapa 12.
+- Versões de Manual vinculadas a uma Jornada podem receber correções de identificação, texto e ordem. Adicionar ou retirar tarefas altera somente Postos em andamento; Postos concluídos permanecem fatos oficiais.
 - Reuniões com frequência e atividades relacionadas não podem perder histórico por exclusão indevida.
 - Linguagem de negócio permanece em português brasileiro.
 - Web mantém BFF/cookie HttpOnly; mobile mantém Authorization Code + PKCE.
@@ -33,7 +33,7 @@ Cada etapa deve começar com árvore limpa e ser concluída, validada e registra
 | Diferenciar Conselheiros, Embaixadores, Candidatos, Visitantes e Inativos | 12 | 14 | 18 |
 | Não aplicar Jornada e vínculos do menino a Conselheiros | 12 | 14 | 18 |
 | Responsáveis com relação, nome, contato e moradia, sem data inicial | 12 | 14 | 18 |
-| Esclarecer cadastro de Conselheiro e liderança | 12 | 14 | 18 |
+| Simplificar Conselheiro e remover liderança separada | 12 | 14 | 18 |
 | Editar Manuais e versões | 12 | 16 | 18 |
 | Editar e remover modelos de roteiro | 12 | 17 | 18 |
 | Editar entidades promotoras | — | 17 | 18 |
@@ -64,7 +64,7 @@ Alinha a página Razor de login ao shell autenticado sem alterar autenticação,
 
 Prompt: `prompts/14-pessoas-conselheiros-responsaveis.md`
 
-Entrega consultas e jornadas visuais distintas para Conselheiros, Embaixadores, Candidatos, Visitantes e Inativos; substitui o vínculo de responsável por campos livres confirmados; e esclarece o fluxo institucional de Conselheiros e lideranças.
+Entrega consultas e jornadas visuais distintas para Conselheiros, Embaixadores, Candidatos, Visitantes e Inativos; substitui o vínculo de responsável por campos livres confirmados; e remove o conceito separado de liderança, mantendo cadastro simples de Conselheiros.
 
 ### Etapa 15 — Correções da Jornada e numeração de tarefas
 
@@ -114,7 +114,7 @@ A ordem numérica continua obrigatória mesmo onde existe independência técnic
 - responsáveis usam exatamente os campos confirmados e não exigem cadastro separado de Pessoa;
 - correções de datas respeitam idade, sequência, progressão e concorrência, sem exigir histórico funcional detalhado;
 - tarefas exibem `Tarefa N: nome` usando a ordem persistida da versão;
-- versões usadas podem ser corrigidas diretamente; o efeito sobre tarefas adicionadas/removidas segue a decisão registrada;
+- versões usadas podem ser corrigidas diretamente; tarefas adicionadas/retiradas afetam Postos em andamento, sem reabrir ou recalcular Postos concluídos;
 - configurações da Agenda podem ser geridas sem quebrar atividades ou reuniões existentes;
 - remoções seguem política explícita e preservam frequência, referências financeiras, acervo e os históricos especificamente exigidos;
 - toda API nova possui permissão, tenant, validação, OpenAPI e testes;
@@ -133,4 +133,6 @@ A ordem numérica continua obrigatória mesmo onde existe independência técnic
 - relatórios, aniversariantes e Dashboard;
 - nova identidade visual oficial;
 - reformulação visual ampla do mobile;
-- exclusão física de histórico que as decisões confirmadas mandem preservar.
+- exclusão física de histórico que as decisões confirmadas mandem preservar;
+- hierarquia entre Conselheiro-chefe, segundo Conselheiro-chefe e auxiliares;
+- controle de frequência de Conselheiros.

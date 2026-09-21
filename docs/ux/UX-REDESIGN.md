@@ -130,7 +130,7 @@ Os componentes podem seguir as convenções do shadcn/ui sobre Radix e Tailwind.
 ### Instituição, Manuais, Financeiro e Acervo
 
 - dados da Igreja e Embaixada apresentados como resumo legível, com edição própria;
-- Conselheiros e lideranças em listagens ou seções independentes;
+- Conselheiros em área própria, sem o formulário separado de liderança aprovado para remoção na Etapa 14;
 - Manuais com lista de versões e detalhe das tarefas;
 - Financeiro com resumo, filtros e lançamentos; formulário extenso fora da listagem;
 - Acervo com linha do tempo e detalhe do marco; anexos dentro do detalhe.
@@ -164,4 +164,3 @@ Os componentes podem seguir as convenções do shadcn/ui sobre Radix e Tailwind.
 - criar a identidade visual oficial da organização;
 - implementar Dashboard ou Relatórios sem requisitos e contratos aprovados;
 - reescrever o aplicativo mobile nativo. Ele deve continuar compilando e consumindo o contrato existente.
-

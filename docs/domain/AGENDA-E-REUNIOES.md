@@ -55,6 +55,8 @@ Exemplo de blocos:
 
 Cada modelo pode ter itens ordenados, duração estimada e observações. Ao criar reunião a partir de modelo, copiar uma versão do roteiro para que mudanças futuras no modelo não alterem reuniões históricas.
 
+Modelo nunca usado pode ser excluído. Depois do primeiro uso, pode ser corrigido para novas preparações ou arquivado, mantendo intactas as cópias já gravadas nas reuniões.
+
 ## Recorrências
 Exemplos suportados:
 - toda quarta às 19h — Culto de Oração
@@ -64,6 +66,14 @@ Exemplos suportados:
 - todo sábado 16h–17h30 — treino de futsal
 
 Usar regra de recorrência e permitir exceções/cancelamentos sem apagar a série.
+
+Excluir a atividade recorrente alcança a série inteira e só é permitido quando ela não possui dependências. Uma ocorrência isolada é cancelada por exceção, não excluída.
+
+## Remoção e preservação
+
+Atividade sem reunião, exceção, relação, lançamento financeiro ou marco histórico pode ser excluída mediante confirmação. Qualquer uma dessas dependências impede a exclusão e deve ser apresentada ao Conselheiro com orientação para cancelar quando aplicável.
+
+Reunião preparada sem frequência pode ser desfeita; a atividade continua na Agenda. Reunião com frequência não pode ser excluída, e seu cancelamento preserva os registros e o cálculo da primeira reunião.
 
 ## Prazos
 Prazo de inscrição, pagamento, escolha ou entrega é item de agenda, podendo estar relacionado a uma atividade futura.

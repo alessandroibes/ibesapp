@@ -18,8 +18,9 @@ Executar somente a Etapa 16: permitir corrigir e organizar diretamente Manuais e
 
 - Permitir editar diretamente identificação da versão, texto e ordem das tarefas, mesmo quando a versão já estiver em uso.
 - Explicar na interface a diferença entre Manual do Posto e versão identificada.
-- Aplicar a decisão da Etapa 12 ao adicionar e remover tarefas em versões usadas.
-- Detectar uso da versão e Postos concluídos no servidor para aplicar essa decisão; não confiar apenas no estado da tela.
+- Permitir adicionar ou retirar tarefas do conjunto aplicável aos Postos em andamento que usam a versão.
+- Ao retirar tarefa, remover sua conclusão somente nos Postos em andamento. Preservar a tarefa e a conclusão no histórico de Postos já concluídos, sem reabertura ou recálculo.
+- Detectar uso da versão, Postos em andamento e Postos concluídos no servidor; não confiar apenas no estado da tela.
 - Preservar a mesma versão vinculada à Jornada; editar não cria migração nem exige cópia.
 - Manter identidade estável das tarefas que continuam existindo, inclusive ao alterar texto ou ordem.
 - Não migrar Jornada existente para versão nova.
@@ -40,6 +41,7 @@ Executar somente a Etapa 16: permitir corrigir e organizar diretamente Manuais e
 - Versão pode ser editada diretamente com concorrência, sem justificativa ou histórico funcional detalhado.
 - A Jornada vinculada passa a mostrar a versão corrigida sem trocar seu Id.
 - Postos já concluídos permanecem fatos oficiais conforme a decisão sobre tarefas adicionadas/removidas.
+- Postos em andamento passam a usar o conjunto corrigido e uma tarefa retirada não conserva conclusão órfã nesse Posto.
 - Tenant e permissão `manuais.gerenciar` são exigidos em todas as mutações.
 
 ## Validação obrigatória

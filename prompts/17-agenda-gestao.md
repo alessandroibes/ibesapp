@@ -15,10 +15,11 @@ Executar somente a Etapa 17: completar a gestão de modelos, entidades promotora
 ## Escopo obrigatório
 
 - Tornar edição de modelos de roteiro encontrável e clara; permitir alterar nome, itens, ordem, duração e observações.
-- Implementar remoção/arquivamento de modelo exatamente conforme a decisão confirmada e preservar a cópia do roteiro em reuniões existentes.
+- Excluir fisicamente modelo somente quando nunca usado; quando já usado, permitir edição para preparações futuras ou arquivamento e preservar a cópia do roteiro em reuniões existentes.
 - Permitir editar diretamente o nome de Entidade promotora e Tipo de atividade com concorrência e validação de duplicidade, sem exigir justificativa ou histórico funcional.
 - Manter referências existentes coerentes ao editar nomes.
-- Implementar exclusão/cancelamento/desfazimento de atividade, série, ocorrência ou reunião somente nos cenários confirmados na Etapa 12.
+- Excluir atividade simples ou série inteira somente quando não houver reunião ou outra dependência. Em série recorrente, deixar explícito que a exclusão alcança toda a série; ocorrência individual é cancelada por exceção.
+- Permitir desfazer reunião preparada sem frequência, mantendo a atividade na Agenda.
 - Antes de remover, verificar reuniões, frequência, exceções, atividades relacionadas, lançamentos financeiros e marcos históricos.
 - Preservar primeira reunião e frequências de reunião cancelada conforme decisões vigentes.
 - Exibir confirmação descritiva informando exatamente o alcance: ocorrência, série, reunião preparada ou atividade inteira.
@@ -38,6 +39,7 @@ Executar somente a Etapa 17: completar a gestão de modelos, entidades promotora
 - Modelos podem ser editados e retirados de uso conforme a política confirmada.
 - Promotoras e tipos podem ser corrigidos sem quebrar atividades históricas.
 - Uma remoção simples desaparece das consultas após confirmação.
+- Ocorrência individual cancelada permanece como exceção da série, e reunião desfeita não remove sua atividade.
 - Uma remoção com dependência histórica é bloqueada ou convertida em ação explícita confirmada, nunca silenciosa.
 - Operações são isoladas por Igreja, autorizadas e concorrentes; histórico funcional permanece somente nos acontecimentos que `DECISIONS.md` manda preservar.
 
