@@ -4,7 +4,9 @@ Esta referência documenta a fundação visual criada na Etapa UX 06. Os compone
 
 ## Tokens
 
-`apps/web/src/styles/tokens.css` concentra cores semânticas, tipografia, raios, sombras, foco, dimensões do shell e camadas. A identidade continua provisória: azul, marinho e neutros expressam o produto sem assumir uma paleta institucional oficial.
+`src/Ibes.Api/wwwroot/design-tokens.css` concentra cores semânticas, tipografia, raios, sombras, foco, dimensões do shell e camadas. `apps/web/src/styles/tokens.css` importa essa fonte única. A identidade continua provisória: azul, marinho e neutros expressam o produto sem assumir uma paleta institucional oficial.
+
+A página Razor de login consome o mesmo arquivo diretamente em `/design-tokens.css`. `conta.css` contém somente a composição própria da página. Assim, mudanças nos tokens semânticos não exigem manter uma segunda paleta sincronizada, e o login continua fora do React e compatível com a CSP sem estilos ou scripts inline.
 
 Use os tokens semânticos (`--primary`, `--surface`, `--foreground`, `--muted`, `--border`, `--danger`, `--success` e `--warning`) em vez de repetir cores em novos módulos. `--focus-ring` define o foco visível e os níveis `--z-*` organizam cabeçalho, sidebar, sobreposição, diálogo e toast.
 

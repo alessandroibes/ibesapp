@@ -2,17 +2,75 @@
 @model Ibes.Api.Pages.Conta.EntrarModel
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Entrar · Embaixadores do Rei</title><link rel="stylesheet" href="/conta.css" /></head>
-<body><main>
-  <p class="marca">EMBAIXADORES DO REI</p>
-  <h1>Bem-vindo de volta</h1>
-  <p>Acesso para Conselheiros e liderança adulta.</p>
-  <form method="post">
-    <input type="hidden" asp-for="ReturnUrl" />
-    @if (Model.Erro is not null) { <p role="alert">@Model.Erro</p> }
-    <label asp-for="Email">E-mail</label><input asp-for="Email" type="email" autocomplete="username" required maxlength="254" />
-    <label asp-for="Senha">Senha</label><input asp-for="Senha" type="password" autocomplete="current-password" required maxlength="128" />
-    <button type="submit">Entrar</button>
-  </form>
-  <a href="/">Voltar ao início</a>
-</main></body></html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Entrar · Embaixadores do Rei</title>
+  <link rel="stylesheet" href="/design-tokens.css" />
+  <link rel="stylesheet" href="/conta.css" />
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <div class="pagina-acesso">
+    <header class="cabecalho-acesso">
+      <a class="marca" href="/" aria-label="Embaixadores do Rei — início">
+        <span class="simbolo" aria-hidden="true">ER</span>
+        <span class="marca-texto">
+          <strong>Embaixadores</strong>
+          <small>do Rei</small>
+        </span>
+      </a>
+      <span class="acesso-restrito">Acesso restrito</span>
+    </header>
+
+    <main id="conteudo" class="conteudo-acesso">
+      <section class="apresentacao-acesso" aria-labelledby="titulo-apresentacao">
+        <span class="selo-acesso">Gestão da Embaixada</span>
+        <h1 id="titulo-apresentacao">Servir, aprender e crescer juntos.</h1>
+        <p>Um espaço seguro para Conselheiros cuidarem da organização e da jornada dos Embaixadores do Rei.</p>
+        <blockquote>
+          <span aria-hidden="true">✦</span>
+          <p>“Somos embaixadores por Cristo.” <cite>2 Coríntios 5:20</cite></p>
+        </blockquote>
+      </section>
+
+      <section class="area-formulario" aria-labelledby="titulo-acesso">
+        <div class="cartao-acesso">
+          <div class="icone-acesso" aria-hidden="true">ER</div>
+          <p class="rotulo-secao">Boas-vindas</p>
+          <h2 id="titulo-acesso">Entre na sua conta</h2>
+          <p class="texto-secundario">Use os dados da sua conta adulta autorizada para continuar.</p>
+
+          <form method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+            @if (Model.Erro is not null)
+            {
+              <div class="mensagem-erro" role="alert" aria-live="polite">
+                <strong>Não foi possível entrar</strong>
+                <span>@Model.Erro</span>
+              </div>
+            }
+
+            <div class="campo">
+              <label asp-for="Email">E-mail</label>
+              <input asp-for="Email" type="email" inputmode="email" autocomplete="username" required maxlength="254" aria-describedby="ajuda-email" />
+              <span id="ajuda-email" class="ajuda-campo">Informe o e-mail associado à sua conta.</span>
+            </div>
+
+            <div class="campo">
+              <label asp-for="Senha">Senha</label>
+              <input asp-for="Senha" type="password" autocomplete="current-password" required maxlength="128" />
+            </div>
+
+            <button type="submit">Entrar</button>
+          </form>
+
+          <p class="ajuda-acesso">O acesso é destinado às contas adultas autorizadas pela Igreja.</p>
+          <a class="voltar" href="/">Voltar ao início</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

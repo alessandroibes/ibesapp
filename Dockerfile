@@ -4,6 +4,7 @@ COPY apps/web/package*.json ./
 RUN npm ci
 COPY apps/web/ ./
 COPY packages/contracts/ /repo/packages/contracts/
+COPY src/Ibes.Api/wwwroot/design-tokens.css /repo/src/Ibes.Api/wwwroot/design-tokens.css
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
