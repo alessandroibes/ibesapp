@@ -39,23 +39,26 @@ public sealed class JornadaEmbaixador : Entidade
         Versao = Guid.NewGuid();
     }
 
-    public void Admitir(DateOnly data, DateOnly nascimento, DateOnly hoje, Guid versaoEscudeiroId, Guid autor)
+    public void Admitir(DateOnly data, DateOnly nascimento, DateOnly hoje, VersaoManual versaoEscudeiro, Guid autor)
     {
         ValidarFato(nascimento, data, hoje);
         Exigir(Postos.Count == 0, "Admissão já registrada.");
-        Exigir(versaoEscudeiroId != Guid.Empty, "Selecione uma versão do manual do Escudeiro.");
+        Exigir(versaoEscudeiro.Id != Guid.Empty && versaoEscudeiro.IgrejaId == IgrejaId, "Selecione uma versão do manual do Escudeiro.");
         Exigir(Enum.GetValues<RequisitoMinimo>().All(r => Requisitos.Any(c => c.Requisito == r && c.DataConclusao <= data)),
             "A admissão exige os cinco Requisitos Mínimos concluídos até sua data.");
         MesesPermanencia = Idade(nascimento, data) < 14 ? 12 : 6;
-        Postos.Add(new JornadaPosto { IgrejaId = IgrejaId, JornadaEmbaixadorId = Id, Posto = Posto.Escudeiro, VersaoManualId = versaoEscudeiroId, DataIngresso = data, RegistradoPor = autor });
+        Postos.Add(CriarPosto(Posto.Escudeiro, versaoEscudeiro, data, autor));
     }
+
+    public void Admitir(DateOnly data, DateOnly nascimento, DateOnly hoje, Guid versaoEscudeiroId, Guid autor) =>
+        Admitir(data, nascimento, hoje, new VersaoManual { Id = versaoEscudeiroId, IgrejaId = IgrejaId }, autor);
 
     public void ConcluirTarefa(Guid tarefaId, VersaoManual manual, DateOnly data, DateOnly nascimento, DateOnly hoje, Guid autor)
     {
         ValidarFato(nascimento, data, hoje);
         var posto = Atual();
         Exigir(posto.Posto != Posto.Emerito, "O manual do Emérito ainda não está definido.");
-        Exigir(manual.Id == posto.VersaoManualId && manual.IgrejaId == IgrejaId && manual.Tarefas.Any(t => t.Id == tarefaId), "Tarefa não pertence à versão do manual deste posto.");
+        Exigir(manual.Id == posto.VersaoManualId && manual.IgrejaId == IgrejaId && (posto.TarefasAplicaveis.Count == 0 || posto.TarefasAplicaveis.Any(t => t.TarefaManualId == tarefaId)), "Tarefa não pertence ao conjunto aplicável deste posto.");
         Exigir(data >= posto.DataIngresso, "A conclusão não pode anteceder o ingresso no posto.");
         Exigir(posto.Tarefas.All(t => t.TarefaManualId != tarefaId), "Tarefa já concluída.");
         posto.Tarefas.Add(new ConclusaoTarefa { IgrejaId = IgrejaId, JornadaPostoId = posto.Id, TarefaManualId = tarefaId, DataConclusao = data, RegistradoPor = autor });
@@ -74,20 +77,24 @@ public sealed class JornadaEmbaixador : Entidade
         Versao = Guid.NewGuid();
     }
 
-    public void ConcluirPosto(VersaoManual manual, DateOnly data, DateOnly nascimento, DateOnly hoje, Guid? proximaVersaoId, Guid autor)
+    public void ConcluirPosto(VersaoManual manual, DateOnly data, DateOnly nascimento, DateOnly hoje, VersaoManual? proximaVersao, Guid autor)
     {
         ValidarFato(nascimento, data, hoje);
         var posto = Atual();
         Exigir(posto.Posto != Posto.Emerito, "A conclusão do Emérito aguarda definição de seu manual.");
         Exigir(manual.Id == posto.VersaoManualId && manual.IgrejaId == IgrejaId, "Versão do manual inválida para esta jornada.");
-        Exigir(manual.Tarefas.Count > 0 && manual.Tarefas.All(t => posto.Tarefas.Any(c => c.TarefaManualId == t.Id && c.DataConclusao <= data)), "Todas as tarefas da versão devem estar concluídas até a data da conclusão do posto.");
+        var tarefasAplicaveis = posto.TarefasAplicaveis.Count == 0 ? manual.Tarefas.Where(t => t.Ativa).Select(t => t.Id) : posto.TarefasAplicaveis.Select(t => t.TarefaManualId);
+        Exigir(tarefasAplicaveis.Any() && tarefasAplicaveis.All(id => posto.Tarefas.Any(c => c.TarefaManualId == id && c.DataConclusao <= data)), "Todas as tarefas aplicáveis da versão devem estar concluídas até a data da conclusão do posto.");
         Exigir(data >= posto.DataIngresso.AddMonths(MesesPermanencia!.Value), "O tempo mínimo de permanência no posto ainda não foi cumprido.");
-        Exigir(posto.Posto == Posto.Senior ? proximaVersaoId is null : proximaVersaoId is not null && proximaVersaoId != Guid.Empty,
+        Exigir(posto.Posto == Posto.Senior ? proximaVersao is null : proximaVersao is not null && proximaVersao.Id != Guid.Empty,
             "Selecione a versão do próximo posto; o Emérito ingressa sem manual.");
         posto.DataConclusao = data;
         posto.ConcluidoPor = autor;
-        Postos.Add(new JornadaPosto { IgrejaId = IgrejaId, JornadaEmbaixadorId = Id, Posto = posto.Posto + 1, VersaoManualId = proximaVersaoId, DataIngresso = data, RegistradoPor = autor });
+        Postos.Add(CriarPosto(posto.Posto + 1, proximaVersao, data, autor));
     }
+
+    public void ConcluirPosto(VersaoManual manual, DateOnly data, DateOnly nascimento, DateOnly hoje, Guid? proximaVersaoId, Guid autor) =>
+        ConcluirPosto(manual, data, nascimento, hoje, proximaVersaoId is { } id ? new VersaoManual { Id = id, IgrejaId = IgrejaId } : null, autor);
 
     public void RegistrarCerimonia(Guid jornadaPostoId, DateOnly data, string descricao, DateOnly hoje, Guid autor)
     {
@@ -99,6 +106,19 @@ public sealed class JornadaEmbaixador : Entidade
 
     public JornadaPosto Atual() => Postos.SingleOrDefault(p => p.DataConclusao is null)
         ?? throw new RegraNegocioException("Registre a admissão antes de trabalhar nos postos.");
+
+    private JornadaPosto CriarPosto(Posto posto, VersaoManual? versao, DateOnly data, Guid autor)
+    {
+        var jornadaPosto = new JornadaPosto { IgrejaId = IgrejaId, JornadaEmbaixadorId = Id, Posto = posto, VersaoManualId = versao?.Id, DataIngresso = data, RegistradoPor = autor };
+        if (versao is not null)
+            jornadaPosto.TarefasAplicaveis = versao.Tarefas.Where(t => t.Ativa).Select(t => new TarefaAplicavelPosto
+            {
+                IgrejaId = IgrejaId,
+                JornadaPostoId = jornadaPosto.Id,
+                TarefaManualId = t.Id
+            }).ToList();
+        return jornadaPosto;
+    }
 }
 
 public sealed class ConclusaoRequisito : Entidade
@@ -119,6 +139,13 @@ public sealed class JornadaPosto : Entidade
     public DateOnly? DataConclusao { get; set; }
     public Guid? ConcluidoPor { get; set; }
     public List<ConclusaoTarefa> Tarefas { get; set; } = [];
+    public List<TarefaAplicavelPosto> TarefasAplicaveis { get; set; } = [];
+}
+
+public sealed class TarefaAplicavelPosto : Entidade
+{
+    public Guid JornadaPostoId { get; set; }
+    public Guid TarefaManualId { get; set; }
 }
 
 public sealed class ConclusaoTarefa : Entidade

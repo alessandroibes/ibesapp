@@ -103,7 +103,7 @@ public sealed class ProgressaoTests
         }
         Assert.Equal(Posto.Emerito, jornada.Atual().Posto);
         Assert.Null(jornada.Atual().VersaoManualId); Assert.Empty(jornada.Atual().Tarefas);
-        Assert.Throws<RegraNegocioException>(() => jornada.ConcluirPosto(manual, data, nascimento, Hoje, null, Autor));
+        Assert.Throws<RegraNegocioException>(() => jornada.ConcluirPosto(manual, data, nascimento, Hoje, (Guid?)null, Autor));
     }
 
     [Fact]

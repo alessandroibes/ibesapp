@@ -68,6 +68,7 @@ public sealed partial class AppDbContext
         versao.HasOne<Manual>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.ManualId }).OnDelete(DeleteBehavior.Restrict);
         var tarefa = Base<TarefaManual>(b, "tarefas_manual", "progressao");
         tarefa.Property(x => x.Nome).HasMaxLength(500);
+        tarefa.Property(x => x.Ativa).HasDefaultValue(true);
         tarefa.HasOne<VersaoManual>().WithMany(x => x.Tarefas).HasForeignKey(x => new { x.IgrejaId, x.VersaoManualId }).OnDelete(DeleteBehavior.Restrict);
         tarefa.HasIndex(x => new { x.IgrejaId, x.VersaoManualId, x.OrdemExibicao }).IsUnique();
         var jornada = Base<JornadaEmbaixador>(b, "jornadas_embaixador", "progressao");
@@ -86,6 +87,10 @@ public sealed partial class AppDbContext
         conclusao.HasOne<JornadaPosto>().WithMany(x => x.Tarefas).HasForeignKey(x => new { x.IgrejaId, x.JornadaPostoId }).OnDelete(DeleteBehavior.Restrict);
         conclusao.HasOne<TarefaManual>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.TarefaManualId }).OnDelete(DeleteBehavior.Restrict);
         conclusao.HasIndex(x => new { x.IgrejaId, x.JornadaPostoId, x.TarefaManualId }).IsUnique();
+        var tarefaAplicavel = Base<TarefaAplicavelPosto>(b, "tarefas_aplicaveis_posto", "progressao");
+        tarefaAplicavel.HasOne<JornadaPosto>().WithMany(x => x.TarefasAplicaveis).HasForeignKey(x => new { x.IgrejaId, x.JornadaPostoId }).OnDelete(DeleteBehavior.Restrict);
+        tarefaAplicavel.HasOne<TarefaManual>().WithMany().HasForeignKey(x => new { x.IgrejaId, x.TarefaManualId }).OnDelete(DeleteBehavior.Restrict);
+        tarefaAplicavel.HasIndex(x => new { x.IgrejaId, x.JornadaPostoId, x.TarefaManualId }).IsUnique();
         var cerimonia = Base<CerimoniaReconhecimento>(b, "cerimonias_reconhecimento", "progressao");
         cerimonia.Property(x => x.Descricao).HasMaxLength(1000);
         cerimonia.HasOne<JornadaEmbaixador>().WithMany(x => x.Cerimonias).HasForeignKey(x => new { x.IgrejaId, x.JornadaEmbaixadorId }).OnDelete(DeleteBehavior.Restrict);

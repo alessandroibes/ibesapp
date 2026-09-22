@@ -13,7 +13,8 @@ namespace Ibes.Api.Features.Dominio;
 public static class ProgressaoEndpoints
 {
     private static IQueryable<JornadaEmbaixador> Jornadas(AppDbContext db) => db.Set<JornadaEmbaixador>()
-        .Include(j => j.Requisitos).Include(j => j.Postos).ThenInclude(p => p.Tarefas).Include(j => j.Cerimonias).AsSplitQuery();
+        .Include(j => j.Requisitos).Include(j => j.Postos).ThenInclude(p => p.Tarefas)
+        .Include(j => j.Postos).ThenInclude(p => p.TarefasAplicaveis).Include(j => j.Cerimonias).AsSplitQuery();
 
     public static void MapProgressao(this WebApplication app)
     {
@@ -22,9 +23,12 @@ public static class ProgressaoEndpoints
         {
             var manuais = await db.Set<Manual>().AsNoTracking().ToListAsync(ct);
             var versoes = await db.Set<VersaoManual>().AsNoTracking().Include(v => v.Tarefas).ToListAsync(ct);
+            var usos = await db.Set<JornadaPosto>().AsNoTracking().Where(p => p.VersaoManualId != null)
+                .GroupBy(p => p.VersaoManualId!.Value).Select(g => new { VersaoManualId = g.Key, EmAndamento = g.Count(p => p.DataConclusao == null), Concluidos = g.Count(p => p.DataConclusao != null) }).ToListAsync(ct);
             return TypedResults.Ok(versoes.Select(v => new ManualResponse(v.Id, (int)manuais.Single(m => m.Id == v.ManualId).Posto,
                 Catalogo.Nome(manuais.Single(m => m.Id == v.ManualId).Posto), v.Identificacao,
-                v.Tarefas.OrderBy(t => t.OrdemExibicao).Select(t => new TarefaResponse(t.Id, t.Nome, t.OrdemExibicao + 1)).ToList())).ToList());
+                v.Tarefas.Where(t => t.Ativa).OrderBy(t => t.OrdemExibicao).Select(t => new TarefaResponse(t.Id, t.Nome, t.OrdemExibicao + 1)).ToList(),
+                v.Versao, usos.Any(u => u.VersaoManualId == v.Id), usos.SingleOrDefault(u => u.VersaoManualId == v.Id)?.EmAndamento ?? 0, usos.SingleOrDefault(u => u.VersaoManualId == v.Id)?.Concluidos ?? 0)).ToList());
         }).RequireAuthorization(Permissoes.ConsultarProgressao).WithName("ListarVersoesManuais");
         grupo.MapGet("/manuais/tarefas-conhecidas", () =>
         {
@@ -42,6 +46,49 @@ public static class ProgressaoEndpoints
             versao.Tarefas = request.Tarefas.Select((t, i) => new TarefaManual { IgrejaId = tenant.IgrejaId, VersaoManualId = versao.Id, Nome = t.Trim(), OrdemExibicao = i }).ToList();
             db.Add(versao); await db.SaveChangesAsync(ct); return TypedResults.Created("/api/v1/manuais", new IdResponse(versao.Id, versao.Versao));
         }).RequireAuthorization(Permissoes.GerenciarManuais).WithName("CadastrarVersaoManual");
+        grupo.MapPut("/manuais/versoes/{id:guid}", async (Guid id, EditarVersaoManualRequest request, AppDbContext db, TenantContext tenant, CancellationToken ct) =>
+        {
+            var versao = await db.Set<VersaoManual>().Include(v => v.Tarefas).SingleOrDefaultAsync(v => v.Id == id, ct) ?? throw new RegistroNaoEncontradoException();
+            Operacao.ConferirVersao(versao, request.Versao);
+            Exigir(!string.IsNullOrWhiteSpace(request.Identificacao) && request.Identificacao.Length <= 150, "Informe a identificação da versão.");
+            Exigir(request.Tarefas is { Count: > 0 and <= 200 } && request.Tarefas.All(t => !string.IsNullOrWhiteSpace(t.Nome) && t.Nome.Length <= 500), "Informe tarefas válidas para a versão do manual.");
+            Exigir(request.Tarefas!.Select(t => t.Nome.Trim()).Distinct(StringComparer.OrdinalIgnoreCase).Count() == request.Tarefas.Count, "Há tarefas duplicadas nesta versão.");
+            var atuais = versao.Tarefas.Where(t => t.Ativa).ToDictionary(t => t.Id);
+            Exigir(request.Tarefas.All(t => t.Id is null || atuais.ContainsKey(t.Id.Value)), "Uma tarefa informada não pertence à versão atual.");
+            Exigir(request.Tarefas.Where(t => t.Id is not null).Select(t => t.Id!.Value).Distinct().Count() == request.Tarefas.Count(t => t.Id is not null), "Uma tarefa foi informada mais de uma vez.");
+            var removidas = atuais.Keys.Except(request.Tarefas.Where(t => t.Id is not null).Select(t => t.Id!.Value)).ToArray();
+            var postosAndamento = await db.Set<JornadaPosto>().Include(p => p.Tarefas).Include(p => p.TarefasAplicaveis)
+                .Where(p => p.VersaoManualId == id && p.DataConclusao == null).ToListAsync(ct);
+            foreach (var tarefaId in removidas)
+            {
+                atuais[tarefaId].Ativa = false;
+                atuais[tarefaId].OrdemExibicao = -10000 - Array.IndexOf(removidas, tarefaId);
+                foreach (var posto in postosAndamento)
+                {
+                    db.RemoveRange(posto.Tarefas.Where(t => t.TarefaManualId == tarefaId));
+                    db.RemoveRange(posto.TarefasAplicaveis.Where(t => t.TarefaManualId == tarefaId));
+                }
+            }
+            versao.Identificacao = request.Identificacao.Trim();
+            versao.Versao = Guid.NewGuid();
+            versao.UpdatedAt = DateTimeOffset.UtcNow;
+            foreach (var (tarefa, indice) in atuais.Values.Where(t => t.Ativa).Select((t, i) => (t, i)))
+                tarefa.OrdemExibicao = -20000 - indice;
+            await db.SaveChangesAsync(ct);
+            foreach (var (tarefa, indice) in request.Tarefas.Select((t, i) => (t, i)))
+            {
+                var entidade = tarefa.Id is { } tarefaId ? atuais[tarefaId] : new TarefaManual { IgrejaId = tenant.IgrejaId, VersaoManualId = versao.Id };
+                entidade.Nome = tarefa.Nome.Trim(); entidade.OrdemExibicao = indice; entidade.Ativa = true;
+                if (tarefa.Id is null)
+                {
+                    versao.Tarefas.Add(entidade);
+                    foreach (var posto in postosAndamento)
+                        posto.TarefasAplicaveis.Add(new TarefaAplicavelPosto { IgrejaId = tenant.IgrejaId, JornadaPostoId = posto.Id, TarefaManualId = entidade.Id });
+                }
+            }
+            await db.SaveChangesAsync(ct);
+            return TypedResults.Ok(new IdResponse(versao.Id, versao.Versao));
+        }).RequireAuthorization(Permissoes.GerenciarManuais).WithName("EditarVersaoManual");
         grupo.MapPost("/pessoas/{id:guid}/candidatura", async (Guid id, VersaoRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
         {
             var pessoa = await db.Set<Pessoa>().SingleOrDefaultAsync(p => p.Id == id, ct);
@@ -69,7 +116,7 @@ public static class ProgressaoEndpoints
                 var manual = versoes.SingleOrDefault(v => v.Id == p.VersaoManualId);
                 return new PostoResponse(p.Id, (int)p.Posto, Catalogo.Nome(p.Posto), p.DataIngresso, p.DataConclusao,
                     p.VersaoManualId, manual?.Identificacao, p.DataIngresso.AddMonths(jornada.MesesPermanencia!.Value),
-                    manual?.Tarefas.OrderBy(t => t.OrdemExibicao).Select(t => new TarefaJornadaResponse(t.Id, t.Nome, t.OrdemExibicao + 1, p.Tarefas.SingleOrDefault(c => c.TarefaManualId == t.Id)?.DataConclusao)).ToList() ?? []);
+                    manual?.Tarefas.Where(t => p.TarefasAplicaveis.Any(a => a.TarefaManualId == t.Id)).OrderBy(t => t.OrdemExibicao).Select(t => new TarefaJornadaResponse(t.Id, t.Nome, t.OrdemExibicao + 1, p.Tarefas.SingleOrDefault(c => c.TarefaManualId == t.Id)?.DataConclusao)).ToList() ?? []);
             }).ToList();
             return Results.Ok(new JornadaResponse(jornada.Id, jornada.Versao, jornada.Situacao(pessoa.DataNascimento!.Value, data),
                 FaixaEtaria(pessoa.DataNascimento.Value, data), data, jornada.MesesPermanencia,
@@ -91,8 +138,8 @@ public static class ProgressaoEndpoints
         grupo.MapPost("/pessoas/{id:guid}/jornada/admissao", async (Guid id, AdmissaoRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
         {
             var (pessoa, jornada) = await Carregar(id, request.Versao, db, tenant, relogio, ct);
-            await ValidarManual(request.VersaoManualId, Posto.Escudeiro, db, ct);
-            jornada.Admitir(request.DataAdmissao, pessoa.DataNascimento!.Value, relogio.Hoje, request.VersaoManualId, tenant.UsuarioId!.Value);
+            var manual = await CarregarManual(request.VersaoManualId, Posto.Escudeiro, db, ct);
+            jornada.Admitir(request.DataAdmissao, pessoa.DataNascimento!.Value, relogio.Hoje, manual, tenant.UsuarioId!.Value);
             await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(jornada.Id, jornada.Versao));
         }).RequireAuthorization(Permissoes.RegistrarProgressao).WithName("RegistrarAdmissao");
         grupo.MapPost("/pessoas/{id:guid}/jornada/tarefas", async (Guid id, ConcluirTarefaRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
@@ -115,9 +162,9 @@ public static class ProgressaoEndpoints
             var (pessoa, jornada) = await Carregar(id, request.Versao, db, tenant, relogio, ct);
             var atual = jornada.Atual();
             Exigir(atual.Posto != Posto.Emerito, "A conclusão do Emérito aguarda definição do manual.");
-            if (atual.Posto != Posto.Senior) await ValidarManual(request.ProximaVersaoManualId ?? Guid.Empty, atual.Posto + 1, db, ct);
+            var proximoManual = atual.Posto == Posto.Senior ? null : await CarregarManual(request.ProximaVersaoManualId ?? Guid.Empty, atual.Posto + 1, db, ct);
             var manual = await db.Set<VersaoManual>().Include(v => v.Tarefas).SingleAsync(v => v.Id == atual.VersaoManualId, ct);
-            jornada.ConcluirPosto(manual, request.DataConclusao, pessoa.DataNascimento!.Value, relogio.Hoje, request.ProximaVersaoManualId, tenant.UsuarioId!.Value);
+            jornada.ConcluirPosto(manual, request.DataConclusao, pessoa.DataNascimento!.Value, relogio.Hoje, proximoManual, tenant.UsuarioId!.Value);
             await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(jornada.Id, jornada.Versao));
         }).RequireAuthorization(Permissoes.RegistrarProgressao).WithName("ConcluirPosto");
         grupo.MapPost("/pessoas/{id:guid}/jornada/cerimonias", async (Guid id, CerimoniaRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
@@ -144,11 +191,19 @@ public static class ProgressaoEndpoints
                       where v.Id == versaoId && m.Posto == posto
                       select v.Id).AnyAsync(ct), "Selecione uma versão do manual do posto na Igreja atual.");
     }
+    private static async Task<VersaoManual> CarregarManual(Guid versaoId, Posto posto, AppDbContext db, CancellationToken ct)
+    {
+        var manual = await db.Set<VersaoManual>().Include(v => v.Tarefas).SingleOrDefaultAsync(v => v.Id == versaoId, ct);
+        Exigir(manual is not null && await (from m in db.Set<Manual>() where m.Id == manual.ManualId && m.Posto == posto select m.Id).AnyAsync(ct), "Selecione uma versão do manual do posto na Igreja atual.");
+        return manual!;
+    }
 }
 public sealed class RegistroNaoEncontradoException : Exception;
 public sealed record ManualRequest(int Posto, [property: Required, StringLength(150)] string Identificacao, [property: Required] List<string> Tarefas);
-public sealed record ManualResponse(Guid Id, int Posto, string NomePosto, string Identificacao, List<TarefaResponse> Tarefas);
+public sealed record ManualResponse(Guid Id, int Posto, string NomePosto, string Identificacao, List<TarefaResponse> Tarefas, Guid Versao, bool EmUso, int PostosEmAndamento, int PostosConcluidos);
 public sealed record TarefaResponse(Guid Id, string Nome, int Numero);
+public sealed record TarefaEdicaoRequest(Guid? Id, [property: Required, StringLength(500)] string Nome);
+public sealed record EditarVersaoManualRequest(Guid Versao, [property: Required, StringLength(150)] string Identificacao, [property: Required] List<TarefaEdicaoRequest> Tarefas);
 public sealed record ConcluirRequisitoRequest(Guid Versao, int Requisito, DateOnly DataConclusao);
 public sealed record CorrigirDataConclusaoRequest(Guid Versao, DateOnly DataConclusao);
 public sealed record AdmissaoRequest(Guid Versao, Guid VersaoManualId, DateOnly DataAdmissao);

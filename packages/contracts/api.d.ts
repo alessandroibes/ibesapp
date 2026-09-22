@@ -696,6 +696,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/manuais/versoes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["EditarVersaoManual"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pessoas/{id}/candidatura": {
         parameters: {
             query?: never;
@@ -4102,6 +4118,12 @@ export interface components {
             possuiBiblia: null | boolean;
             observacoes: null | string;
         };
+        EditarVersaoManualRequest: {
+            /** Format: uuid */
+            versao: string;
+            identificacao: string;
+            tarefas: components["schemas"]["TarefaEdicaoRequest"][];
+        };
         EleicaoRequest: {
             /** Format: uuid */
             versaoMandato: string;
@@ -4343,6 +4365,13 @@ export interface components {
             nomePosto: string;
             identificacao: string;
             tarefas: components["schemas"]["TarefaResponse"][];
+            /** Format: uuid */
+            versao: string;
+            emUso: boolean;
+            /** Format: int32 */
+            postosEmAndamento: number | string;
+            /** Format: int32 */
+            postosConcluidos: number | string;
         };
         MarcoHistoricoRequest: {
             /** Format: date */
@@ -4754,6 +4783,11 @@ export interface components {
             igrejas: components["schemas"]["IgrejaResponse"][];
         };
         SituacaoEscalacao: number;
+        TarefaEdicaoRequest: {
+            /** Format: uuid */
+            id: null | string;
+            nome: string;
+        };
         TarefaJornadaResponse: {
             /** Format: uuid */
             id: string;
@@ -5259,6 +5293,35 @@ export interface operations {
         responses: {
             /** @description Created */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    EditarVersaoManual: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditarVersaoManualRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

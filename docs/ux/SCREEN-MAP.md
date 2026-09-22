@@ -9,7 +9,7 @@ O shell apresenta somente áreas permitidas no vínculo da Igreja selecionada. I
 | Pessoas e Jornada | `/pessoas`, `/pessoas/nova`, `/pessoas/{id}`, `/pessoas/{id}/editar` | Candidatos, Embaixadores, Visitantes e Inativos; ficha, Jornada aplicável, Frequência, vínculos, histórico, inativação e reativação |
 | Conselheiros | `/conselheiros`, `/conselheiros/{id}` | listagem, cadastro simples, detalhe, edição dos dados pessoais aplicáveis, encerramento do vínculo adulto e consulta de eventual trajetória ER histórica |
 | Igreja e Embaixada | `/instituicao`, `/instituicao/editar` | resumo institucional e edição; o formulário separado de liderança será removido na Etapa 14 |
-| Manuais | `/manuais`, `/manuais/nova`, `/manuais/{id}`, rota de edição a definir na Etapa 16 | versões, tarefas e correções aprovadas |
+| Manuais | `/manuais`, `/manuais/nova`, `/manuais/{id}`, `/manuais/{id}/editar` | versões, tarefas e correções aprovadas |
 | Agenda | `/agenda`, `/agenda/nova`, `/agenda/configuracoes` | Hoje, Próximos, Lista, Mês, Ano, cadastro e configurações |
 | Atividade e reunião | `/agenda/atividades/{id}/ocorrencias/{data}`, `/agenda/reunioes/{id}/chamada` | detalhe, recorrência, roteiro e chamada |
 | Organização | `/organizacao/consulados`, `/organizacao/consulados/{id}`, `/organizacao/diretoria`, `/organizacao/mandatos/{id}` | Consulados, Cônsul, membros, Diretoria, cargos e mandatos |

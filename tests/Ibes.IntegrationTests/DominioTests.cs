@@ -297,16 +297,23 @@ public sealed class DominioTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
-    public async Task ManuaisImutaveisSemEdicaoInventadaENemManualEmerito()
+    public async Task VersaoDeManualPodeSerCorrigidaSemMigrarJornadaEAjustaPostoEmAndamento()
     {
         Assert.Equal(HttpStatusCode.BadRequest, (await Enviar("/api/v1/manuais/versoes", new ManualRequest(1, "", ["Tarefa"]))).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await Enviar("/api/v1/manuais/versoes", new ManualRequest(4, "Não definido", ["Tarefa"]))).StatusCode);
         var manual = await Manual(1);
-        await api.NaIgreja(api.IgrejaA, async db =>
-        {
-            (await db.Set<VersaoManual>().SingleAsync(v => v.Id == manual.Id)).Identificacao = "Alterada";
-            await Assert.ThrowsAsync<InvalidOperationException>(() => db.SaveChangesAsync());
-        });
+        var pessoa = await Candidato(); await ConcluirRequisitos(pessoa);
+        var jornada = await Jornada(pessoa);
+        await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa}/jornada/admissao", new AdmissaoRequest(jornada.Versao, manual.Id, new DateOnly(2024, 1, 1))));
+        var alterado = await Ler<IdResponse>(await Enviar($"/api/v1/manuais/versoes/{manual.Id}", new EditarVersaoManualRequest(manual.Versao, "Edição corrigida", [new TarefaEdicaoRequest(manual.Tarefas[1].Id, "Texto corrigido"), new TarefaEdicaoRequest(null, "Nova tarefa")]), HttpMethod.Put));
+        var atualizado = (await Ler<List<ManualResponse>>(await api.GetTenant("/api/v1/manuais", api.IgrejaA))).Single(v => v.Id == manual.Id);
+        Assert.Equal("Edição corrigida", atualizado.Identificacao); Assert.True(atualizado.EmUso); Assert.Equal(1, atualizado.PostosEmAndamento);
+        Assert.Equal(["Texto corrigido", "Nova tarefa"], atualizado.Tarefas.Select(t => t.Nome));
+        var jornadaCorrigida = await Jornada(pessoa);
+        Assert.Equal(manual.Id, jornadaCorrigida.Postos.Single().VersaoManualId);
+        Assert.Equal(["Texto corrigido", "Nova tarefa"], jornadaCorrigida.Postos.Single().Tarefas.Select(t => t.Nome));
+        Assert.Equal(HttpStatusCode.Conflict, (await Enviar($"/api/v1/manuais/versoes/{manual.Id}", new EditarVersaoManualRequest(manual.Versao, "Conflito", atualizado.Tarefas.Select(t => new TarefaEdicaoRequest(t.Id, t.Nome)).ToList()), HttpMethod.Put)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await Enviar($"/api/v1/manuais/versoes/{manual.Id}", new EditarVersaoManualRequest(alterado.Versao, "Duplicada", [new TarefaEdicaoRequest(null, "Igual"), new TarefaEdicaoRequest(null, " igual ")]), HttpMethod.Put)).StatusCode);
         var dados = await Ler<Dictionary<string, string[]>>(await api.GetTenant("/api/v1/manuais/tarefas-conhecidas", api.IgrejaA));
         Assert.Equal(3, dados.Count); Assert.All(dados.Values, tarefas => Assert.Equal(10, tarefas.Length));
     }

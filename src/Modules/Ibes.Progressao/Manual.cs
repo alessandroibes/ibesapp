@@ -43,4 +43,5 @@ public sealed class TarefaManual : Entidade
     public Guid VersaoManualId { get; set; }
     public string Nome { get; set; } = "";
     public int OrdemExibicao { get; set; }
+    public bool Ativa { get; set; } = true;
 }
