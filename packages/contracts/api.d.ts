@@ -744,6 +744,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pessoas/{id}/jornada/requisitos/{requisito}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["CorrigirDataRequisito"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pessoas/{id}/jornada/admissao": {
         parameters: {
             query?: never;
@@ -770,6 +786,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["ConcluirTarefa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pessoas/{id}/jornada/tarefas/{tarefaId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["CorrigirDataTarefa"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4046,6 +4078,12 @@ export interface components {
             embaixada: string;
             permissoes: string[];
         };
+        CorrigirDataConclusaoRequest: {
+            /** Format: uuid */
+            versao: string;
+            /** Format: date */
+            dataConclusao: string;
+        };
         CsrfResponse: {
             token: string;
         };
@@ -4720,6 +4758,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             nome: string;
+            /** Format: int32 */
+            numero: number | string;
             /** Format: date */
             dataConclusao: null | string;
         };
@@ -4727,6 +4767,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             nome: string;
+            /** Format: int32 */
+            numero: number | string;
         };
         TipoAlteracaoEscalacao: number;
         TipoAlteracaoSituacaoPessoa: number;
@@ -5311,6 +5353,36 @@ export interface operations {
             };
         };
     };
+    CorrigirDataRequisito: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+                requisito: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CorrigirDataConclusaoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
     RegistrarAdmissao: {
         parameters: {
             query?: never;
@@ -5355,6 +5427,36 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ConcluirTarefaRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdResponse"];
+                };
+            };
+        };
+    };
+    CorrigirDataTarefa: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Igreja selecionada. Exige vínculo e permissão da conta autenticada. */
+                "X-Igreja-Id": string;
+            };
+            path: {
+                id: string;
+                tarefaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CorrigirDataConclusaoRequest"];
             };
         };
         responses: {

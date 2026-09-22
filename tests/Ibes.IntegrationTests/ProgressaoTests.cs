@@ -148,4 +148,25 @@ public sealed class ProgressaoTests
         jornada.ConcluirTarefa(manual.Tarefas[0].Id, manual, data, nascimento, Hoje, Autor);
         Assert.Throws<RegraNegocioException>(() => jornada.ConcluirTarefa(manual.Tarefas[0].Id, manual, data, nascimento, Hoje, Autor));
     }
+
+    [Fact]
+    public void CorrigirDatasPreservaFatosERejeitaInconsistenciasCronologicas()
+    {
+        var nascimento = new DateOnly(2010, 1, 1);
+        var requisito = new DateOnly(2024, 1, 1);
+        var jornada = Candidato(nascimento, requisito);
+        var manual = Manual(jornada);
+        var admissao = requisito.AddDays(10);
+        jornada.Admitir(admissao, nascimento, Hoje, manual.Id, Autor);
+        jornada.ConcluirTarefa(manual.Tarefas[0].Id, manual, admissao.AddDays(1), nascimento, Hoje, Autor);
+
+        jornada.CorrigirDataRequisito(RequisitoMinimo.Tema, requisito.AddDays(-1), nascimento, Hoje);
+        jornada.CorrigirDataTarefa(manual.Tarefas[0].Id, admissao.AddDays(2), nascimento, Hoje);
+
+        Assert.Equal(requisito.AddDays(-1), jornada.Requisitos.Single(r => r.Requisito == RequisitoMinimo.Tema).DataConclusao);
+        Assert.Equal(admissao.AddDays(2), jornada.Atual().Tarefas.Single().DataConclusao);
+        Assert.Throws<RegraNegocioException>(() => jornada.CorrigirDataRequisito(RequisitoMinimo.Tema, admissao.AddDays(1), nascimento, Hoje));
+        Assert.Throws<RegraNegocioException>(() => jornada.CorrigirDataTarefa(manual.Tarefas[0].Id, admissao.AddDays(-1), nascimento, Hoje));
+        Assert.Equal(admissao, jornada.Atual().DataIngresso);
+    }
 }

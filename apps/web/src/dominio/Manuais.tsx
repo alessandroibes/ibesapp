@@ -140,10 +140,10 @@ function Detalhe({ manuais }: { manuais: Manual[] }) {
         </CardHeader>
         <CardContent>
           <ol className="lista-tarefas">
-            {m.tarefas.map((t, i) => (
+            {m.tarefas.map((t) => (
               <li key={t.id}>
-                <span>{i + 1}</span>
-                {t.nome}
+                <span>{t.numero}</span>
+                Tarefa {t.numero}: {t.nome}
               </li>
             ))}
           </ol>

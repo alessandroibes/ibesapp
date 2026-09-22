@@ -24,7 +24,7 @@ public static class ProgressaoEndpoints
             var versoes = await db.Set<VersaoManual>().AsNoTracking().Include(v => v.Tarefas).ToListAsync(ct);
             return TypedResults.Ok(versoes.Select(v => new ManualResponse(v.Id, (int)manuais.Single(m => m.Id == v.ManualId).Posto,
                 Catalogo.Nome(manuais.Single(m => m.Id == v.ManualId).Posto), v.Identificacao,
-                v.Tarefas.OrderBy(t => t.OrdemExibicao).Select(t => new TarefaResponse(t.Id, t.Nome)).ToList())).ToList());
+                v.Tarefas.OrderBy(t => t.OrdemExibicao).Select(t => new TarefaResponse(t.Id, t.Nome, t.OrdemExibicao + 1)).ToList())).ToList());
         }).RequireAuthorization(Permissoes.ConsultarProgressao).WithName("ListarVersoesManuais");
         grupo.MapGet("/manuais/tarefas-conhecidas", () =>
         {
@@ -69,7 +69,7 @@ public static class ProgressaoEndpoints
                 var manual = versoes.SingleOrDefault(v => v.Id == p.VersaoManualId);
                 return new PostoResponse(p.Id, (int)p.Posto, Catalogo.Nome(p.Posto), p.DataIngresso, p.DataConclusao,
                     p.VersaoManualId, manual?.Identificacao, p.DataIngresso.AddMonths(jornada.MesesPermanencia!.Value),
-                    manual?.Tarefas.OrderBy(t => t.OrdemExibicao).Select(t => new TarefaJornadaResponse(t.Id, t.Nome, p.Tarefas.SingleOrDefault(c => c.TarefaManualId == t.Id)?.DataConclusao)).ToList() ?? []);
+                    manual?.Tarefas.OrderBy(t => t.OrdemExibicao).Select(t => new TarefaJornadaResponse(t.Id, t.Nome, t.OrdemExibicao + 1, p.Tarefas.SingleOrDefault(c => c.TarefaManualId == t.Id)?.DataConclusao)).ToList() ?? []);
             }).ToList();
             return Results.Ok(new JornadaResponse(jornada.Id, jornada.Versao, jornada.Situacao(pessoa.DataNascimento!.Value, data),
                 FaixaEtaria(pessoa.DataNascimento.Value, data), data, jornada.MesesPermanencia,
@@ -82,6 +82,12 @@ public static class ProgressaoEndpoints
             jornada.ConcluirRequisito((RequisitoMinimo)request.Requisito, request.DataConclusao, pessoa.DataNascimento!.Value, relogio.Hoje, tenant.UsuarioId!.Value);
             await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(jornada.Id, jornada.Versao));
         }).RequireAuthorization(Permissoes.RegistrarProgressao).WithName("ConcluirRequisito");
+        grupo.MapPut("/pessoas/{id:guid}/jornada/requisitos/{requisito:int}", async (Guid id, int requisito, CorrigirDataConclusaoRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
+        {
+            var (pessoa, jornada) = await Carregar(id, request.Versao, db, tenant, relogio, ct);
+            jornada.CorrigirDataRequisito((RequisitoMinimo)requisito, request.DataConclusao, pessoa.DataNascimento!.Value, relogio.Hoje);
+            await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(jornada.Id, jornada.Versao));
+        }).RequireAuthorization(Permissoes.RegistrarProgressao).WithName("CorrigirDataRequisito");
         grupo.MapPost("/pessoas/{id:guid}/jornada/admissao", async (Guid id, AdmissaoRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
         {
             var (pessoa, jornada) = await Carregar(id, request.Versao, db, tenant, relogio, ct);
@@ -98,6 +104,12 @@ public static class ProgressaoEndpoints
             jornada.ConcluirTarefa(request.TarefaManualId, manual, request.DataConclusao, pessoa.DataNascimento!.Value, relogio.Hoje, tenant.UsuarioId!.Value);
             await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(jornada.Id, jornada.Versao));
         }).RequireAuthorization(Permissoes.RegistrarProgressao).WithName("ConcluirTarefa");
+        grupo.MapPut("/pessoas/{id:guid}/jornada/tarefas/{tarefaId:guid}", async (Guid id, Guid tarefaId, CorrigirDataConclusaoRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
+        {
+            var (pessoa, jornada) = await Carregar(id, request.Versao, db, tenant, relogio, ct);
+            jornada.CorrigirDataTarefa(tarefaId, request.DataConclusao, pessoa.DataNascimento!.Value, relogio.Hoje);
+            await db.SaveChangesAsync(ct); return TypedResults.Ok(new IdResponse(jornada.Id, jornada.Versao));
+        }).RequireAuthorization(Permissoes.RegistrarProgressao).WithName("CorrigirDataTarefa");
         grupo.MapPost("/pessoas/{id:guid}/jornada/conclusao-posto", async (Guid id, ConcluirPostoRequest request, AppDbContext db, TenantContext tenant, Relogio relogio, CancellationToken ct) =>
         {
             var (pessoa, jornada) = await Carregar(id, request.Versao, db, tenant, relogio, ct);
@@ -136,8 +148,9 @@ public static class ProgressaoEndpoints
 public sealed class RegistroNaoEncontradoException : Exception;
 public sealed record ManualRequest(int Posto, [property: Required, StringLength(150)] string Identificacao, [property: Required] List<string> Tarefas);
 public sealed record ManualResponse(Guid Id, int Posto, string NomePosto, string Identificacao, List<TarefaResponse> Tarefas);
-public sealed record TarefaResponse(Guid Id, string Nome);
+public sealed record TarefaResponse(Guid Id, string Nome, int Numero);
 public sealed record ConcluirRequisitoRequest(Guid Versao, int Requisito, DateOnly DataConclusao);
+public sealed record CorrigirDataConclusaoRequest(Guid Versao, DateOnly DataConclusao);
 public sealed record AdmissaoRequest(Guid Versao, Guid VersaoManualId, DateOnly DataAdmissao);
 public sealed record ConcluirTarefaRequest(Guid Versao, Guid TarefaManualId, DateOnly DataConclusao);
 public sealed record ConcluirPostoRequest(Guid Versao, Guid? ProximaVersaoManualId, DateOnly DataConclusao);
@@ -145,5 +158,5 @@ public sealed record CerimoniaRequest(Guid Versao, Guid JornadaPostoId, DateOnly
 public sealed record JornadaResponse(Guid Id, Guid Versao, string Situacao, string? FaixaEtaria, DateOnly DataBase, int? MesesPermanencia, bool ElegivelAdmissao, List<RequisitoResponse> Requisitos, List<PostoResponse> Postos, List<CerimoniaResponse> Cerimonias);
 public sealed record RequisitoResponse(int Requisito, string Nome, DateOnly? DataConclusao);
 public sealed record PostoResponse(Guid Id, int Posto, string Nome, DateOnly DataIngresso, DateOnly? DataConclusao, Guid? VersaoManualId, string? IdentificacaoManual, DateOnly PermanenciaAte, List<TarefaJornadaResponse> Tarefas);
-public sealed record TarefaJornadaResponse(Guid Id, string Nome, DateOnly? DataConclusao);
+public sealed record TarefaJornadaResponse(Guid Id, string Nome, int Numero, DateOnly? DataConclusao);
 public sealed record CerimoniaResponse(Guid Id, Guid JornadaPostoId, DateOnly Data, string Descricao);

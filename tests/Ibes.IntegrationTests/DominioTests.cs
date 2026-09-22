@@ -106,6 +106,41 @@ public sealed class DominioTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
+    public async Task CorrecaoDeDataDaJornadaExigeConselheiroVersaoETenantEAtualizaSomenteOFato()
+    {
+        var pessoa = await Candidato();
+        var jornada = await Jornada(pessoa);
+        var concluido = await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa}/jornada/requisitos",
+            new ConcluirRequisitoRequest(jornada.Versao, (int)RequisitoMinimo.Tema, new DateOnly(2024, 1, 1))));
+
+        var corrigido = await Ler<IdResponse>(await Enviar($"/api/v1/pessoas/{pessoa}/jornada/requisitos/{(int)RequisitoMinimo.Tema}",
+            new CorrigirDataConclusaoRequest(concluido.Versao, new DateOnly(2023, 12, 31)), HttpMethod.Put));
+        var atual = await Jornada(pessoa);
+        Assert.Equal(new DateOnly(2023, 12, 31), atual.Requisitos.Single(r => r.Requisito == (int)RequisitoMinimo.Tema).DataConclusao);
+        Assert.Equal(HttpStatusCode.Conflict, (await Enviar($"/api/v1/pessoas/{pessoa}/jornada/requisitos/{(int)RequisitoMinimo.Tema}",
+            new CorrigirDataConclusaoRequest(concluido.Versao, new DateOnly(2023, 12, 30)), HttpMethod.Put)).StatusCode);
+
+        await api.NaIgreja(api.IgrejaB, async db =>
+        {
+            db.VinculosIgreja.Add(new VinculoIgreja { IgrejaId = api.IgrejaB, UsuarioId = api.UsuarioId, Permissoes = Permissoes.Todas });
+            await db.SaveChangesAsync();
+        });
+        try
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, (await Enviar($"/api/v1/pessoas/{pessoa}/jornada/requisitos/{(int)RequisitoMinimo.Tema}",
+                new CorrigirDataConclusaoRequest(corrigido.Versao, new DateOnly(2023, 12, 30)), HttpMethod.Put, api.IgrejaB)).StatusCode);
+        }
+        finally
+        {
+            await api.NaIgreja(api.IgrejaB, async db =>
+            {
+                db.VinculosIgreja.Remove(await db.VinculosIgreja.SingleAsync());
+                await db.SaveChangesAsync();
+            });
+        }
+    }
+
+    [Fact]
     public async Task IsolamentoEntrePessoasDasDuasIgrejas()
     {
         var pessoa = await CriarPessoa(); var outra = Guid.NewGuid();

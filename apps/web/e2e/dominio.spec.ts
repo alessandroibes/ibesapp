@@ -112,6 +112,24 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
   await tarefa.getByRole("button", { name: "Salvar" }).click();
   await expect(tarefa).toHaveCount(0);
   await expect(page.getByText("Concluída em 03/01/2024")).toBeVisible();
+  await expect(
+    page.getByText("Tarefa 2: Tarefa fictícia segunda", { exact: true }),
+  ).toBeVisible();
+  const correcao = page.getByRole("form", {
+    name: "Corrigir data da Tarefa 2: Tarefa fictícia segunda",
+    exact: true,
+    includeHidden: true,
+  });
+  await correcao.locator("..").locator("summary").click();
+  await correcao.getByLabel("Data da conclusão").fill("2024-01-04");
+  await correcao.getByRole("button", { name: "Salvar data corrigida" }).click();
+  await expect(page.getByText("Concluída em 04/01/2024")).toBeVisible();
+  await correcao.getByLabel("Data da conclusão").fill("2023-12-31");
+  await correcao.getByRole("button", { name: "Salvar data corrigida" }).click();
+  await expect(
+    page.getByText("A conclusão não pode anteceder o ingresso no posto."),
+  ).toBeVisible();
+  await expect(page.getByText("Concluída em 04/01/2024")).toBeVisible();
   expect(
     (
       await new AxeBuilder({ page })
@@ -140,5 +158,5 @@ test("cadastro e admissão histórica com manual identificado e tarefa fora de o
     .getByRole("link", { name: "Visualizar" })
     .click();
   await page.getByRole("tab", { name: "Jornada" }).click();
-  await expect(page.getByText("Concluída em 03/01/2024")).toBeVisible();
+  await expect(page.getByText("Concluída em 04/01/2024")).toBeVisible();
 });

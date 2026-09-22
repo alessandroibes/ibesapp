@@ -54,6 +54,15 @@ export function Jornada({
     atualizar();
   }
 
+  async function corrigir(caminho: string, dados: Record<string, unknown>) {
+    await api(
+      `/pessoas/${pessoaId}/jornada/${caminho}`,
+      { ...dados, versao: jornada!.versao },
+      "PUT",
+    );
+    atualizar();
+  }
+
   const campoData: Campo = {
     nome: "dataConclusao",
     rotulo: "Data da conclusão",
@@ -185,6 +194,20 @@ export function Jornada({
                         />
                       </details>
                     )}
+                    {requisito.dataConclusao && podeRegistrar && (
+                      <details>
+                        <summary>Corrigir data</summary>
+                        <Formulario
+                          titulo={`Corrigir data de ${requisito.nome}`}
+                          campos={[campoData]}
+                          iniciais={{ dataConclusao: requisito.dataConclusao }}
+                          texto="Salvar data corrigida"
+                          salvar={(dados) =>
+                            corrigir(`requisitos/${requisito.requisito}`, dados)
+                          }
+                        />
+                      </details>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -292,7 +315,9 @@ export function Jornada({
                                     )}
                                   </span>
                                   <div>
-                                    <strong>{tarefa.nome}</strong>
+                                    <strong>
+                                      Tarefa {tarefa.numero}: {tarefa.nome}
+                                    </strong>
                                     <span>
                                       {tarefa.dataConclusao
                                         ? `Concluída em ${dataBr(tarefa.dataConclusao)}`
@@ -317,6 +342,25 @@ export function Jornada({
                                         />
                                       </details>
                                     )}
+                                  {tarefa.dataConclusao && podeRegistrar && (
+                                    <details>
+                                      <summary>Corrigir data</summary>
+                                      <Formulario
+                                        titulo={`Corrigir data da Tarefa ${tarefa.numero}: ${tarefa.nome}`}
+                                        campos={[campoData]}
+                                        iniciais={{
+                                          dataConclusao: tarefa.dataConclusao,
+                                        }}
+                                        texto="Salvar data corrigida"
+                                        salvar={(dados) =>
+                                          corrigir(
+                                            `tarefas/${tarefa.id}`,
+                                            dados,
+                                          )
+                                        }
+                                      />
+                                    </details>
+                                  )}
                                 </li>
                               ))}
                             </ul>

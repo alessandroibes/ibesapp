@@ -26,6 +26,19 @@ public sealed class JornadaEmbaixador : Entidade
         Requisitos.Add(new ConclusaoRequisito { IgrejaId = IgrejaId, JornadaEmbaixadorId = Id, Requisito = requisito, DataConclusao = data, RegistradoPor = autor });
     }
 
+    public void CorrigirDataRequisito(RequisitoMinimo requisito, DateOnly data, DateOnly nascimento, DateOnly hoje)
+    {
+        Exigir(Enum.IsDefined(requisito), "Requisito Mínimo inválido.");
+        ValidarFato(nascimento, data, hoje);
+        var conclusao = Requisitos.SingleOrDefault(r => r.Requisito == requisito);
+        Exigir(conclusao is not null, "Conclua o Requisito Mínimo antes de corrigir sua data.");
+        var admissao = Postos.OrderBy(p => p.DataIngresso).FirstOrDefault();
+        Exigir(admissao is null || data <= admissao.DataIngresso,
+            "A conclusão do Requisito Mínimo não pode ser posterior à admissão.");
+        conclusao!.DataConclusao = data;
+        Versao = Guid.NewGuid();
+    }
+
     public void Admitir(DateOnly data, DateOnly nascimento, DateOnly hoje, Guid versaoEscudeiroId, Guid autor)
     {
         ValidarFato(nascimento, data, hoje);
@@ -46,6 +59,19 @@ public sealed class JornadaEmbaixador : Entidade
         Exigir(data >= posto.DataIngresso, "A conclusão não pode anteceder o ingresso no posto.");
         Exigir(posto.Tarefas.All(t => t.TarefaManualId != tarefaId), "Tarefa já concluída.");
         posto.Tarefas.Add(new ConclusaoTarefa { IgrejaId = IgrejaId, JornadaPostoId = posto.Id, TarefaManualId = tarefaId, DataConclusao = data, RegistradoPor = autor });
+    }
+
+    public void CorrigirDataTarefa(Guid tarefaId, DateOnly data, DateOnly nascimento, DateOnly hoje)
+    {
+        ValidarFato(nascimento, data, hoje);
+        var posto = Postos.SingleOrDefault(p => p.Tarefas.Any(t => t.TarefaManualId == tarefaId));
+        Exigir(posto is not null, "Conclua a tarefa antes de corrigir sua data.");
+        var conclusao = posto!.Tarefas.Single(t => t.TarefaManualId == tarefaId);
+        Exigir(data >= posto.DataIngresso, "A conclusão não pode anteceder o ingresso no posto.");
+        Exigir(posto.DataConclusao is null || data <= posto.DataConclusao,
+            "A conclusão da tarefa não pode ser posterior à conclusão do posto.");
+        conclusao.DataConclusao = data;
+        Versao = Guid.NewGuid();
     }
 
     public void ConcluirPosto(VersaoManual manual, DateOnly data, DateOnly nascimento, DateOnly hoje, Guid? proximaVersaoId, Guid autor)

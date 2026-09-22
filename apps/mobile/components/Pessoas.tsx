@@ -122,6 +122,38 @@ export function Pessoas({
       setSalvando(false);
     }
   }
+  async function corrigir(caminho: string) {
+    if (!jornada || !/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+      setErro("Informe a data do fato no formato AAAA-MM-DD.");
+      return;
+    }
+    setSalvando(true);
+    setErro("");
+    setMensagem("");
+    try {
+      const r = await fetch(`${api}/api/v1/pessoas/${id}/jornada/${caminho}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-Igreja-Id": igrejaId,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ versao: jornada.versao, dataConclusao: data }),
+      });
+      if (!r.ok) {
+        const problema = await r.json().catch(() => ({}));
+        throw new Error(problema.title ?? "Não foi possível corrigir a data.");
+      }
+      setMensagem("Data corrigida.");
+      setRevisao((valor) => valor + 1);
+    } catch (e) {
+      setErro(
+        e instanceof Error ? e.message : "Não foi possível corrigir a data.",
+      );
+    } finally {
+      setSalvando(false);
+    }
+  }
   const botao = (titulo: string, acao: () => void, desabilitado = false) => (
     <Pressable
       accessibilityRole="button"
@@ -272,6 +304,14 @@ export function Pessoas({
                   () => void concluir("requisitos", { requisito: r.requisito }),
                   salvando,
                 )}
+              {!!r.dataConclusao &&
+                permissoes.includes("progressao.registrar") &&
+                !pessoa?.conselheiroVigente &&
+                botao(
+                  `Corrigir data de ${r.nome}`,
+                  () => void corrigir(`requisitos/${r.requisito}`),
+                  salvando,
+                )}
             </View>
           ))}
           {jornada.postos.map((p) => (
@@ -289,15 +329,24 @@ export function Pessoas({
               {p.tarefas.map((t) => (
                 <View key={t.id}>
                   <Text>
-                    {t.nome} · {t.dataConclusao ?? "Pendente"}
+                    Tarefa {t.numero}: {t.nome} ·{" "}
+                    {t.dataConclusao ?? "Pendente"}
                   </Text>
                   {!t.dataConclusao &&
                     !p.dataConclusao &&
                     permissoes.includes("progressao.registrar") &&
                     !pessoa?.conselheiroVigente &&
                     botao(
-                      `Concluir ${t.nome}`,
+                      `Concluir Tarefa ${t.numero}: ${t.nome}`,
                       () => void concluir("tarefas", { tarefaManualId: t.id }),
+                      salvando,
+                    )}
+                  {!!t.dataConclusao &&
+                    permissoes.includes("progressao.registrar") &&
+                    !pessoa?.conselheiroVigente &&
+                    botao(
+                      `Corrigir data da Tarefa ${t.numero}: ${t.nome}`,
+                      () => void corrigir(`tarefas/${t.id}`),
                       salvando,
                     )}
                 </View>

@@ -64,3 +64,94 @@ test("consulta autenticada e troca de Igreja não mantém ficha anterior", async
     ),
   );
 });
+
+test("exibe numeração e corrige data de tarefa concluída", async () => {
+  const fetcher = jest
+    .fn()
+    .mockImplementation((url: string, init?: RequestInit) => {
+      if (init?.method === "PUT")
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      if (url.endsWith("/pessoas?p") || url.includes("/pessoas?"))
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            total: 1,
+            pessoas: [{ id: "p1", nome: "Daniel" }],
+          }),
+        });
+      if (url.endsWith("/pessoas/p1"))
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            id: "p1",
+            possuiJornada: true,
+            conselheiroVigente: false,
+            dados: { nome: "Daniel", dataNascimento: "2010-01-01" },
+            responsaveis: [],
+          }),
+        });
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          id: "j1",
+          versao: "v1",
+          situacao: "Embaixador",
+          mesesPermanencia: 12,
+          requisitos: [],
+          postos: [
+            {
+              id: "posto",
+              nome: "Embaixador Escudeiro",
+              dataIngresso: "2024-01-01",
+              dataConclusao: null,
+              identificacaoManual: "Edição",
+              tarefas: [
+                {
+                  id: "t1",
+                  numero: 1,
+                  nome: "Os postos",
+                  dataConclusao: "2024-01-02",
+                },
+              ],
+            },
+          ],
+          cerimonias: [],
+        }),
+      });
+    });
+  global.fetch = fetcher;
+  render(
+    <Pessoas
+      api="https://api.test"
+      token="token"
+      igrejaId="a"
+      permissoes={[
+        "pessoas.consultar",
+        "progressao.consultar",
+        "progressao.registrar",
+      ]}
+    />,
+  );
+  fireEvent.press(await screen.findByRole("button", { name: "Daniel" }));
+  expect(
+    await screen.findByText("Tarefa 1: Os postos · 2024-01-02"),
+  ).toBeTruthy();
+  fireEvent.changeText(
+    screen.getByLabelText("Data do fato (AAAA-MM-DD)"),
+    "2024-01-03",
+  );
+  fireEvent.press(
+    screen.getByRole("button", {
+      name: "Corrigir data da Tarefa 1: Os postos",
+    }),
+  );
+  await waitFor(() =>
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://api.test/api/v1/pessoas/p1/jornada/tarefas/t1",
+      expect.objectContaining({
+        method: "PUT",
+        body: JSON.stringify({ versao: "v1", dataConclusao: "2024-01-03" }),
+      }),
+    ),
+  );
+});
